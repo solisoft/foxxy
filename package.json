@@ -1,0 +1,24 @@
+{
+  "name": "foxx-framework",
+  "version": "0.0.1",
+  "description": "Foxx framework based on RiotJS + ArangoDB/Foxx",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solisoft/foxx-framework.git"
+  },
+  "keywords": [
+    "Foxx",
+    "ArangoDB",
+    "RiotJS"
+  ],
+  "author": "Olivier BONNAURE <olivier@solisoft.net> (http://solisoft.net)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/solisoft/foxx-framework/issues"
+  },
+  "homepage": "https://github.com/solisoft/foxx-framework#readme"
+}

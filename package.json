@@ -1,10 +1,14 @@
 {
   "name": "foxx-framework",
-  "version": "0.0.1",
+  "preferGlobal": "true",
+  "version": "0.0.3",
   "description": "Foxx framework based on RiotJS + ArangoDB/Foxx",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "foxxy": "./bin/foxxy"
   },
   "repository": {
     "type": "git",
@@ -22,9 +26,10 @@
   },
   "homepage": "https://github.com/solisoft/foxx-framework#readme",
   "dependencies": {
-    "jquery": "^3.1.0",
-    "riot": "^2.5.0",
-    "select2": "^4.0.3",
-    "uikit": "^2.26.4"
+    "colors": "^1.1.2",
+    "hasbin": "^1.2.3",
+    "js-yaml": "^3.6.1",
+    "pluralize": "^3.0.0",
+    "yargs": "^5.0.0"
   }
 }

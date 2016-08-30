@@ -13,7 +13,7 @@ request({
     text: `Hi,
 
 To confirm your email address, please clik on the link below :
-https://board.plugandwork.net/login#confirm/${params.uuid}
+https://${module.context.configuration.domain}/#confirm/${params.uuid}
 
 If you don't know about this email, please ignore it
 

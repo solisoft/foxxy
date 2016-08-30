@@ -112,15 +112,16 @@ hasbin('foxx-manager', function(result) {
                 if(error) console.log(error.red)
                 if(stdout) console.log(stdout.green)
                 if(stderr) console.log(stderr.red)
-                
-                deleteFolderRecursive(path.join(process.cwd(), "foxx_tmp"))
+                deleteFolderRecursive(path.join(process.cwd(), argv._[1]+"/foxx_tmp"))
                 
                 // Set dev mode
                 var cmd = `foxx-manager development /auth --server.endpoint ${argv.endpoint} --server.database ${argv.database} --server.username ${argv.user} ${password}`
                 exec(cmd, function(error, stdout, stderr) {
                   console.log("App Created ! Grrrrr!".green)
-                  console.log("\nNow create a symlink to your arangodb app path from your app foxx folder")
-                  var cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
+                  console.log("\nNow move auth foxx app and create a symlink to your arangodb app path from your app foxx folder")
+                  var cmd = `mv /usr/local/var/lib/arangodb3-apps/_db/${argv.database}/* ${path.join(process.cwd(), argv._[1] + "/foxx")}`
+                  console.log(cmd.cyan)
+                  cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
                   console.log(cmd.cyan)
                   cmd = `ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
                   console.log(cmd.cyan)
@@ -139,14 +140,8 @@ hasbin('foxx-manager', function(result) {
         if(argv._.length != 3) {
           console.log("Usage : foxxy g <type> <model>".red)
         } else {
-          var action;
-          if(argv._[1] === "crud") {
-            action = "crud";
-          }
-          if(argv._[1] === "eu") {
-            action = "eu";
-          }
-
+          var action = argv._[1];
+          if(["crud", "eu", "basic"].indexOf(action) < 0) throw "No action found ! Please check manual..."
           var model = argv._[2]
           var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
           // First install foxx service

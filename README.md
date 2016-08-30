@@ -1,5 +1,7 @@
 # foxx-framework
 
+foxx-framework is a simple tool which help you starting with your single page application using ArangoDB / Foxx for backend and API, riotjs for views and brunch to build your assets.
+
 ## Prerequisite
 
 - ArangoDB 3.0.5
@@ -10,12 +12,6 @@
 ## Installation
 
 `$ npm install foxx-framework`
-
-# Creating a new application
-
-`$ foxxy new demo_app`
-
-This will create a new folder named 'demo_app' which will contain everything you need to start your new app.
 
 ## Configurating application
 
@@ -47,6 +43,18 @@ Please note that my local Nginx is running on port 8080. Adapt your configuratio
 The `public` folder will be created using the `brunch w` command.
 
 Edit your `/etc/hosts` file to point your .dev domain name to your 127.0.0.1 loopback address.
+
+### Symlink to your foxx folder
+
+To simplify your work, create a symlink from your 
+
+# Creating a new application
+
+First create a database called `demoapp` within ArangoDB Web UI
+
+`$ foxxy new demo_app --database demoapp`
+
+This will create a new folder named 'demo_app' which will contain everything you need to start your new app.
 
 # Creating your first CRUD
 

@@ -1,7 +1,7 @@
 {
-    "name": "users",
+    "name": "Auth",
     "version": "0.0.7",
-    "description": "User login",
+    "description": "Auth",
     "engines": {
         "arangodb": "^3.0.0"
     },

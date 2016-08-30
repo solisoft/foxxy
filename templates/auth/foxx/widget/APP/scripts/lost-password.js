@@ -9,10 +9,10 @@ request({
     from: module.context.configuration.mailgun_from,
     to: params.to,
     subject: "Lost password",
-    text: `Bonjour,
+    text: `Hi,
 
 You asked to change your password. Please follow instruction on link below :
-http://enter.your.urk/login#change_password/${params.uuid}
+http://${module.context.configuration.domain}/login#change_password/${params.uuid}
 
 Best,
 Foxxy App`

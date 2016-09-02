@@ -126,14 +126,7 @@ router.post('/signup', function (req, res) {
     delete user.password;
     delete user.password_confirmation;
     
-    // Create an organisation
-    let organisation = { n: user.company }
-    const meta_org = organisations.save(organisation)
-    Object.assign(organisation, meta_org);
-
-    user.organisation_id = org._key;
     user.email_code = uuid;
-    user.role = "provisoire";
     delete user.company;
     
     const meta = users.save(user);    

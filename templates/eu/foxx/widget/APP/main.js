@@ -19,9 +19,14 @@ module.context.use(router);
 var fields = []
 var schema = {}
 
-var loadFields = function() {
+// Comment this block if you want to avoid authorization
+module.context.use(function (req, res, next) {
+  if(!req.session.uidd) res.throw('unauthorized')
+  next();
+});
 
-  // r: new row; c: classname; n: name/id; t: type; j: joi validation; l: label; d: data list
+var loadFields = function() {
+  // { r: new_row, c: classname, n: name/id, t: type, j: joi validation, l: label, d: data list }
   fields = [
   ]
   schema = {}
@@ -32,14 +37,12 @@ var loadFields = function() {
 loadFields()
 
 router.get('/', function (req, res) {
-  if(!req.session.uid) res.throw('unauthorized')
   loadFields();
   res.send({ fields: fields, data: db._query("FOR doc IN @@collection RETURN doc", { "@collection": collName})._documents[0] });
 })
 .description('Returns first @{{object}}');
 
 router.get('/check_form', function (req, res) {
-  if(!req.session.uid) res.throw('unauthorized')
     var errors = []
   try {
     errors = joi.validate(JSON.parse(req.queryParams.data), schema, { abortEarly: false }).error.details
@@ -49,7 +52,6 @@ router.get('/check_form', function (req, res) {
 .description('Check the form for live validation');
 
 router.post('/:id', function (req, res) {
-  if(!req.session.uid) res.throw('unauthorized')
   var obj = collection.document(req.pathParams.id)
   var data = {}
   each(fields, function(f) {data[f.n] = req.body[f.n]})

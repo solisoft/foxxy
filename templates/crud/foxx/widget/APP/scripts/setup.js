@@ -11,3 +11,8 @@ if (!db._collection(collection)) {
 if (!db._collection("sessions")) {
   db._createDocumentCollection("sessions");
 }
+
+db._collection("@{{objects}}").ensureIndex({
+  type: 'fulltext',
+  fields: ['search']
+});

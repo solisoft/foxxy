@@ -33,5 +33,5 @@ $(function() {
   })
   
   riot.route.start(true)
-  riot.mount("*")
+  //riot.mount("*")
 })

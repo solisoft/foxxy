@@ -11,6 +11,10 @@ var pluralize = require('pluralize');
 var colors = require('colors');
 
 
+var copyFileSync = function(src, dest) {
+  fs.writeFileSync(dest, fs.readFileSync(src, { encoding: "utf8" }));
+}
+
 /**
  * Look ma, it's cp -R.
  * @param {string} src The path to the thing to copy.
@@ -28,7 +32,8 @@ var copyRecursiveSync = function(src, dest, model) {
                         model);
     });
   } else {
-    fs.linkSync(src, dest);
+
+    copyFileSync(src, dest);
     if(model !== undefined) {
       replaceInFile(dest, /@\{\{object\}\}/g, model)
       replaceInFile(dest, /@\{\{objects\}\}/g, pluralize(model))
@@ -165,9 +170,10 @@ hasbin('foxx-manager', function(result) {
             exec(cmd, function(error, stdout, stderr) {})
             
             // Widget  
+            console.log("Creating widget " + model)
             var src_file = path.join(__dirname, `../templates/${action}/riot/widget.html.tag`);
             var dest_file = path.join(process.cwd(), `app/widgets/${pluralize(model)}.html.tag`);
-            fs.linkSync(src_file, dest_file)
+            copyFileSync(src_file, dest_file)
             replaceInFile(dest_file, /@\{\{object\}\}/g, model)
             replaceInFile(dest_file, /@\{\{objects\}\}/g, pluralize(model))
             
@@ -179,7 +185,6 @@ hasbin('foxx-manager', function(result) {
 
             // Router
             dest_file= path.join(process.cwd(), `app/js/js.js`);
-
             src_file = path.join(__dirname, `../templates/${action}/router/router.js`)
             try {
               fs.statSync(src_file)

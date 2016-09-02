@@ -48,7 +48,6 @@ router.get('/page/:page', function (req, res) {
 .description('Returns all objects');
 
 router.get('/search/:term', function (req, res) {
-  // The search field 
   res.send({ data: db._query(`
     FOR u IN FULLTEXT(@@collection, 'search', @term)
     LIMIT 100

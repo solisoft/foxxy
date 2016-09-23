@@ -18,7 +18,7 @@
     <div class="uk-grid">
       <div class="uk-width-medium-2-10 uk-width-small-1-10"></div>
       <div class="content uk-width-medium-6-10 uk-width-small-8-10">
-        <h1 class="uk-contrast"><i class="uk-icon-sign-in"></i> Connection</h1>
+        <h1 class="uk-margin-large-top"><i class="uk-icon-sign-in"></i> Connection</h1>
         <form class="uk-form uk-margin-top"  onsubmit="{ save_form }">
 
 
@@ -69,7 +69,7 @@
     <div class="uk-grid">
       <div class="uk-width-medium-2-10 uk-width-small-1-10"></div>
       <div class="content uk-width-medium-6-10 uk-width-small-8-10">
-        <h1 class="uk-contrast"><i class="uk-icon-sign-in"></i> Creating an account</h1>
+        <h1 class="uk-margin-large-top"><i class="uk-icon-sign-in"></i> Creating an account</h1>
         <form class="uk-form uk-margin-top" id="form_signup"  onsubmit="{ save_form }">
             <div class="uk-form-row">
               <input type="text" placeholder="Company" class="uk-width-1-1" id="company" name="company" value="" required='true'>

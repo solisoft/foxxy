@@ -5,6 +5,8 @@ $(function() {
     riot.mount('div#app', 'loading')
   })
 
+  riot.route('/welcome', function(name) {riot.mount('div#app', 'welcome') })
+  
   riot.route('/login', function(name) {riot.mount('div#app', 'login') })
   riot.route('/signup', function(name) {riot.mount('div#app', 'signup') })
 

@@ -9,8 +9,17 @@
       if(d.username === null) document.location.href="login.html"; 
       else {
         // Load the widget you want
-        // riot.route('/my-app')
+        riot.route('/welcome')
       }
     })
   </script>
 </loading>
+
+<welcome>
+
+  <h1>Welcome aboard</h1>
+  <p>This is a landing page ... Nothing special here, replace it by what you want !</p>
+
+  <p>Find me in <code>app/widgets/loading.html.tag</code></p>
+
+</welcome>

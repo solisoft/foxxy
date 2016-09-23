@@ -56,6 +56,11 @@ First create a database called `demoapp` within ArangoDB Web UI
 
 This will create a new folder named 'demo_app' which will contain everything you need to start your new app.
 
+## Install depedencies
+
+`cd demo_app`
+`npm install`
+
 # Creating your first CRUD
 
 `$ foxxy g crud post` 

@@ -17,6 +17,12 @@ module.exports = {
       fs.createReadStream('node_modules/uikit/dist/js/components/pagination.js').pipe(fs.createWriteStream('app/vendors/uikit-pagination.js'));
       fs.createReadStream('node_modules/uikit/dist/js/components/form-select.js').pipe(fs.createWriteStream('app/vendors/uikit-form-select.js'));
       fs.createReadStream('node_modules/uikit/dist/js/components/datepicker.js').pipe(fs.createWriteStream('app/vendors/uikit-datepicker.js'));
+
+      fs.createReadStream('node_modules/uikit/dist/fonts/fontawesome-webfont.ttf').pipe(fs.createWriteStream('app/assets/fonts/fontawesome-webfont.ttf'));
+      fs.createReadStream('node_modules/uikit/dist/fonts/fontawesome-webfont.woff').pipe(fs.createWriteStream('app/assets/fonts/fontawesome-webfont.woff'));
+      fs.createReadStream('node_modules/uikit/dist/fonts/fontawesome-webfont.woff2').pipe(fs.createWriteStream('app/assets/fonts/fontawesome-webfont.woff2'));
+      fs.createReadStream('node_modules/uikit/dist/fonts/FontAwesome.otf').pipe(fs.createWriteStream('app/assets/fonts/FontAwesome.otf'));
+      
       fs.createReadStream('node_modules/select2/dist/js/select2.js').pipe(fs.createWriteStream('app/vendors/select2.js'));
       end();
     }

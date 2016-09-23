@@ -2,7 +2,7 @@ $(function() {
 
   riot.route('/', function(name) {
     // Here set the / mount
-    // riot.mount('div#app', 'loading')
+    riot.mount('div#app', 'loading')
   })
 
   riot.route('/login', function(name) {riot.mount('div#app', 'login') })

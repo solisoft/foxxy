@@ -82,7 +82,7 @@ hasbin('foxx-manager', function(result) {
       console.log("# Widgets are : [crud, eu, hcrud]");
       console.log("## crud : a basic CRUD widget");
       console.log("## eu : a basic Edit/Update widget");
-      console.log("## hcrud : a CRUD widget within a Hierachical structure (tree)");
+      //console.log("## hcrud : a CRUD widget within a Hierachical structure (tree)");
     } else {
       // Create a new application
       if(argv._[0] == "new") {

@@ -37,7 +37,11 @@
       var url = "/_db/{{DBNAME}}/";
       var per_page = 25;
       var common = require("js/common.js");
+      require("vendors/select2.js");
       require("vendors/uikit-pagination.js");
+      require("vendors/uikit-form-select.js");
+      require("vendors/uikit-datepicker.js");
+      
       common.init();
       require("widgets/loading.html.tag");
       /*@{{riot_components}}*/

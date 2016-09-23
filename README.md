@@ -11,7 +11,7 @@ foxx-framework is a simple tool which help you starting with your single page ap
 
 ## Installation
 
-`$ npm install foxx-framework`
+`$ npm install foxx-framework -g` 
 
 ## Configurating application
 

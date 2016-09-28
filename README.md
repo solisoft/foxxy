@@ -70,3 +70,19 @@ This will create a new folder named 'demo_app' which will contain everything you
 Please use singular for your model name.
 
 Ok now you have your first CRUD created. 
+
+# Compile the app
+
+## Dev mode
+
+`brunch w` will start the live reloader
+
+# Deployment
+
+To deploy your app, you'll need `ruby` and `mina gem`
+
+Check `config/deploy.rb` and adapt it to your needs.
+
+Then run : `$ mina deploy` 
+
+It will compile assets for production env and deploy code (app & Foxx services)

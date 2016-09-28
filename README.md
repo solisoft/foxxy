@@ -16,6 +16,7 @@ foxx-framework is a simple tool which help you starting with your single page ap
 ## Configurating application
 
 ````
+$ foxxy new demo_app --database demoapp
 $ cd demo_app/
 $ npm install
 ````

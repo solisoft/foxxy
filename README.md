@@ -59,9 +59,9 @@ This will create a new folder named 'demo_app' which will contain everything you
 
 ## Install depedencies
 
-`cd demo_app`
+`$ cd demo_app`
 
-`npm install`
+`$ npm install`
 
 # Creating your first CRUD
 
@@ -75,7 +75,7 @@ Ok now you have your first CRUD created.
 
 ## Dev mode
 
-`brunch w` will start the live reloader
+`$ brunch w` will start the live reloader
 
 # Deployment
 

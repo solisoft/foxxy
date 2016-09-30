@@ -21,7 +21,7 @@ var schema = {}
 
 // Comment this block if you want to avoid authorization
 module.context.use(function (req, res, next) {
-  if(!req.session.uidd) res.throw('unauthorized')
+  if(!req.session.uid) res.throw('unauthorized')
   next();
 });
 

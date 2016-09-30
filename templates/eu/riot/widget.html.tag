@@ -14,7 +14,7 @@
     
     common.checkLogin()
 
-    $.get(url + "@{{object}}/", function(d) {
+    $.get(url + "@{{objects}}/", function(d) {
       _this.obj = d.data      
       common.buildForm(_this.obj, d.fields, '#form_@{{object}}')
     })

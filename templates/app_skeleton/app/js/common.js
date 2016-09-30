@@ -51,9 +51,9 @@ var Common = {
     html += '</div>'
     html += '<hr><div class="uk-grid uk-grid-small uk-text-right"><div class="uk-width-1-1">'
     if (back_str != undefined) {
-      html += '<a href="/#'+ back_str +'" class="uk-button">Retour</a> '
+      html += '<a href="/#'+ back_str +'" class="uk-button"><i class="uk-icon-chevron-left"></i> Back</a> '
     }
-    html += '<button class="uk-button uk-button-success">Enregistrer</button></div></div><hr>'
+    html += '<button class="uk-button uk-button-success"><i class="uk-icon-save"></i> Save</button></div></div><hr>'
 
     $(formId).html(html)
     riot.update()

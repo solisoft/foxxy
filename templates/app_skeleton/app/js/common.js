@@ -26,6 +26,8 @@ var Common = {
       else {
         if (l.r && i > 0) html += '</div>'
         if (l.r) html += '<div class="uk-grid uk-grid-small">'
+        if (l.c.indexOf("uk-width") == -1) l.c = "uk-width-" + l.c
+
         html += '<div class="'+ l.c +'">'
         if (l.j._flags.presence === "required") {
           l.l = "<strong>" + l.l + "*</strong>"

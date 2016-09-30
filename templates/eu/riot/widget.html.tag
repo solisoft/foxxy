@@ -7,7 +7,7 @@
   <script>    
     save_form(e) {
       common.checkLogin()
-      common.saveForm("form_@{{objects}}", "@{{object}}", _this.obj._key)
+      common.saveForm("form_@{{objects}}", "@{{objects}}", _this.obj._key)
     }
 
     var _this = this;    

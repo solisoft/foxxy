@@ -63,20 +63,8 @@ var Common = {
 
   checkLogin: function checkLogin() {
     $.get(url + "auth/whoami", function(d) {
-      if(d.username === null) riot.route('/login');
-    })
-  },
-
-  checkLoginAndRedirect: function checkLogin() {
-    $.get(url + "auth/whoami", function(d) {
       if(d.username === null) document.location.href = "login.html";
     })
-  },
-
-  average: function (arr) {
-    return _.reduce(arr, function(memo, num) {
-      return memo + num;
-    }, 0) / (arr.length === 0 ? 1 : arr.length);
   },
 
   checkForm: function(formID, path, callback) {    

@@ -111,9 +111,12 @@
           <p>Notice that in my case Nginx run on port 8080. Open now <a href="http://sampleapp.dev:8080/" target="_blank">http://sampleapp.dev:8080/</a> in your browser.</p>
           
           <h4>Setup the application</h4>
-          <p>Create an account within the UI and validate it by adding the field <em>{ "a": true }</em> to your user object (via ArangoDB UI). So next you'll login it will be OK.</p>
 
           <p>Open the ArangoDB web UI and go to your database. Open services tab and go to the auth service. Click on the Settings link and set your mailgun credential (Used for sending emails verifications).</p>
+
+          <p>Create an account within the app UI and validate it by adding the field <em>{ "a": true }</em> to your user object (via ArangoDB UI). So next time you'll login it will be OK.</p>
+
+          
 
 
         </div>
@@ -191,32 +194,44 @@
       </div>
 
       <div class="uk-grid">
-        <div class="uk-width-1-2">
+        <div class="uk-width-1-1">
           <h4>Command</h4>
           <code>foxxy g crud post</code>
           <br>
-          <p>It will create you a Foxx service called posts and will also create a RiotJS widgets called <em>app/widgets/posts.html.tag</em></p>
+          <p>It will create a Foxx service called posts and will also create a RiotJS widgets called <em>app/widgets/posts.html.tag</em></p>
 
-          <p><img src="ui/1.jpg" alt=""></p>
-          <p><img src="ui/2.jpg" alt=""></p>
-          <p><img src="ui/3.jpg" alt=""></p>
-          <p><img src="ui/4.jpg" alt=""></p>
-          <p><img src="ui/5.jpg" alt=""></p>
+          
+        </div>
+      </div>
+      <div class="uk-grid">
+        <div class="uk-width-1-2">
+          <p>Once CRUD created open <em>foxx/posts/APP/main.js</em> at line 30 (line 3 on the code below) ...</p>
+          <script src="https://gist.github.com/solisoft/ce8fe6fa04efe398abb884bdc41c1d21.js"></script>
         </div>
         <div class="uk-width-1-2">
-          <h4>Configure</h4>
-          <p>Once CRUD created open <em>foxx/posts/APP/main.js</em> at line 30 (line 3 on the code below) ...</p>
-
-          <script src="https://gist.github.com/solisoft/ce8fe6fa04efe398abb884bdc41c1d21.js"></script>
-
-          ... and define your model.
+          <p>... and define your model.</p>
           <script src="https://gist.github.com/solisoft/6d241d0a9f3e1a8f7a997392f89135b1.js"></script>
-
+        </div>
+      </div>
+      <div class="uk-grid">
+        <div class="uk-width-1-1">
           <h4>Activating Search functionality</h4>
           To activate search functionnality you have to define first your <em>search</em> content. Go to line 86 and 96 and replace comment by :
           <p><code>data.search = [data.title, data.text, data.date].join(" ")</code></p>
           <p>So when you'll create or modify your object, the search field will be up to date. You can start using the search bar and press enter to filter your content using the full text search engine.</p>
         </div>
+      </div>
+      
+      <div class="uk-grid">
+
+        <div class="uk-width-1-1"><h2>Screenshots</h2></div>
+      
+        <div class="uk-width-1-2"><img src="ui/1.jpg" alt=""></div>
+        <div class="uk-width-1-2"><img src="ui/2.jpg" alt=""></div>
+        <div class="uk-width-1-2"><img src="ui/3.jpg" alt=""></div>
+        <div class="uk-width-1-2"><img src="ui/4.jpg" alt=""></div>
+        <div class="uk-width-1-2"><img src="ui/5.jpg" alt=""></div>
+        
       </div>
 
 
@@ -224,9 +239,10 @@
     </div>
     
     <div class="foxx uk-margin-top">
-      <div class="uk-container uk-container-center uk-margin-top">
+      <div class="uk-container uk-container-center">
         <div class="uk-grid">
-          <div class="uk-width-1-1">
+          <div class="uk-width-1-1 uk-text-center">
+            <p>foxx-framework is created by Olivier BONNAURE - <a href="https://github.com/solisoft/foxx-framework" target="_blank">github repository</a></p>
           </div>
         </div>
       </div>

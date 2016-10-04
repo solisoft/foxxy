@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Foxx-framework</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.1/css/uikit.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300" rel="stylesheet">
+    <link rel="stylesheet" href="css.css"> 
+    
+  </head>
+  <body>
+    
+    <nav class="uk-navbar">
+      <div class="uk-container uk-container-center">
+        <ul class="uk-navbar-nav">
+          <li class="uk-active"><a href="#">Foxx Framework</a></li>
+        </ul>
+        <div class="uk-navbar-flip">
+          <ul class="uk-navbar-nav">
+            <li><a href="#start">Getting Started</a></li>
+            <li><a href="#why">Why?</a></li>
+            
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    
+    <div class="foxx">
+      <div class="uk-container uk-container-center">
+        <div class="uk-grid">
+          <div class="uk-width-1-2">
+            <img src="foxx.jpg" alt="">
+          </div>
+          <div class="uk-width-1-2 uk-margin-top">
+            <h1>Be smart ! Save time by using microservices !!</h1>
+            <h2>Foxx-Framework is built on ArangoDB database and Foxx services.</h2>
+            <h3>Create apps, develop and deploy with ease.</h3>
+          </div>
+        </div>
+      </div>  
+    </div>
+    <div class="uk-container uk-container-center uk-margin-top">
+      <div class="uk-grid">
+        <div class="uk-width-1-1">
+          <a name="start"> <h1>Why?</h1> </a>
+          <p>I wanted to create a tool for building web applications easily using Foxx &amp; ArangoDB. I also wanted to have an easy way to build, develop my app and deploy it with ease. So I did create <strong>foxx-framework</strong> !
+          <br>
+          With <strong>foxx-framework</strong> you can create new skeleton apps with everything configurated. It comes with :
+          <ul>
+            <li><strong>brunch</strong> for live reload and building assets for production</li>
+            <li><strong>Riotjs</strong> for building web apps and widgets.</li>
+            <li><strong>UIKit</strong> for designing views.</li>
+          </ul>
+          </p>
+          <hr>
+        </div>
+      </div>
+      <div class="uk-grid">
+        <div class="uk-width-1-1">
+          <a name="start"> <h1>Get Started.</h1> </a>
+        </div>
+        <div class="uk-width-1-2">
+          
+          <h2>Install requirements</h2>
+          <p><strong>Foxx-framework</strong> needs nodejs and npm installed. <strong>ArangoDB</strong> of course is needed.</p>
+
+          <p>To deploy your application, you'll need Ruby too.</p>
+        </div>
+        <div class="uk-width-1-2">
+          <h2>Install foxx-framework</h2>
+          <code>npm install foxx-framework -g</code>
+        </div>
+      </div>
+      <div class="uk-grid">
+        <div class="uk-width-1-1">
+          <h2>Create your first app</h2>
+          <p>You need first to create an database within ArangoDB web UI.</p>
+        </div>
+      </div>
+      <div class="uk-grid">
+        <div class="uk-width-1-2">
+          
+          <code>foxxy new sample_app --database my_test_db</code>
+          <p>
+            This action below will create the skeleton app with a simple login authentification.
+          </p>
+          <code>cd sample_app && npm install</code>
+          <p>This will install everything you need to run the application.</p>
+
+          <h4>Now configure nginx</h4>
+          To make it work properly, we will use Nginx 
+          <br><code>brew install nginx</code> If needed.
+          
+          <p>Edit your nginx.conf file and set : </p>
+          <pre>server {
+    listen       8080;
+    server_name  sampleapp.dev;
+
+    location / {
+        root   /path/to/your/folder/public/;
+        index  index.html index.htm;
+    }
+
+    location /_db {
+            allow all;
+            proxy_pass http://127.0.0.1:8529/_db;
+    }
+}</pre>
+
+          <p>Notice that in my case Nginx run on port 8080.</p>
+
+        </div>
+        <div class="uk-width-1-2">
+          <pre>
+└── sample_app
+    ├── Gemfile
+    ├── app
+    │   ├── assets
+    │   │   ├── fonts
+    │   │   ├── img
+    │   │   ├── index.html
+    │   │   └── login.html
+    │   ├── css
+    │   │   └── css.scss
+    │   ├── js
+    │   │   ├── common.js
+    │   │   └── js.js
+    │   ├── vendors
+    │   │   └── uikit
+    │   │       └── css
+    │   │           ├── 00_uikit.almost-flat.css
+    │   │           └── components
+    │   │               ├── datepicker.gradient.css
+    │   │               ├── form-select.gradient.css
+    │   │               └── notify.gradient.css
+    │   └── widgets
+    │       ├── loading.html.tag
+    │       └── login.html.tag
+    ├── brunch-config.js
+    ├── config
+    │   ├── deploy.rb
+    │   └── local_env.yml.sample
+    ├── foxx
+    │   ├── auth
+    │   │   └── APP
+    │   │       ├── README.md
+    │   │       ├── main.js
+    │   │       ├── manifest.json
+    │   │       ├── package.json
+    │   │       ├── scripts
+    │   │       │   ├── lost-password.js
+    │   │       │   ├── send-mail.js
+    │   │       │   └── setup.js
+    │   │       └── test
+    │   │           └── example.js
+    └── package.json            
+          </pre>
+        </div>
+
+      </div>
+      <div class="uk-grid">
+        <div class="uk-width-1-1">
+          <h2>Run the app</h2>
+        </div>
+        
+      </div>
+
+      <div class="uk-grid">
+        <div class="uk-width-1-2">
+          <code>brunch w</code>
+        </div>
+        <div class="uk-width-1-2"></div>
+      </div>
+
+
+    </div>
+    
+    <div class="foxx uk-margin-top">
+      <div class="uk-container uk-container-center uk-margin-top">
+        <div class="uk-grid">
+          <div class="uk-width-1-1">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </body>
+
+</html>

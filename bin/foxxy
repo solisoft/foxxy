@@ -181,6 +181,7 @@ hasbin('foxx-manager', function(result) {
             var whtml = "require('widgets/"+pluralize(model)+".html.tag');\n      /*@{{riot_components}}*/"
             replaceInFile(dest_file, /\/\*@\{\{riot_components\}\}\*\//g, whtml)
             replaceInFile(dest_file, /\{\{DBNAME\}\}/g, arangoconf.database)
+            // Create Menu Item
             replaceInFile(dest_file, "<!-- item_menu -->", `<li><a href="/#${pluralize(model)}">${model[0].toUpperCase() +  pluralize(model).slice(1)}</a></li>\n        <!-- item_menu -->`)
             
 

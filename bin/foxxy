@@ -79,9 +79,10 @@ hasbin('foxx-manager', function(result) {
       console.log("- Generate a page : foxxy g page page_name");
       console.log("- Generate a widget : foxxy g crud users");
       console.log("------------------------------------------");
-      console.log("# Widgets are : [crud, eu, hcrud]");
+      console.log("# Widgets are : [crud, eu]");
       console.log("## crud : a basic CRUD widget");
       console.log("## eu : a basic Edit/Update widget");
+      console.log("version: 0.0.19")
       //console.log("## hcrud : a CRUD widget within a Hierachical structure (tree)");
     } else {
       // Create a new application

@@ -99,6 +99,9 @@ hasbin('foxx-manager', function(result) {
           fs.stat(dest_folder, function(err, stats) {
             if(err !== null) {
               copyRecursiveSync(src_folder, dest_folder)
+              var dest_file = path.join(process.cwd(), `${argv._[1]}/app/assets/index.html`);
+              replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
+              
               var dest_file = path.join(process.cwd(), `${argv._[1]}/app/assets/login.html`);
               replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
               fs.writeFileSync(dest_folder + "/.arangodb.yml", yaml.safeDump({ database: argv.database, username: argv.user, password: argv.password, endpoint: argv.endpoint }))

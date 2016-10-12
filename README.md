@@ -2,6 +2,8 @@
 
 foxx-framework is a simple tool which help you starting with your single page application using ArangoDB / Foxx for backend and API, riotjs for views and brunch to build your assets.
 
+https://www.foxx-framework.com
+
 ## Prerequisite
 
 - ArangoDB 3.0.5

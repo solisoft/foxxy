@@ -82,7 +82,7 @@ hasbin('foxx-manager', function(result) {
       console.log("# Widgets are : [crud, eu]");
       console.log("## crud : a basic CRUD widget");
       console.log("## eu : a basic Edit/Update widget");
-      console.log("version: 0.0.19")
+      
       //console.log("## hcrud : a CRUD widget within a Hierachical structure (tree)");
     } else {
       // Create a new application
@@ -233,6 +233,20 @@ hasbin('foxx-manager', function(result) {
         }
         
       }
+
+      // Install a new service. Useful for team development
+      if(argv._[0] == "install") {
+        var service = argv._[1];
+        var cmd = `cd foxx; mv ${service} tmp; `;
+        cmd += `zip -r tmp.zip tmp;`
+        cmd += "foxx-manager install tmp.zip /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
+        cmd += "foxx-manager development /${i%/} --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
+        cmd += `mv ${service} tmp2;`;
+        cmd += `mv tmp ${service};`;
+        cmd += `rm -Rf tmp2`;
+        exec(cmd, function(error, stdout, stderr) {})
+      }
+
     }
   } else {
     console.log("You need first to install ArangoDB : https://www.arangodb.com/")

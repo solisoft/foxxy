@@ -236,6 +236,7 @@ hasbin('foxx-manager', function(result) {
 
       // Install a new service. Useful for team development
       if(argv._[0] == "install") {
+        var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
         var service = argv._[1];
         var cmd = `cd foxx; mv ${service} tmp; `;
         cmd += `zip -r tmp.zip tmp;`

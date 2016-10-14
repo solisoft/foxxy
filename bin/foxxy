@@ -245,7 +245,8 @@ hasbin('foxx-manager', function(result) {
         cmd += `mv ${service} tmp2;`;
         cmd += `mv tmp ${service};`;
         cmd += `rm -Rf tmp2`;
-        exec(cmd, function(error, stdout, stderr) {})
+        console.log(cmd)
+        //exec(cmd, function(error, stdout, stderr) {})
       }
 
     }

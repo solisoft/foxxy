@@ -7,14 +7,14 @@
   <script>
     save_form(e) {
       common.checkLogin()
-      common.saveForm("form_@{{object}}", "@{{object}}s", opts.@{{object}}_id)
+      common.saveForm("form_@{{object}}", "@{{objects}}", opts.@{{object}}_id)
     }
 
     var _this = this;    
     
-    $.get(url + "@{{object}}s/" + opts.@{{object}}_id, function(d) {
+    $.get(url + "@{{objects}}/" + opts.@{{object}}_id, function(d) {
       _this.@{{object}} = d.data      
-      common.buildForm(_this.@{{object}}, d.fields, '#form_@{{object}}', '@{{object}}s')
+      common.buildForm(_this.@{{object}}, d.fields, '#form_@{{object}}', '@{{objects}}')
     })
     this.on('updated', function() { $("select").select2() })
   </script>
@@ -30,11 +30,11 @@
     })
     
     save_form(e) {
-      common.saveForm("form_new_@{{object}}", "@{{object}}s")
+      common.saveForm("form_new_@{{object}}", "@{{objects}}")
     }
 
-    $.get(url + "@{{object}}s/fields", function(d) {
-      common.buildForm({}, d.fields, '#form_new_@{{object}}', '@{{object}}s');
+    $.get(url + "@{{objects}}/fields", function(d) {
+      common.buildForm({}, d.fields, '#form_new_@{{object}}', '@{{objects}}');
     })
     this.on('updated', function() { $("select").select2() })
   </script>
@@ -42,7 +42,7 @@
 
 <@{{objects}}>
   <h3>Listing @{{objects}}</h3>
-  <a href="/#@{{object}}s/new" class="uk-button uk-button-mini"><i class="uk-icon-plus"></i> New @{{object}}</a>
+  <a href="/#@{{objects}}/new" class="uk-button uk-button-mini"><i class="uk-icon-plus"></i> New @{{object}}</a>
   <form onsubmit={filter} class="uk-form uk-margin-top">
     <div class="uk-form-icon uk-width-1-1">
       <i class="uk-icon-search"></i>
@@ -109,7 +109,7 @@
     destroy_object(e) {      
       UIkit.modal.confirm("Are you sure?", function() {
         $.ajax({
-          url: url + "@{{object}}s/" + e.item.row._key,
+          url: url + "@{{objects}}/" + e.item.row._key,
           method: "DELETE",
           success: function() {
             $.get(url + "@{{objects}}/page/1", function(d) {

@@ -79,7 +79,7 @@ router.get('/check_form', function (req, res) {
 .description('Check the form for live validation');
 
 router.get('/fields', function (req, res) {
-  loadFields();
+  loadFields(req);
   res.send({ fields: fields });
 })
 .description('Get all fields to build form');

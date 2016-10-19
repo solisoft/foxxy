@@ -34,6 +34,9 @@ var loadFields = function(req) {
   //  RETURN [doc._key, doc.desired_field_name]
   //  `, { "@collection": "whatever", key: req.session.data.key })._documents
   //} catch(e) {}
+  // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: data },
+  
+
   // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: [["data", "list"]] },
   fields = [
   ]

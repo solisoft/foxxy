@@ -30,7 +30,7 @@ var loadFields = function(req) {
   //var data = []
   //try {
   //  data = db._query(`FOR doc in @@collection
-  //  FILTER doc.foreign_key = @key
+  //  FILTER doc.foreign_key == @key
   //  RETURN [doc._key, doc.desired_field_name]
   //  `, { "@collection": "whatever", key: req.session.data.key })._documents
   //} catch(e) {}

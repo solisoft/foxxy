@@ -25,8 +25,16 @@ module.context.use(function (req, res, next) {
   next();
 });
 
-var loadFields = function() {
-  // { r: new_row, c: classname, n: name/id, t: type, j: joi validation, l: label, d: data list }
+var loadFields = function(req) {
+  // Sample to load an external collection as list
+  //var data = []
+  //try {
+  //  data = db._query(`FOR doc in @@collection
+  //  FILTER doc.foreign_key = @key
+  //  RETURN [doc._key, doc.desired_field_name]
+  //  `, { "@collection": "whatever", key: req.session.data.key })._documents
+  //} catch(e) {}
+  // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: [["data", "list"]] },
   fields = [
   ]
     
@@ -35,7 +43,7 @@ var loadFields = function() {
     schema[f.n] = f.j
   })
 }
-loadFields();
+loadFields({});
 
 router.get('/page/:page', function (req, res) {
   res.send({ data: db._query(`
@@ -56,7 +64,7 @@ router.get('/search/:term', function (req, res) {
 .description('Returns all objects');
 
 router.get('/:id', function (req, res) {
-  loadFields();
+  loadFields(req);
   res.send({fields: fields, data: collection.document(req.pathParams.id) });
 })
 .description('Returns object within ID');

@@ -37,7 +37,7 @@ var Common = {
         if(value === undefined) value = ""
         if(l.t === "string") html += '<input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "date") html += '<div class="uk-form-icon uk-width-1-1"><i class="uk-icon-calendar"></i><input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" data-uk-datepicker="{format:\'DD-MM-YYYY\'}" value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-          if(l.t === "time") html += '<div class="uk-form-icon uk-width-1-1"><i class="uk-icon-clock"></i><input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" data-uk-timepicker value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+          if(l.t === "time") html += '<div class="uk-form-icon uk-width-1-1"><i class="uk-icon-clock-o"></i><input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" data-uk-timepicker value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "text") html += '<textarea id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "list") {
           html += '<select name="'+ l.n +'" class="uk-width-1-1" id="'+l.n+'">'

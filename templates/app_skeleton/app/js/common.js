@@ -112,6 +112,12 @@ var Common = {
           data: json,
           method: "POST",
           success: function(d) {
+            UIkit.notify({
+              message : 'Successfully saved!',
+              status  : 'success',
+              timeout : 1000,
+              pos     : 'bottom-right'
+            });
             if(objID == "") {
               objID = d.key._key
               riot.route("/"+ path +"/" + objID + "/edit")

@@ -21,7 +21,6 @@ module.exports = {
       fs.createReadStream('node_modules/uikit/dist/js/components/notify.js').pipe(fs.createWriteStream('app/vendors/uikit-notify.js'));
       fs.createReadStream('node_modules/uikit/dist/js/components/timepicker.js').pipe(fs.createWriteStream('app/vendors/uikit-timepicker.js'));
       fs.createReadStream('node_modules/select2/dist/js/select2.js').pipe(fs.createWriteStream('app/vendors/select2.js'));
-      fs.createReadStream('node_modules/select2/dist/js/select2.js').pipe(fs.createWriteStream('app/vendors/select2.js'));
       // CSS
       fs.createReadStream('node_modules/uikit/dist/css/uikit.almost-flat.css').pipe(fs.createWriteStream('app/vendors/0-uikit.css'));
       fs.createReadStream('node_modules/uikit/dist/css/components/datepicker.gradient.css').pipe(fs.createWriteStream('app/vendors/1-uikit-datepicker.css'));
@@ -34,7 +33,6 @@ module.exports = {
       fs.createReadStream('node_modules/uikit/dist/fonts/fontawesome-webfont.woff2').pipe(fs.createWriteStream('app/assets/fonts/fontawesome-webfont.woff2'));
       fs.createReadStream('node_modules/uikit/dist/fonts/FontAwesome.otf').pipe(fs.createWriteStream('app/assets/fonts/FontAwesome.otf'));
       
-      fs.createReadStream('node_modules/select2/dist/js/select2.js').pipe(fs.createWriteStream('app/vendors/select2.js'));
       end();
     }
   },

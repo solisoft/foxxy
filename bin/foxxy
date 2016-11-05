@@ -138,7 +138,7 @@ hasbin('foxx-manager', function(result) {
                       console.log("\nNow move auth foxx app and create a symlink to your arangodb app path from your app foxx folder")
                       var cmd = `cp -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}/* ${path.join(process.cwd(), argv._[1] + "/foxx")}`
                       console.log(cmd.cyan)
-                      cmd = `sudo rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
+                      cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
                       console.log(cmd.cyan)
                       cmd = `ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
                       console.log(cmd.cyan)

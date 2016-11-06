@@ -6,7 +6,7 @@ https://www.foxx-framework.com
 
 ## Prerequisite
 
-- ArangoDB 3.0.5
+- ArangoDB >= 3.x
 - Nginx
 - Node.js and npm
 - Ruby (for deployment purpose)
@@ -88,3 +88,7 @@ Check `config/deploy.rb` and adapt it to your needs.
 Then run : `$ mina deploy` 
 
 It will compile assets for production env and deploy code (app & Foxx services)
+
+# Todo
+
+- Use jwtTokens to avoid nginx _db mounting point

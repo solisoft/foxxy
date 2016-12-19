@@ -57,7 +57,7 @@ desc "Deploys the current version to the server."
 task :deploy => :environment do
   to :before_hook do
     # Put things to run locally before ssh
-    queue "rm -Rf dist/*; brunch b --production;git add . ; git commit -am 'dist release'; git push"
+    queue "rm -Rf dist/*; yarn run brunch b -- --production;git add . ; git commit -am 'dist release'; git push"
 
   end
   deploy do

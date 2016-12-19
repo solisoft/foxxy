@@ -2,6 +2,7 @@
 "use strict";
 
 var exec = require('child_process').exec;
+var execSync = require('child_process').execSync;
 var yaml = require('js-yaml');
 var fs = require('fs');
 var path = require('path');
@@ -161,6 +162,26 @@ hasbin('foxx-manager', function(result) {
         }
       }
       
+      if(argv._[0] == "setup") {
+        var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
+        console.log(process.cwd() + "/foxx")
+        fs.readdir(process.cwd() + "/foxx", function(err, files) {
+        
+          files.forEach(function(file, index) {
+
+            var stats = fs.statSync(process.cwd() + "/foxx/" + file)
+            //console.log(file, stats)
+            if(stats.isDirectory()) {
+              //console.log(file, stats)
+              install_service(file);
+              //exec(cmd, function(error, stdout, stderr) {})
+            }
+          })
+
+          exec("rm foxx/tmp.zip", function(error, stdout, stderr) {})
+        })
+      }
+
       if(argv._[0] == "g") {
         fs.mkdirSync(path.join(process.cwd(), "foxx_tmp"))
         if(argv._.length != 3) {
@@ -246,18 +267,22 @@ hasbin('foxx-manager', function(result) {
       }
 
       // Install a new service. Useful for team development
-      if(argv._[0] == "install") {
+      var install_service = function(service) {
+        console.log("Install Service " + service)
         var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
-        var service = argv._[1];
-        var cmd = `cd foxx; mv ${service} tmp; `;
+        var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${arangoconf.database}') < 0) db._createDatabase('${arangoconf.database}');" --server.endpoint ${arangoconf.endpoint} --server.username ${arangoconf.username} ${arangoconf.password}`
+        
+        execSync(cmd) 
+        cmd = `cd foxx; mv ${service} tmp; `;
         cmd += `zip -r tmp.zip tmp;`
-        cmd += "foxx-manager install tmp.zip /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
-        cmd += "foxx-manager development /${i%/} --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
-        cmd += `mv ${service} tmp2;`;
+        cmd += "foxx-manager install tmp.zip /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+arangoconf.password+";"
+        cmd += "foxx-manager development /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+arangoconf.password+";"
         cmd += `mv tmp ${service};`;
-        cmd += `rm -Rf tmp2`;
-        console.log(cmd)
-        //exec(cmd, function(error, stdout, stderr) {})
+        
+        cmd += `cd ..;`;
+
+        execSync(cmd)
+        
       }
 
     }

@@ -6,15 +6,12 @@
 
   <script>    
     save_form(e) {
-      common.checkLogin()
       common.saveForm("form_@{{objects}}", "@{{objects}}", _this.obj._key)
     }
 
     var _this = this;    
     
-    common.checkLogin()
-
-    $.get(url + "@{{objects}}/", function(d) {
+    common.get(url + "@{{objects}}/", function(d) {
       _this.obj = d.data      
       common.buildForm(_this.obj, d.fields, '#form_@{{objects}}')
     })

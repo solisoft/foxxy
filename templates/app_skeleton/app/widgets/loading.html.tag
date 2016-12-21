@@ -5,7 +5,7 @@
   </div>
 
   <script>
-    $.get(url + "auth/whoami", function(d) {
+    common.get(url + "auth/whoami", function(d) {
       if(d.username === null) document.location.href="login.html"; 
       else {
         // Load the widget you want

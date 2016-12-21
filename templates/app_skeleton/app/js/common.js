@@ -63,7 +63,7 @@ var Common = {
   },
 
   checkLogin: function checkLogin() {
-    $.get(url + "auth/whoami", function(d) {
+    this.ajax(url + "auth/whoami", "GET", "", function(d) {
       if(d.username === null) document.location.href = "login.html";
     })
   },
@@ -72,7 +72,7 @@ var Common = {
     var json = JSON.stringify($("#"+ formID).serializeObject())
     $("div[data-hint]").html("")
     var errors = null
-    $.get(url + path + "/check_form?data=" + json, function(d) {
+    this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {
       $("#"+ formID + " input, #"+ formID + " select").removeClass("uk-form-danger")
       $("#"+ formID + " input, #"+ formID + " select").removeClass("uk-form-success")
       $("#"+ formID + " input, #"+ formID + " select").addClass("uk-form-success")
@@ -94,10 +94,10 @@ var Common = {
 
   saveForm: function (formID, path, objID) {
     objID = objID||""
-    
+    var _this = this;
     var json = JSON.stringify($("#"+ formID).serializeObject())
     $("div[data-hint]").html("")
-    $.get(url + path + "/check_form?data=" + json, function(d) {
+    _this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {
       $("#"+ formID + " input, #"+ formID + " select").removeClass("uk-form-danger")
       $("#"+ formID + " input, #"+ formID + " select").removeClass("uk-form-success")
       $("#"+ formID + " input, #"+ formID + " select").addClass("uk-form-success")
@@ -108,25 +108,16 @@ var Common = {
           $("div[data-hint="+e.path+"]").html("<div>"+e.message+"</div>")
         })
       } else {
-        $.ajax(url + path + "/" + objID, {
-          data: json,
-          method: "POST",
-          success: function(d) {
-            UIkit.notify({
-              message : 'Successfully saved!',
-              status  : 'success',
-              timeout : 1000,
-              pos     : 'bottom-right'
-            });
-            if(objID == "") {
-              objID = d.key._key
-              riot.route("/"+ path +"/" + objID + "/edit")
-            }
-          },
-          statusCode: {
-            401: function() {
-              document.location.href = "login.html";
-            }
+        _this.ajax(url + path + "/" + objID, "POST", json, function(d) {
+          UIkit.notify({
+            message : 'Successfully saved!',
+            status  : 'success',
+            timeout : 1000,
+            pos     : 'bottom-right'
+          });
+          if(objID == "") {
+            objID = d.key._key
+            riot.route("/"+ path +"/" + objID + "/edit")
           }
         })
       }
@@ -134,6 +125,43 @@ var Common = {
         $("#"+ formID +" input, #"+ formID +" select").removeClass("uk-form-success")
       }, 300 )
     }) 
+  },
+
+  ajax: function(url, method, dataForm, callback) {
+    $.ajax({
+      url: url,
+      data: dataForm || "",
+      type: method,
+      beforeSend: function(xhr){
+        var x = localStorage.getItem('X-Session-Id')
+        if(x !== null) {
+          xhr.setRequestHeader('X-Session-Id', localStorage.getItem('X-Session-Id'))
+        }
+      },
+      success: function(data, textStatus, request) { 
+        localStorage.setItem('X-Session-Id',request.getResponseHeader('X-Session-Id'))
+        callback(data) 
+      },
+      statusCode: {
+        401: function() { document.location.href = "login.html" }
+      }
+    });
+  },
+
+  get: function(url, callback) {
+    this.ajax(url, "GET", "", callback)
+  },
+  delete: function(url, callback) {
+    this.ajax(url, "DELETE", "", callback)
+  },
+  post: function(url, json, callback) {
+    this.ajax(url, "POST", json, callback)
+  },
+  patch: function(url, json, callback) {
+    this.ajax(url, "PATCH", json, callback)
+  },
+  put: function(url, json, callback) {
+    this.ajax(url, "PUT", json, callback)
   }
 
 };

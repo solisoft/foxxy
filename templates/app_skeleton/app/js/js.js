@@ -11,13 +11,13 @@ $(function() {
   riot.route('/signup', function(name) {riot.mount('div#app', 'signup') })
 
   riot.route('/confirm/*', function(id) {
-    $.post(url+'auth/confirm', JSON.stringify({ uuid: id }), function() {
+    common.post(url+'auth/confirm', JSON.stringify({ uuid: id }), function() {
       document.location.href = "index.html"
     })
   })
   
   riot.route('/logout', function(name) {
-    $.post(url +"auth/logout", function(d) {
+    common.post(url +"auth/logout", "", function(d) {
       document.location.href = "login.html"
     })
   })

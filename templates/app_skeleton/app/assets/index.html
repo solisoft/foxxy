@@ -32,7 +32,13 @@
     <script src="DIGEST(js/vendors.js)"></script>
     <script src="DIGEST(js/js.js)"></script>
     <script>
-      var url = "/_db/{{DBNAME}}/";
+      
+      var url = "http://localhost:8529/_db/{{DBNAME}}/";
+      // Production config
+      //if(window.location.hostname !== "localhost") {
+      //  url = "_db/{{DBNAME}}/";
+      //}
+      
       var per_page = 25;
       var common = require("js/common.js");
       require("vendors/select2.js");

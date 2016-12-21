@@ -18,7 +18,7 @@ const organisations = db._collection('organisations');
 const each = require('underscore').each;
 const queue = queues.create('mailer');
 
-const _settings = db._collection('settings').firstExample();
+const _settings = db._collection('foxxy_settings').firstExample();
 
 const sessions = sessionsMiddleware({
   storage: jwtStorage(_settings.jwt_secret),
@@ -75,6 +75,7 @@ router.get('/fields', function (req, res) {
 
 // GET whoami
 router.get('/whoami', function (req, res) {
+  if(!req.session.uid) res.throw('unauthorized')
   try {
     const user = users.document(req.session.uid);
     res.send({username: user.username, role: user.role, a: user.a});

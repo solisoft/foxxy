@@ -5,10 +5,7 @@
   </div>
 
   <script>
-    common.get(url + "auth/whoami", function(d) {
-      if(d.username === null) riot.route('/login'); 
-      else document.location.href="index.html";
-    })
+    riot.route('/login');
   </script>
 </loading>
 

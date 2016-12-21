@@ -10,7 +10,7 @@ const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
 const router = createRouter();
 const collection = db._collection(collName);
 
-const _settings = db._collection('settings').firstExample();
+const _settings = db._collection('foxxy_settings').firstExample();
 
 const sessions = sessionsMiddleware({
   storage: jwtStorage(_settings.jwt_secret),

@@ -149,10 +149,8 @@ hasbin('foxx-manager', function(result) {
                 } else {
                   console.log("App Created ! Grrrrr!".green)                    
                 }
-
-                
               } else {
-                console.log("Folder already existing ... aborting ... ".red)
+                console.log("Folder already exists ... aborting ... ".red)
               }
             })
           })
@@ -164,17 +162,11 @@ hasbin('foxx-manager', function(result) {
       
       if(argv._[0] == "setup") {
         var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
-        console.log(process.cwd() + "/foxx")
         fs.readdir(process.cwd() + "/foxx", function(err, files) {
-        
           files.forEach(function(file, index) {
-
             var stats = fs.statSync(process.cwd() + "/foxx/" + file)
-            //console.log(file, stats)
             if(stats.isDirectory()) {
-              //console.log(file, stats)
               install_service(file);
-              //exec(cmd, function(error, stdout, stderr) {})
             }
           })
 

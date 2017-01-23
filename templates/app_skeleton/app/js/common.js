@@ -41,7 +41,7 @@ var Common = {
         if(l.t === "text") html += '<textarea id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "list") {
           html += '<select name="'+ l.n +'" class="uk-width-1-1" id="'+l.n+'">'
-          _.each(l.d, function(o) {
+          l.d.forEach(function(o) {
             value = ""
             if(obj[l.n] === o[0]) value="selected='selected'"
             html += '<option value="'+ o[0] +'" '+value+'>'+ o[1] +'</option>'
@@ -78,7 +78,7 @@ var Common = {
       $("#"+ formID + " input, #"+ formID + " select").addClass("uk-form-success")
       if(d.errors.length > 0) {
         errors = d.errors
-        _.each(d.errors, function(e) {
+        d.errors.forEach(function(e) {
           $("#" + e.path).removeClass("uk-form-success")
           $("#" + e.path).addClass("uk-form-danger")
           $("div[data-hint="+e.path+"]").html("<div>"+e.message+"</div>")
@@ -102,7 +102,7 @@ var Common = {
       $("#"+ formID + " input, #"+ formID + " select").removeClass("uk-form-success")
       $("#"+ formID + " input, #"+ formID + " select").addClass("uk-form-success")
       if(d.errors.length > 0) {
-        _.each(d.errors, function(e) {
+        d.errors.forEach(function(e) {
           $("#" + e.path).removeClass("uk-form-success")
           $("#" + e.path).addClass("uk-form-danger")
           $("div[data-hint="+e.path+"]").html("<div>"+e.message+"</div>")

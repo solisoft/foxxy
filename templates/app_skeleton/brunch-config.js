@@ -3,7 +3,6 @@ module.exports = {
     globals: {
       $: 'jquery',
       jQuery: 'jquery',
-      _: "underscore",
       riot: "riot",
       UIKit: "uikit"
     },
@@ -32,7 +31,7 @@ module.exports = {
       fs.createReadStream('node_modules/uikit/dist/fonts/fontawesome-webfont.woff').pipe(fs.createWriteStream('app/assets/fonts/fontawesome-webfont.woff'));
       fs.createReadStream('node_modules/uikit/dist/fonts/fontawesome-webfont.woff2').pipe(fs.createWriteStream('app/assets/fonts/fontawesome-webfont.woff2'));
       fs.createReadStream('node_modules/uikit/dist/fonts/FontAwesome.otf').pipe(fs.createWriteStream('app/assets/fonts/FontAwesome.otf'));
-      
+
       end();
     }
   },
@@ -40,7 +39,7 @@ module.exports = {
     javascripts: {
       joinTo: {
         'js/js.js': /^app\/[js|widgets]/,
-        'js/vendors.js': [/^(?!app)/, /^app\/vendors/ ], 
+        'js/vendors.js': [/^(?!app)/, /^app\/vendors/ ],
       }
     },
     stylesheets: {
@@ -61,7 +60,7 @@ module.exports = {
       paths: {
         public: 'dist'
       }
-    } 
+    }
   }
-  
+
 };

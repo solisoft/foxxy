@@ -1,18 +1,19 @@
 <@{{object}}_edit>
-  
+
   <h3>Editing @{{object}}</h3>
   <form onsubmit="{ save_form }" class="uk-form" id="form_@{{object}}">
   </form>
 
   <script>
     save_form(e) {
+      e.preventDefault()
       common.saveForm("form_@{{object}}", "@{{objects}}", opts.@{{object}}_id)
     }
 
-    var _this = this;    
-    
+    var _this = this;
+
     common.get(url + "@{{objects}}/" + opts.@{{object}}_id, function(d) {
-      _this.@{{object}} = d.data      
+      _this.@{{object}} = d.data
       common.buildForm(_this.@{{object}}, d.fields, '#form_@{{object}}', '@{{objects}}')
     })
     this.on('updated', function() { $("select").select2() })
@@ -25,6 +26,7 @@
   </form>
   <script>
     save_form(e) {
+      e.preventDefault()
       common.saveForm("form_new_@{{object}}", "@{{objects}}")
     }
 
@@ -58,24 +60,24 @@
           <a onclick={edit} class="uk-button uk-button-primary uk-button-mini"><i class="uk-icon-edit"></i></a>
           <a onclick={ destroy_object } class="uk-button uk-button-danger uk-button-mini"><i class="uk-icon-trash"></i></a>
         </td>
-      </tr>    
+      </tr>
     </tbody>
-    
+
   </table>
   <ul show={count > per_page} class="uk-pagination" ></ul>
 
   <script>
 
     var _this = this
-    
+
     this.loadFirstPage = function() {
       common.get(url + "@{{objects}}/page/1", function(d) {
         _this.data = d.data[0].users
-        _this.cols = _.difference(_.keys(_this.data[0]), ["_id", "_key", "_rev"])
+        _this.cols = common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"])
         _this.count = d.data[0].count
         UIkit.pagination(".uk-pagination", { items: _this.count, itemsOnPage: per_page });
         _this.update()
-      })  
+      })
     }
     this.loadFirstPage()
 
@@ -88,7 +90,7 @@
           $(".uk-form-icon i").attr("class", "uk-icon-search")
           _this.update()
         })
-      }        
+      }
       else {
         $(".uk-pagination").show()
         _this.loadFirstPage()
@@ -99,14 +101,14 @@
       riot.route("/@{{objects}}/" + e.item.row._key + "/edit")
     }
 
-    destroy_object(e) {      
+    destroy_object(e) {
       UIkit.modal.confirm("Are you sure?", function() {
         common.delete(url + "@{{objects}}/" + e.item.row._key, function() {
           common.get(url + "@{{objects}}/page/1", function(d) {
             _this.data = d.data[0].users
             _this.count = d.data[0].count
             _this.update()
-          })    
+          })
         })
       });
     }
@@ -118,7 +120,7 @@
           _this.update()
         })
     });
-    
+
   </script>
 </@{{objects}}>
 

@@ -1,39 +1,39 @@
 $(function() {
 
-  riot.route('/', function(name) {
+  route('/', function(name) {
     // Here set the / mount
     riot.mount('div#app', 'loading')
   })
 
-  riot.route('/welcome', function(name) {riot.mount('div#app', 'welcome') })
-  
-  riot.route('/login', function(name) {riot.mount('div#app', 'login') })
-  riot.route('/signup', function(name) {riot.mount('div#app', 'signup') })
+  route('/welcome', function(name) {riot.mount('div#app', 'welcome') })
 
-  riot.route('/confirm/*', function(id) {
+  route('/login', function(name) {riot.mount('div#app', 'login') })
+  route('/signup', function(name) {riot.mount('div#app', 'signup') })
+
+  route('/confirm/*', function(id) {
     common.post(url+'auth/confirm', JSON.stringify({ uuid: id }), function() {
       document.location.href = "index.html"
     })
   })
-  
-  riot.route('/logout', function(name) {
+
+  route('/logout', function(name) {
     common.post(url +"auth/logout", "", function(d) {
       document.location.href = "login.html"
     })
   })
 
   /*@{{router}}*/
-  
-  riot.route(function(collection, id, action) {
+
+  route(function(collection, id, action) {
     if(action != undefined) {
       /*@{{router_cia}}*/
     }
   })
 
-  riot.route(function(collection, action) {
-    /*@{{router_ca}}*/    
+  route(function(collection, action) {
+    /*@{{router_ca}}*/
   })
-  
-  riot.route.start(true)
+
+  route.start(true)
   //riot.mount("*")
 })

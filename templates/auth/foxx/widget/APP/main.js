@@ -32,7 +32,7 @@ var fields = []
 var schema = {}
 
 var loadFields = function() {
-  
+
   // r: new row; c: classname; n: name/id; t: type; j: joi validation; l: label; d: data list
   fields = [
     { r: true,  c:"uk-width-1-1", n:"company", t:"string", j: joi.string().required(), l:"Société !!" },
@@ -80,7 +80,7 @@ router.get('/whoami', function (req, res) {
     const user = users.document(req.session.uid);
     res.send({username: user.username, role: user.role, a: user.a});
   } catch (e) {
-    
+
     res.send({username: null});
   }
 })
@@ -101,6 +101,7 @@ router.post('/login', function (req, res) {
   if(valid) {
     req.session.uid = user._key;
   }
+  res.setHeader("Access-Control-Expose-Headers", "X-Session-Id");
   res.send({success: valid, uid: req.session});
 })
 .body(joi.object({
@@ -122,17 +123,17 @@ router.post('/logout', function (req, res) {
 router.post('/signup', function (req, res) {
   const user = req.body;
   const uuid = crypt.genRandomAlphaNumbers(40);
-    
+
   try {
     // Create an authentication hash
     user.authData = auth.create(user.password);
     delete user.password;
     delete user.password_confirmation;
-    
+
     user.email_code = uuid;
     delete user.company;
-    
-    const meta = users.save(user);    
+
+    const meta = users.save(user);
     Object.assign(user, meta);
   } catch (e) {
     res.throw('bad request', 'Username already taken', e);

@@ -6,10 +6,10 @@
 
   <script>
     common.get(url + "auth/whoami", function(d) {
-      if(d.username === null) document.location.href="login.html"; 
+      if(d.username === null) document.location.href="login.html";
       else {
         // Load the widget you want
-        riot.route('/welcome')
+        route('/welcome')
       }
     })
   </script>

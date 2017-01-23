@@ -4,6 +4,7 @@ module.exports = {
       $: 'jquery',
       jQuery: 'jquery',
       riot: "riot",
+      route: "riot-route",
       UIKit: "uikit"
     },
     styles: {

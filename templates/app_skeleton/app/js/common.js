@@ -163,6 +163,16 @@ var Common = {
   },
   put: function(url, json, callback) {
     this.ajax(url, "PUT", json, callback)
+  },
+
+  array_diff: function(a, b) {
+    return a.filter(function(i) {return b.indexOf(i) < 0;});
+  },
+
+  keys: function(h) {
+    var keys = []
+    for(var k in h) keys.push(k)
+    return keys
   }
 
 };

@@ -4,6 +4,8 @@ const joi = require('joi');
 const createAuth = require('@arangodb/foxx/auth');
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
+const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
+
 const queues = require('@arangodb/foxx/queues');
 const crypt = require('@arangodb/crypto');
 
@@ -16,9 +18,11 @@ const organisations = db._collection('organisations');
 const each = require('underscore').each;
 const queue = queues.create('mailer');
 
+const _settings = db._collection('foxxy_settings').firstExample();
+
 const sessions = sessionsMiddleware({
-  storage: 'sessions',
-  transport: 'cookie'
+  storage: jwtStorage(_settings.jwt_secret),
+  transport: 'header'
 });
 module.context.use(sessions);
 module.context.use(router);
@@ -71,6 +75,7 @@ router.get('/fields', function (req, res) {
 
 // GET whoami
 router.get('/whoami', function (req, res) {
+  if(!req.session.uid) res.throw('unauthorized')
   try {
     const user = users.document(req.session.uid);
     res.send({username: user.username, role: user.role, a: user.a});
@@ -95,7 +100,6 @@ router.post('/login', function (req, res) {
   // Log the user in
   if(valid) {
     req.session.uid = user._key;
-    var ret = req.sessionStorage.save(req.session);
   }
   res.send({success: valid, uid: req.session});
 })
@@ -109,7 +113,6 @@ router.post('/login', function (req, res) {
 router.post('/logout', function (req, res) {
   if (req.session.uid) {
     req.session.uid = null;
-    req.sessionStorage.save(req.session);
   }
   res.send({success: true});
 })
@@ -140,7 +143,6 @@ router.post('/signup', function (req, res) {
     {to: user.username, uuid: uuid}
   );
   req.session.uid = user._key;
-  req.sessionStorage.save(req.session);
   res.send({success: true});
 })
 .body(joi.object(schema), 'Credentials')
@@ -154,7 +156,6 @@ router.post('/confirm', function (req, res) {
     user.a = true;
     delete user.email_code;
     users.update(user._id, user);
-      
   }
   res.send({success: true});
 })

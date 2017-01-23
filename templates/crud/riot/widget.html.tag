@@ -6,13 +6,12 @@
 
   <script>
     save_form(e) {
-      common.checkLogin()
       common.saveForm("form_@{{object}}", "@{{objects}}", opts.@{{object}}_id)
     }
 
     var _this = this;    
     
-    $.get(url + "@{{objects}}/" + opts.@{{object}}_id, function(d) {
+    common.get(url + "@{{objects}}/" + opts.@{{object}}_id, function(d) {
       _this.@{{object}} = d.data      
       common.buildForm(_this.@{{object}}, d.fields, '#form_@{{object}}', '@{{objects}}')
     })
@@ -25,15 +24,11 @@
   <form onsubmit="{ save_form }" class="uk-form" id="form_new_@{{object}}">
   </form>
   <script>
-    this.on('update', function(eventName) {
-      common.checkLogin()
-    })
-    
     save_form(e) {
       common.saveForm("form_new_@{{object}}", "@{{objects}}")
     }
 
-    $.get(url + "@{{objects}}/fields", function(d) {
+    common.get(url + "@{{objects}}/fields", function(d) {
       common.buildForm({}, d.fields, '#form_new_@{{object}}', '@{{objects}}');
     })
     this.on('updated', function() { $("select").select2() })
@@ -73,10 +68,8 @@
 
     var _this = this
     
-    common.checkLogin()
-
     this.loadFirstPage = function() {
-      $.get(url + "@{{objects}}/page/1", function(d) {
+      common.get(url + "@{{objects}}/page/1", function(d) {
         _this.data = d.data[0].users
         _this.cols = _.difference(_.keys(_this.data[0]), ["_id", "_key", "_rev"])
         _this.count = d.data[0].count
@@ -89,7 +82,7 @@
     filter(e) {
       if(_this.term.value != "") {
         $(".uk-form-icon i").attr("class", "uk-icon-spin uk-icon-spinner")
-        $.get(url + "@{{objects}}/search/"+_this.term.value, function(d) {
+        common.get(url + "@{{objects}}/search/"+_this.term.value, function(d) {
           _this.data = d.data
           $(".uk-pagination").hide()
           $(".uk-form-icon i").attr("class", "uk-icon-search")
@@ -108,23 +101,18 @@
 
     destroy_object(e) {      
       UIkit.modal.confirm("Are you sure?", function() {
-        $.ajax({
-          url: url + "@{{objects}}/" + e.item.row._key,
-          method: "DELETE",
-          success: function() {
-            $.get(url + "@{{objects}}/page/1", function(d) {
-              _this.data = d.data[0].users
-              _this.count = d.data[0].count
-              _this.update()
-            })    
-          }
+        common.delete(url + "@{{objects}}/" + e.item.row._key, function() {
+          common.get(url + "@{{objects}}/page/1", function(d) {
+            _this.data = d.data[0].users
+            _this.count = d.data[0].count
+            _this.update()
+          })    
         })
-        
       });
     }
 
     $('body').on('select.uk.pagination', '.uk-pagination', function(e, pageIndex){
-        $.get(url + "@{{objects}}/page/" + (pageIndex+1), function(d) {
+        common.get(url + "@{{objects}}/page/" + (pageIndex+1), function(d) {
           _this.data = d.data[0].users
           _this.count = d.data[0].count
           _this.update()

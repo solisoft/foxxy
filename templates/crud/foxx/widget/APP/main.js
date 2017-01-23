@@ -5,13 +5,16 @@ const joi = require('joi');
 const each = require('underscore').each;
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
+const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
 
 const router = createRouter();
 const collection = db._collection(collName);
 
+const _settings = db._collection('foxxy_settings').firstExample();
+
 const sessions = sessionsMiddleware({
-  storage: 'sessions',
-  transport: 'cookie'
+  storage: jwtStorage(_settings.jwt_secret),
+  transport: 'header'
 });
 module.context.use(sessions);
 module.context.use(router);

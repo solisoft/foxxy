@@ -41,6 +41,7 @@
             <h1>Be smart ! Save time by using microservices !!</h1>
             <h2>Foxx-Framework is built on ArangoDB database and Foxx services.</h2>
             <h3>Create apps, develop and deploy with ease.</h3>
+            <h4>NEW! foxx-framework use now JWT tokens</h4>
           </div>
         </div>
       </div>
@@ -66,7 +67,7 @@
 
         </div>
         <div class="uk-width-1-2">
-          <script type="text/javascript" src="https://asciinema.org/a/7lch9w1v1byj6x95zzaktirue.js" id="asciicast-7lch9w1v1byj6x95zzaktirue" async></script>
+          <script type="text/javascript" src="https://asciinema.org/a/8csd4sbr2oqp7okpbc2xhb8js.js" id="asciicast-8csd4sbr2oqp7okpbc2xhb8js" async></script>
         </div>
       </div>
       <div class="uk-grid">
@@ -76,7 +77,7 @@
         <div class="uk-width-1-2">
 
           <h2>Install requirements</h2>
-          <p><strong>Foxx-framework</strong> needs nodejs and npm installed. <strong>ArangoDB</strong> of course is needed.</p>
+          <p><strong>Foxx-framework</strong> needs nodejs and <a href="https://github.com/yarnpkg/yarn">yarn</a> installed. <strong>ArangoDB >= 3.1</strong> of course is needed.</p>
 
           <p>To deploy your application, you'll need Ruby too.</p>
         </div>
@@ -98,39 +99,11 @@
           <p>
             This action will create the skeleton app with a simple login authentification.
           </p>
-          <code>cd sample_app && npm install</code>
+          <code>cd sample_app && yarn</code>
           <p>This will install everything you need to run the application.</p>
-
-          <h4>Now configure nginx</h4>
-          To make it work properly, we will use Nginx
-          <br><code>brew install nginx</code> If needed.
-
-          <p>Edit your nginx.conf file and set : </p>
-          <pre>server {
-    listen       8080;
-    server_name  sampleapp.dev;
-
-    location / {
-        root   /path/to/your/folder/public/;
-        index  index.html index.htm;
-    }
-
-    location /_db {
-            allow all;
-            proxy_pass http://127.0.0.1:8529/_db;
-    }
-}</pre>
-
-          <p>Notice that in my case Nginx run on port 8080. Open now <a href="http://sampleapp.dev:8080/" target="_blank">http://sampleapp.dev:8080/</a> in your browser.</p>
-
           <h4>Setup the application</h4>
 
-          <p>Open the ArangoDB web UI and go to your database. Open services tab and go to the auth service. Click on the Settings link and set your mailgun credential (Used for sending emails verifications).</p>
-
           <p>Create an account within the app UI and validate it by adding the field <em>{ "a": true }</em> to your user object (via ArangoDB UI). So next time you'll login it will be OK.</p>
-
-
-
 
         </div>
         <div class="uk-width-1-2">
@@ -190,11 +163,12 @@
       <div class="uk-grid">
         <div class="uk-width-1-2">
           <h4>Command</h4>
-          <code>brunch w</code>
-          <p>This will start the listener ... Any change on your source code will run a live reload in your browser.</p>
+          <code>brunch w --server</code>
+          <p>This will start the listener and server... Any change on your source code will run a live reload in your browser.</p>
         </div>
         <div class="uk-width-1-2">
           <h4>Output</h4>
+          <pre>04 Oct 16:38:41 - info: application started on http://localhost:3333/</pre>
           <pre>04 Oct 16:38:41 - info: compiled 20 files into 4 files, copied 4 in 2.5 sec</pre>
         </div>
       </div>

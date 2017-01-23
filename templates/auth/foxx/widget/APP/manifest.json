@@ -13,19 +13,5 @@
         "send-mail": "scripts/send-mail.js"
     },
 
-    "tests": "test/**/*.js",
-    "configuration": {
-      "mailgun_apikey": {
-        "description": "Mailgun's API KEY",
-        "type": "string"
-      },
-      "mailgun_domain": {
-        "description": "Mailgun's domain",
-        "type": "string"
-      },
-      "mailgun_from": {
-        "description": "Mailgun's from email",
-        "type": "string"
-      }
-    }
+    "tests": "test/**/*.js"
 }

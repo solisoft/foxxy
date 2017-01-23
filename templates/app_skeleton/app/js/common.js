@@ -31,7 +31,7 @@ var Common = {
         html += '<div class="'+ l.c +'">'
         if (l.j._flags.presence === "required") {
           l.l = "<strong>" + l.l + "*</strong>"
-        }  
+        }
         html += '<label for="" class="uk-form-label">'+ l.l +'</label>'
         var value = obj[l.n]
         if(value === undefined) value = ""
@@ -48,7 +48,7 @@ var Common = {
           })
           html += '</select>'
         }
-        html += '</div>'  
+        html += '</div>'
       }
     })
     html += '</div>'
@@ -68,7 +68,7 @@ var Common = {
     })
   },
 
-  checkForm: function(formID, path, callback) {    
+  checkForm: function(formID, path, callback) {
     var json = JSON.stringify($("#"+ formID).serializeObject())
     $("div[data-hint]").html("")
     var errors = null
@@ -79,7 +79,7 @@ var Common = {
       if(d.errors.length > 0) {
         errors = d.errors
         _.each(d.errors, function(e) {
-          $("#" + e.path).removeClass("uk-form-success")  
+          $("#" + e.path).removeClass("uk-form-success")
           $("#" + e.path).addClass("uk-form-danger")
           $("div[data-hint="+e.path+"]").html("<div>"+e.message+"</div>")
         })
@@ -103,7 +103,7 @@ var Common = {
       $("#"+ formID + " input, #"+ formID + " select").addClass("uk-form-success")
       if(d.errors.length > 0) {
         _.each(d.errors, function(e) {
-          $("#" + e.path).removeClass("uk-form-success")  
+          $("#" + e.path).removeClass("uk-form-success")
           $("#" + e.path).addClass("uk-form-danger")
           $("div[data-hint="+e.path+"]").html("<div>"+e.message+"</div>")
         })
@@ -124,7 +124,7 @@ var Common = {
       setTimeout(function() {
         $("#"+ formID +" input, #"+ formID +" select").removeClass("uk-form-success")
       }, 300 )
-    }) 
+    })
   },
 
   ajax: function(url, method, dataForm, callback) {
@@ -138,9 +138,10 @@ var Common = {
           xhr.setRequestHeader('X-Session-Id', localStorage.getItem('X-Session-Id'))
         }
       },
-      success: function(data, textStatus, request) { 
-        localStorage.setItem('X-Session-Id',request.getResponseHeader('X-Session-Id'))
-        callback(data) 
+      success: function(data, textStatus, request) {
+        if(request.getResponseHeader('X-Session-Id'))
+          localStorage.setItem('X-Session-Id',request.getResponseHeader('X-Session-Id'))
+        callback(data)
       },
       statusCode: {
         401: function() { document.location.href = "login.html" }

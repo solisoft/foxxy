@@ -54,7 +54,7 @@ Ok now you have your first CRUD created.
 
 ## Dev mode
 
-`$ brunch w --server` will start the live reloader
+`$ brunch w --server` will start the live reloader and a server.
 
 # Deployment
 

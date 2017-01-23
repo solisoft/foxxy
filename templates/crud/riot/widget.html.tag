@@ -98,7 +98,7 @@
     }
 
     edit(e) {
-      riot.route("/@{{objects}}/" + e.item.row._key + "/edit")
+      route("/@{{objects}}/" + e.item.row._key + "/edit")
     }
 
     destroy_object(e) {

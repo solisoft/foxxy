@@ -6,13 +6,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.27.1/css/uikit.min.css">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.1/themes/prism.min.css">
-    
-    <link rel="stylesheet" href="css.css"> 
+
+    <link rel="stylesheet" href="css.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.1/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.1/components/prism-css.min.js"></script>
   </head>
   <body>
-    
+
+    <a href="https://github.com/solisoft/foxx-framework"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+
     <nav class="uk-navbar">
       <div class="uk-container uk-container-center">
         <ul class="uk-navbar-nav">
@@ -22,13 +24,13 @@
           <ul class="uk-navbar-nav">
             <li><a href="#start">Getting Started</a></li>
             <li><a href="#why">Why?</a></li>
-            
+
           </ul>
         </div>
       </div>
     </nav>
 
-    
+
     <div class="foxx">
       <div class="uk-container uk-container-center">
         <div class="uk-grid">
@@ -41,7 +43,7 @@
             <h3>Create apps, develop and deploy with ease.</h3>
           </div>
         </div>
-      </div>  
+      </div>
     </div>
     <div class="uk-container uk-container-center uk-margin-top">
       <div class="uk-grid">
@@ -60,7 +62,7 @@
           <p>
             <strong>Foxx-framework</strong> allow you to create your app localy and then deploy your code on your server with ease. We use <a href="http://nadarei.co/mina/">mina</a> to automate the deployment.
           </p>
-          
+
 
         </div>
         <div class="uk-width-1-2">
@@ -72,7 +74,7 @@
           <a name="start"> <h1>Get Started.</h1> </a>
         </div>
         <div class="uk-width-1-2">
-          
+
           <h2>Install requirements</h2>
           <p><strong>Foxx-framework</strong> needs nodejs and npm installed. <strong>ArangoDB</strong> of course is needed.</p>
 
@@ -91,7 +93,7 @@
       </div>
       <div class="uk-grid">
         <div class="uk-width-1-2">
-          
+
           <code>foxxy new sample_app --database my_test_db</code>
           <p>
             This action will create the skeleton app with a simple login authentification.
@@ -100,9 +102,9 @@
           <p>This will install everything you need to run the application.</p>
 
           <h4>Now configure nginx</h4>
-          To make it work properly, we will use Nginx 
+          To make it work properly, we will use Nginx
           <br><code>brew install nginx</code> If needed.
-          
+
           <p>Edit your nginx.conf file and set : </p>
           <pre>server {
     listen       8080;
@@ -120,14 +122,14 @@
 }</pre>
 
           <p>Notice that in my case Nginx run on port 8080. Open now <a href="http://sampleapp.dev:8080/" target="_blank">http://sampleapp.dev:8080/</a> in your browser.</p>
-          
+
           <h4>Setup the application</h4>
 
           <p>Open the ArangoDB web UI and go to your database. Open services tab and go to the auth service. Click on the Settings link and set your mailgun credential (Used for sending emails verifications).</p>
 
           <p>Create an account within the app UI and validate it by adding the field <em>{ "a": true }</em> to your user object (via ArangoDB UI). So next time you'll login it will be OK.</p>
 
-          
+
 
 
         </div>
@@ -174,7 +176,7 @@
     │   │       │   └── setup.js
     │   │       └── test
     │   │           └── example.js
-    └── package.json            
+    └── package.json
           </pre>
         </div>
 
@@ -182,7 +184,7 @@
       <div class="uk-grid">
         <div class="uk-width-1-1">
           <h2>Run the app</h2>
-        </div>        
+        </div>
       </div>
 
       <div class="uk-grid">
@@ -197,11 +199,11 @@
         </div>
       </div>
 
-      
+
       <div class="uk-grid">
         <div class="uk-width-1-1">
           <h2>Add a CRUD to your app</h2>
-        </div>        
+        </div>
       </div>
 
       <div class="uk-grid">
@@ -211,7 +213,7 @@
           <br>
           <p>It will create a Foxx service called posts and will also create a RiotJS widgets called <em>app/widgets/posts.html.tag</em></p>
 
-          
+
         </div>
       </div>
       <div class="uk-grid">
@@ -221,14 +223,14 @@
   // { r: new_row, c: classname, n: name/id, t: type, j: joi validation, l: label, d: data list }
   fields = [
   ]
-    
+
   schema = {}
   each(fields, function(f) {
     schema[f.n] = f.j
   })
 }
           </code></pre>
-          
+
         </div>
         <div class="uk-width-1-2">
           <p>... and define your model.</p>
@@ -240,7 +242,7 @@
     { r: false, c: "1-2", n: "draft", t: "list", j: joi.string().required(), l: "Draft?", d: [["y", "Yes"], ["n", "No"]] },
     { r: true, c: "1-1", n: "text", t: "text", j: joi.string().required(), l: "Text"}
   ]
-    
+
   schema = {}
   each(fields, function(f) {
     schema[f.n] = f.j
@@ -256,24 +258,24 @@
           <p>So when you'll create or modify your object, the search field will be up to date. You can start using the search bar and press enter to filter your content using the full text search engine.</p>
         </div>
       </div>
-      
+
       <div class="uk-grid">
 
         <div class="uk-width-1-1"><h2>Screenshots</h2></div>
-      
+
         <div class="uk-width-1-2"><img src="ui/1.jpg" alt=""></div>
         <div class="uk-width-1-2"><img src="ui/2.jpg" alt=""></div>
         <div class="uk-width-1-2"><img src="ui/3.jpg" alt=""></div>
         <div class="uk-width-1-2"><img src="ui/4.jpg" alt=""></div>
         <div class="uk-width-1-2"><img src="ui/5.jpg" alt=""></div>
-        
+
       </div>
 
 
 
 
     </div>
-    
+
     <div class="foxx uk-margin-top">
       <div class="uk-container uk-container-center">
         <div class="uk-grid">

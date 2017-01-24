@@ -25,6 +25,7 @@ var schema = {}
 // Comment this block if you want to avoid authorization
 module.context.use(function (req, res, next) {
   if(!req.session.uid) res.throw('unauthorized')
+  res.setHeader("Access-Control-Expose-Headers", "X-Session-Id")
   next();
 });
 
@@ -38,12 +39,12 @@ var loadFields = function(req) {
   //  `, { "@collection": "whatever", key: req.session.data.key })._documents
   //} catch(e) {}
   // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: data },
-  
+
 
   // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: [["data", "list"]] },
   fields = [
   ]
-    
+
   schema = {}
   each(fields, function(f) {
     schema[f.n] = f.j
@@ -57,7 +58,7 @@ router.get('/page/:page', function (req, res) {
     LET datausers = (FOR doc IN @@collection SORT doc._key DESC LIMIT @offset,25 RETURN doc)
     RETURN { count: count, users: datausers }
     `, { "@collection": collName, "offset": (req.pathParams.page - 1) * 25})._documents });
-  
+
 })
 .description('Returns all objects');
 
@@ -94,7 +95,7 @@ router.post('/', function (req, res) {
   var data = {}
   each(fields, function(f) {data[f.n] = req.body[f.n]})
   // data.search = update with what you want to search for
-  res.send({ success: true, key: collection.save(data, { waitForSync: true }) });  
+  res.send({ success: true, key: collection.save(data, { waitForSync: true }) });
 })
 .body(joi.object(schema), 'data')
 .description('Create a new object.');

@@ -25,6 +25,7 @@ var schema = {}
 // Comment this block if you want to avoid authorization
 module.context.use(function (req, res, next) {
   if(!req.session.uid) res.throw('unauthorized')
+  res.setHeader("Access-Control-Expose-Headers", "X-Session-Id")
   next();
 });
 

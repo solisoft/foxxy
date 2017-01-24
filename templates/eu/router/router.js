@@ -1,4 +1,4 @@
-riot.route('/@{{objects}}', function(name) {
+route('/@{{objects}}', function(name) {
     riot.mount('div#app', '@{{objects}}')
   })
   /*@{{router}}*/

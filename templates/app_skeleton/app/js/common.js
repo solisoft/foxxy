@@ -117,7 +117,7 @@ var Common = {
           });
           if(objID == "") {
             objID = d.key._key
-            riot.route("/"+ path +"/" + objID + "/edit")
+            route("/"+ path +"/" + objID + "/edit")
           }
         })
       }

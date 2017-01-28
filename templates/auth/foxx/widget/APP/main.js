@@ -35,12 +35,6 @@ var loadFields = function() {
 
   // r: new row; c: classname; n: name/id; t: type; j: joi validation; l: label; d: data list
   fields = [
-    { r: true,  c:"uk-width-1-1", n:"company", t:"string", j: joi.string().required(), l:"Société !!" },
-    { r: true,  c:"uk-width-1-1", n:"fn", t:"string", j: joi.string().required(), l:"Nom" },
-    { r: true,  c:"uk-width-1-1", n:"ln", t:"string", j: joi.string().required(), l:"Prénom" },
-    { r: true,  c:"uk-width-1-1", n:"username", t:"email", j: joi.string().required(), l:"Email" },
-    { r: true,  c:"uk-width-1-1", n:"password", t:"password", j: joi.string().min(8).max(32).required(), l:"Mot de passe" },
-    { r: true,  c:"uk-width-1-1", n:"password_confirmation", t:"confirm", j: joi.string().required(), l:"Confirmation du mot de passe" }
   ]
 
   schema = {}

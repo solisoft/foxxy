@@ -113,12 +113,6 @@
   </div>
 
   <script>
-    var _this = this;
-    this.fields = []
-    $.get(url + "auth/fields", function(d) {
-      _this.fields = d.fields;
-    })
-
     save_form(e) {
       e.preventDefault()
       common.checkForm("form_signup", "auth", function(err) {

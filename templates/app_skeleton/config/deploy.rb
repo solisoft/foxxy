@@ -57,8 +57,8 @@ desc "Deploys the current version to the server."
 task :deploy => :environment do
   to :before_hook do
     # Put things to run locally before ssh
-    queue "rm -Rf dist/*; yarn run brunch b -- --production;git add . ; git commit -am 'dist release'; git push"
-
+    find_and_replace = "ruby -pi -e \"gsub('http://localhost:8529/_db/#{ENV["ARANGODB_DBNAME"]}/', '#{ENV["ARANGODB_HTTP_ENDPOINT"]}')\" dist/*.html"
+    queue "rm -Rf dist/*; yarn run brunch b -- --production;git add . ; #{find_and_replace}; git commit -am 'dist release'; git push"
   end
   deploy do
     invoke :'git:clone'

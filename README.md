@@ -10,7 +10,7 @@ https://www.foxx-framework.com
 
 ## Prerequisite
 
-- ArangoDB >= 3.x
+- ArangoDB >= 3.1
 - Node.js
 - Ruby (for deployment purpose)
 - yarn https://yarnpkg.com/en/docs/install

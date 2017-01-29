@@ -5,6 +5,7 @@ const createAuth = require('@arangodb/foxx/auth');
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
 const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
+require("@arangodb/aql/cache").properties({ mode: "on" });
 
 const queues = require('@arangodb/foxx/queues');
 const crypt = require('@arangodb/crypto');

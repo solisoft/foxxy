@@ -6,6 +6,7 @@ const each = require('underscore').each;
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
 const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
+require("@arangodb/aql/cache").properties({ mode: "on" });
 
 const router = createRouter();
 const collection = db._collection(collName);

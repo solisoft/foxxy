@@ -62,8 +62,8 @@ var replaceInFile = function(filename, find, replace) {
   fs.writeFileSync(filename, result);
 }
 var foxxy_welcome = `
- ___                 
-|  _|___ _ _ _ _ _ _ 
+ ___
+|  _|___ _ _ _ _ _ _
 |  _| . |_'_|_'_| | |
 |_| |___|_,_|_,_|_  |
                 |___|`
@@ -83,7 +83,7 @@ hasbin('foxx-manager', function(result) {
       console.log("# Widgets are : [crud, eu]");
       console.log("## crud : a basic CRUD widget");
       console.log("## eu : a basic Edit/Update widget");
-      
+
       //console.log("## hcrud : a CRUD widget within a Hierachical structure (tree)");
     } else {
       // Create a new application
@@ -99,7 +99,7 @@ hasbin('foxx-manager', function(result) {
           // Create database if not exist
           var password = "--server.password \"\"";
           if(argv.password != "") password = `--server.password ${argv.password}`
-          var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${argv.database}') < 0) db._createDatabase('${argv.database}');" --server.endpoint ${argv.endpoint} --server.username ${argv.user} ${password}`     
+          var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${argv.database}') < 0) db._createDatabase('${argv.database}');" --server.endpoint ${argv.endpoint} --server.username ${argv.user} ${password}`
           console.log(cmd)
           exec(cmd, function(error, stdout, stderr) {
             var src_folder = path.join(__dirname, '../templates/app_skeleton');
@@ -110,16 +110,16 @@ hasbin('foxx-manager', function(result) {
                 copyRecursiveSync(src_folder, dest_folder)
                 var dest_file = path.join(process.cwd(), `${argv._[1]}/app/assets/index.html`);
                 replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
-                
+
                 var dest_file = path.join(process.cwd(), `${argv._[1]}/app/assets/login.html`);
                 replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
                 fs.writeFileSync(dest_folder + "/.arangodb.yml", yaml.safeDump({ database: argv.database, username: argv.user, password: argv.password, endpoint: argv.endpoint }))
-                
+
                 if(argv.no_widgets === undefined) {
                   src_folder = path.join(__dirname, '../templates/auth/foxx/widget')
                   dest_folder = path.join(process.cwd(), argv._[1]+"/foxx_tmp/auth")
                   fs.mkdirSync(path.join(process.cwd(), argv._[1]+"/foxx_tmp"))
-                  
+
                   copyRecursiveSync(src_folder, dest_folder)
                   console.log("Installing Foxx service...".blue)
                   var password = "--server.password \"\"";
@@ -131,7 +131,7 @@ hasbin('foxx-manager', function(result) {
                     if(stdout) console.log(stdout.green)
                     if(stderr) console.log(stderr.red)
                     deleteFolderRecursive(path.join(process.cwd(), argv._[1]+"/foxx_tmp"))
-                    
+
                     // Set dev mode
                     var cmd = `foxx-manager development /auth --server.endpoint ${argv.endpoint} --server.database ${argv.database} --server.username ${argv.user} ${password}`
                     exec(cmd, function(error, stdout, stderr) {
@@ -145,9 +145,9 @@ hasbin('foxx-manager', function(result) {
                       console.log(cmd.cyan)
                     })
                   })
-                    
+
                 } else {
-                  console.log("App Created ! Grrrrr!".green)                    
+                  console.log("App Created ! Grrrrr!".green)
                 }
               } else {
                 console.log("Folder already exists ... aborting ... ".red)
@@ -156,10 +156,10 @@ hasbin('foxx-manager', function(result) {
           })
 
 
-          
+
         }
       }
-      
+
       if(argv._[0] == "setup") {
         var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
         fs.readdir(process.cwd() + "/foxx", function(err, files) {
@@ -196,28 +196,28 @@ hasbin('foxx-manager', function(result) {
             if(error) console.log(error.red)
             if(stdout) console.log(stdout.green)
             if(stderr) console.log(stderr.red)
-            
+
             deleteFolderRecursive(path.join(process.cwd(), "foxx_tmp"))
-            
+
             // Set dev mode
             var cmd = `foxx-manager development /${pluralize(model)} --server.endpoint ${arangoconf.endpoint} --server.database ${arangoconf.database} --server.username ${arangoconf.username} ${password}`
             exec(cmd, function(error, stdout, stderr) {})
-            
-            // Widget  
+
+            // Widget
             console.log("Creating widget " + model)
             var src_file = path.join(__dirname, `../templates/${action}/riot/widget.html.tag`);
             var dest_file = path.join(process.cwd(), `app/widgets/${pluralize(model)}.html.tag`);
             copyFileSync(src_file, dest_file)
             replaceInFile(dest_file, /@\{\{object\}\}/g, model)
             replaceInFile(dest_file, /@\{\{objects\}\}/g, pluralize(model))
-            
+
             dest_file= path.join(process.cwd(), `app/assets/index.html`);
             var whtml = "require('widgets/"+pluralize(model)+".html.tag');\n      /*@{{riot_components}}*/"
             replaceInFile(dest_file, /\/\*@\{\{riot_components\}\}\*\//g, whtml)
             replaceInFile(dest_file, /\{\{DBNAME\}\}/g, arangoconf.database)
             // Create Menu Item
             replaceInFile(dest_file, "<!-- item_menu -->", `<li><a href="/#${pluralize(model)}">${model[0].toUpperCase() +  pluralize(model).slice(1)}</a></li>\n        <!-- item_menu -->`)
-            
+
 
             // Router
             dest_file= path.join(process.cwd(), `app/js/js.js`);
@@ -227,9 +227,9 @@ hasbin('foxx-manager', function(result) {
               var js = fs.readFileSync(src_file, { encoding: "utf8" })
               replaceInFile(dest_file, /\/\*@\{\{router\}\}\*\//g, js)
               replaceInFile(dest_file, /@\{\{object\}\}/g, model)
-              replaceInFile(dest_file, /@\{\{objects\}\}/g, pluralize(model))        
+              replaceInFile(dest_file, /@\{\{objects\}\}/g, pluralize(model))
             } catch(e) {}
-            
+
 
             src_file = path.join(__dirname, `../templates/${action}/router/router_ca.js`)
             try {
@@ -237,25 +237,25 @@ hasbin('foxx-manager', function(result) {
               var js = fs.readFileSync(src_file, { encoding: "utf8" })
               replaceInFile(dest_file, /\/\*@\{\{router_ca\}\}\*\//g, js)
               replaceInFile(dest_file, /@\{\{object\}\}/g, model)
-              replaceInFile(dest_file, /@\{\{objects\}\}/g, pluralize(model))        
+              replaceInFile(dest_file, /@\{\{objects\}\}/g, pluralize(model))
             } catch(e) {}
-            
+
             src_file = path.join(__dirname, `../templates/${action}/router/router_cia.js`)
             try {
               fs.statSync(src_file)
               var js = fs.readFileSync(src_file, { encoding: "utf8" })
               replaceInFile(dest_file, /\/\*@\{\{router_cia\}\}\*\//g, js)
               replaceInFile(dest_file, /@\{\{object\}\}/g, model)
-              replaceInFile(dest_file, /@\{\{objects\}\}/g, pluralize(model))        
+              replaceInFile(dest_file, /@\{\{objects\}\}/g, pluralize(model))
             } catch(e) {}
-            
+
             console.log(action.toUpperCase() + " "+ model +" created successfully!".green)
 
           });
-          
-          
+
+
         }
-        
+
       }
 
       // Install a new service. Useful for team development
@@ -263,18 +263,21 @@ hasbin('foxx-manager', function(result) {
         console.log("Install Service " + service)
         var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
         var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${arangoconf.database}') < 0) db._createDatabase('${arangoconf.database}');" --server.endpoint ${arangoconf.endpoint} --server.username ${arangoconf.username} ${arangoconf.password}`
-        
-        execSync(cmd) 
-        cmd = `cd foxx; mv ${service} tmp; `;
-        cmd += `zip -r tmp.zip tmp;`
-        cmd += "foxx-manager install tmp.zip /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+arangoconf.password+";"
-        cmd += "foxx-manager development /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+arangoconf.password+";"
-        cmd += `mv tmp ${service};`;
-        
-        cmd += `cd ..;`;
 
         execSync(cmd)
-        
+        var password = "--server.password \"\"";
+        if(arangoconf.password != "") password = `--server.password ${arangoconf.password}`
+        cmd = `cd foxx; mv ${service} tmp; `;
+        cmd += `zip -r tmp.zip tmp;`
+        cmd += "foxx-manager uninstall /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
+        cmd += "foxx-manager install tmp.zip /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
+        cmd += "foxx-manager development /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
+        cmd += `mv tmp ${service};`;
+        cmd += `rm -Rf ${service}/tmp;`;
+        cmd += `cd ..;`;
+        console.log(cmd);
+        execSync(cmd);
+
       }
 
     }

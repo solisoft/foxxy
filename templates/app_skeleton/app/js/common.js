@@ -128,6 +128,7 @@ var Common = {
   },
 
   ajax: function(url, method, dataForm, callback, errorCallback) {
+    if(typeof(errorCallback) === "undefined") errorCallback = function() {}
     $.ajax({
       url: url,
       data: dataForm || "",
@@ -150,20 +151,20 @@ var Common = {
     });
   },
 
-  get: function(url, callback) {
-    this.ajax(url, "GET", "", callback)
+  get: function(url, callback, errorCallback) {
+    this.ajax(url, "GET", "", callback, errorCallback)
   },
-  delete: function(url, callback) {
-    this.ajax(url, "DELETE", "", callback)
+  delete: function(url, callback, errorCallback) {
+    this.ajax(url, "DELETE", "", callback, errorCallback)
   },
-  post: function(url, json, callback) {
-    this.ajax(url, "POST", json, callback)
+  post: function(url, json, callback, errorCallback) {
+    this.ajax(url, "POST", json, callback, errorCallback)
   },
-  patch: function(url, json, callback) {
-    this.ajax(url, "PATCH", json, callback)
+  patch: function(url, json, callback, errorCallback) {
+    this.ajax(url, "PATCH", json, callback, errorCallback)
   },
-  put: function(url, json, callback) {
-    this.ajax(url, "PUT", json, callback)
+  put: function(url, json, callback, errorCallback) {
+    this.ajax(url, "PUT", json, callback, errorCallback)
   },
 
   array_diff: function(a, b) {

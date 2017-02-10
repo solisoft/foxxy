@@ -18,6 +18,7 @@ $(function() {
 
   route('/logout', function(name) {
     common.post(url +"auth/logout", "", function(d) {
+      localStorage.removeItem('X-Session-Id')
       document.location.href = "login.html"
     })
   })

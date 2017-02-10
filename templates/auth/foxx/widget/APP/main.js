@@ -50,21 +50,14 @@ var loadFields = function() {
   })
 }
 
-loadFields()
+loadFields();
 
 router.get('/check_form', function (req, res) {
   var errors = []
-  var json = {}
   try {
     errors = joi.validate(JSON.parse(req.queryParams.data), schema, { abortEarly: false }).error.details
-  } catch(e) { }
-
-  json = JSON.parse(req.queryParams.data)
-  if(json.password != json.password_confirmation) {
-    errors.push({ "path": "password_confirmation", "message": "La confirmation du mot de passe ne correspond pas!"})
-  }
-
-  res.send({errors: errors});
+  } catch(e) {}
+  res.send({errors: errors });
 })
 .description('Check the form for live validation');
 

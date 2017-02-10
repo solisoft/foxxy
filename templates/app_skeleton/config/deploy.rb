@@ -67,7 +67,7 @@ task :deploy => :environment do
       foxx_commands = []
       # Try to install
       foxx_commands << "foxx-manager install #{deploy_to}/#{current_path}/foxx/${i%/}.zip /${i%/} --server.endpoint #{ENV["ARANGODB_ENDPOINT"]} --server.database #{ENV["ARANGODB_DBNAME"]} --server.password #{ENV["ARANGODB_PASS"]} --server.username #{ENV["ARANGODB_USER"]}"
-      # Uprage
+      # Uprade
       foxx_commands << "foxx-manager upgrade #{deploy_to}/#{current_path}/foxx/${i%/}.zip /${i%/} --server.endpoint #{ENV["ARANGODB_ENDPOINT"]} --server.database #{ENV["ARANGODB_DBNAME"]} --server.password #{ENV["ARANGODB_PASS"]} --server.username #{ENV["ARANGODB_USER"]}"
       # Run setup
       foxx_commands << "foxx-manager setup /${i%/} --server.database #{ENV["ARANGODB_DBNAME"]} --server.endpoint #{ENV["ARANGODB_ENDPOINT"]} --server.password #{ENV["ARANGODB_PASS"]} --server.username #{ENV["ARANGODB_USER"]}"

@@ -127,7 +127,7 @@ var Common = {
     })
   },
 
-  ajax: function(url, method, dataForm, callback) {
+  ajax: function(url, method, dataForm, callback, errorCallback) {
     $.ajax({
       url: url,
       data: dataForm || "",
@@ -144,7 +144,8 @@ var Common = {
         callback(data)
       },
       statusCode: {
-        401: function() { document.location.href = "login.html" }
+        401: function() { document.location.href = "login.html" },
+        500: errorCallback(),
       }
     });
   },

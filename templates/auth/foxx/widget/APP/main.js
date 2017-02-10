@@ -76,6 +76,7 @@ router.get('/fields', function (req, res) {
 
 // GET whoami
 router.get('/whoami', function (req, res) {
+  if(!req.session.uid) res.throw('unauthorized')
   try {
     const user = users.document(req.session.uid);
     res.send({username: user.username, role: user.role, a: user.a});

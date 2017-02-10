@@ -11,6 +11,8 @@
         // Load the widget you want
         route('/welcome')
       }
+    }, function() {
+      document.location.href="login.html";
     })
   </script>
 </loading>

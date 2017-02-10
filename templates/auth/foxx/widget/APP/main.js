@@ -36,6 +36,12 @@ var loadFields = function() {
 
   // r: new row; c: classname; n: name/id; t: type; j: joi validation; l: label; d: data list
   fields = [
+    { r: true,  c:"uk-width-1-1", n:"company", t:"string", j: joi.string().required(), l:"Company" },
+    { r: true,  c:"uk-width-1-1", n:"fn", t:"string", j: joi.string().required(), l:"First Name" },
+    { r: true,  c:"uk-width-1-1", n:"ln", t:"string", j: joi.string().required(), l:"Last Name" },
+    { r: true,  c:"uk-width-1-1", n:"username", t:"email", j: joi.string().required(), l:"Email" },
+    { r: true,  c:"uk-width-1-1", n:"password", t:"password", j: joi.string().min(8).max(32).required(), l:"Password" },
+    { r: true,  c:"uk-width-1-1", n:"password_confirmation", t:"confirm", j: joi.string().required(), l:"Password Confirmation" }
   ]
 
   schema = {}
@@ -70,12 +76,10 @@ router.get('/fields', function (req, res) {
 
 // GET whoami
 router.get('/whoami', function (req, res) {
-  if(!req.session.uid) res.throw('unauthorized')
   try {
     const user = users.document(req.session.uid);
     res.send({username: user.username, role: user.role, a: user.a});
   } catch (e) {
-
     res.send({username: null});
   }
 })

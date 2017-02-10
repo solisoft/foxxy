@@ -2,7 +2,7 @@
 const collName = "@{{objects}}"
 const db = require('@arangodb').db;
 const joi = require('joi');
-const each = require('underscore').each;
+const each = require('lodash').each;
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
 const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
@@ -78,7 +78,7 @@ router.get('/:id', function (req, res) {
 .description('Returns object within ID');
 
 router.get('/check_form', function (req, res) {
-    var errors = []
+  var errors = []
   try {
     errors = joi.validate(JSON.parse(req.queryParams.data), schema, { abortEarly: false }).error.details
   } catch(e) {}

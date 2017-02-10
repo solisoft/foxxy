@@ -15,8 +15,8 @@ const _ = require('underscore');
 const auth = createAuth();
 const router = createRouter();
 const users = db._collection('users');
-const organisations = db._collection('organisations');
-const each = require('underscore').each;
+
+const each = require('lodash').each;
 const queue = queues.create('mailer');
 
 const _settings = db._collection('foxxy_settings').firstExample();

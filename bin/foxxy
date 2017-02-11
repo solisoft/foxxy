@@ -154,10 +154,21 @@ hasbin('foxx-manager', function(result) {
               }
             })
           })
-
-
-
         }
+      }
+
+      if(argv._[0] == "symlinks") {
+        var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
+        var password = "--server.password \"\"";
+        if(arangoconf.password != "") password = `--server.password ${arangoconf.password}`
+        var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${arangoconf.database}') < 0) db._createDatabase('${arangoconf.database}');" --server.endpoint ${arangoconf.endpoint} --server.username ${arangoconf.user} ${password}`
+        //console.log(cmd)
+        exec(cmd, function(error, stdout, stderr) {
+          cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${arangoconf.database}`
+          console.log(cmd.cyan)
+          cmd = `ln -s ${path.join(process.cwd(), "/foxx")} /usr/local/var/lib/arangodb3-apps/_db/${arangoconf.database}`
+          console.log(cmd.cyan)
+        })
       }
 
       if(argv._[0] == "setup") {

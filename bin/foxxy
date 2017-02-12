@@ -308,7 +308,7 @@ hasbin('foxx-manager', function(result) {
         execSync(cmd)
         var password = "--server.password \"\"";
         if(arangoconf.password != "") password = `--server.password ${arangoconf.password}`
-        cmd = `cd foxx; mv ${service} tmp; `;
+        cmd = `cd foxx; rm -Rf tmp*; mv ${service} tmp; `;
         cmd += `zip -r tmp.zip tmp;`
         cmd += "foxx-manager uninstall /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
         cmd += "foxx-manager install tmp.zip /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"

@@ -1,7 +1,13 @@
 'use strict';
 const db = require('@arangodb').db;
 
-// Always look for sessions collection
-if (!db._collection("sessions")) {
-  db._createDocumentCollection("sessions");
+const collection = '@{{objects}}';
+
+if (!db._collection(collection)) {
+  db._createDocumentCollection(collection);
 }
+
+db._collection("@{{objects}}").ensureIndex({
+  type: 'fulltext',
+  fields: ['search']
+});

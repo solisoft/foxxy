@@ -56,6 +56,24 @@ var deleteFolderRecursive = function(path) {
   }
 };
 
+var foxxAppsFolder = function() {
+  // Brew OSX default install
+  if(fs.existsSync('/usr/local/var/lib/arangodb3-apps')) {
+    return '/usr/local/var/lib/arangodb3-apps'
+  }
+
+  // centOS7  and surely a lot of linux ditri
+  if(fs.existsSync('/var/lib/arangodb3-apps')) {
+    return '/var/lib/arangodb3-apps';
+  }
+
+  return '';
+}
+
+const arangodb3AppsPath = foxxAppsFolder();
+
+console.log(arangodb3AppsPath)
+
 var replaceInFile = function(filename, find, replace) {
   var data = fs.readFileSync(filename, { encoding: "utf8" })
   var result = data.replace(find, replace);
@@ -137,12 +155,18 @@ hasbin('foxx-manager', function(result) {
                     exec(cmd, function(error, stdout, stderr) {
                       console.log("App Created ! Grrrrr!".green)
                       console.log("\nNow move auth foxx app and create a symlink to your arangodb app path from your app foxx folder")
-                      var cmd = `cp -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}/* ${path.join(process.cwd(), argv._[1] + "/foxx")}`
-                      console.log(cmd.cyan)
-                      cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
-                      console.log(cmd.cyan)
-                      cmd = `ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
-                      console.log(cmd.cyan)
+                      //var cmd = `cp -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}/* ${path.join(process.cwd(), argv._[1] + "/foxx")}`
+                      //console.log(cmd.cyan)
+                      if(arangodb3AppsPath != '') {
+                        execSync(`rm -Rf ${arangodb3AppsPath}/_db/${argv.database}`);
+                        execSync(`ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} ${arangodb3AppsPath}/_db/${argv.database}`);
+                      } else {
+                        cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
+                        console.log(cmd.cyan)
+                        cmd = `ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
+                        console.log(cmd.cyan)
+                      }
+
                     })
                   })
 
@@ -164,10 +188,16 @@ hasbin('foxx-manager', function(result) {
         var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${arangoconf.database}') < 0) db._createDatabase('${arangoconf.database}');" --server.endpoint ${arangoconf.endpoint} --server.username ${arangoconf.user} ${password}`
         //console.log(cmd)
         exec(cmd, function(error, stdout, stderr) {
-          cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${arangoconf.database}`
-          console.log(cmd.cyan)
-          cmd = `ln -s ${path.join(process.cwd(), "/foxx")} /usr/local/var/lib/arangodb3-apps/_db/${arangoconf.database}`
-          console.log(cmd.cyan)
+          if(arangodb3AppsPath != '') {
+            execSync(`rm -Rf ${arangodb3AppsPath}/_db/${argv.database}`);
+            execSync(`ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} ${arangodb3AppsPath}/_db/${argv.database}`);
+          } else {
+            cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${arangoconf.database}`
+            console.log(cmd.cyan)
+            cmd = `ln -s ${path.join(process.cwd(), "/foxx")} /usr/local/var/lib/arangodb3-apps/_db/${arangoconf.database}`
+            console.log(cmd.cyan)
+          }
+
         })
       }
 

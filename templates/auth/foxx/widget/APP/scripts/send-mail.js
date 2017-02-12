@@ -7,7 +7,7 @@ console.log(`Sent to ${module.context.argv[0].to}`);
 
 request({
   method: "POST",
-  url: "https://api:"+ settings.mailgun_apikey +"@api.mailgun.net/v3/"+ module.context.configuration.mailgun_domain +"/messages",
+  url: "https://api:"+ settings.mailgun_apikey +"@api.mailgun.net/v3/"+ settings.mailgun_domain +"/messages",
   form: {
     from: settings.mailgun_from,
     to: params.to,

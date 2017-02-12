@@ -4,9 +4,9 @@ const params = module.context.argv[0];
 
 request({
   method: "POST",
-  url: "https://api:"+ module.context.configuration.mailgun_apikey +"@api.mailgun.net/v3/"+ module.context.configuration.mailgun_domain +"/messages",
+  url: "https://api:"+ settings.mailgun_apikey +"@api.mailgun.net/v3/"+ settings.mailgun_domain +"/messages",
   form: {
-    from: module.context.configuration.mailgun_from,
+    from: settings.mailgun_from,
     to: params.to,
     subject: "Lost password",
     text: `Hi,

@@ -191,8 +191,8 @@ hasbin('foxx-manager', function(result) {
         //console.log(cmd)
         exec(cmd, function(error, stdout, stderr) {
           if(arangodb3AppsPath != '') {
-            execSync(`rm -Rf ${arangodb3AppsPath}/_db/${argv.database}`);
-            execSync(`ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} ${arangodb3AppsPath}/_db/${argv.database}`);
+            execSync(`rm -Rf ${arangodb3AppsPath}/_db/${arangoconf.database}`);
+            execSync(`ln -s ${path.join(process.cwd(), "/foxx")} ${arangodb3AppsPath}/_db/${arangoconf.database}`);
           } else {
             cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${arangoconf.database}`
             console.log(cmd.cyan)

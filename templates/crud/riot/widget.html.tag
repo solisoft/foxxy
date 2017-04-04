@@ -43,7 +43,7 @@
   <form onsubmit={filter} class="uk-form uk-margin-top">
     <div class="uk-form-icon uk-width-1-1">
       <i class="uk-icon-search"></i>
-      <input type="text" name="term" id="term" class="uk-width-1-1" autocomplete="off">
+      <input type="text" ref="term" id="term" class="uk-width-1-1" autocomplete="off">
     </div>
   </form>
   <table class="uk-table uk-table-striped">
@@ -82,9 +82,10 @@
     this.loadFirstPage()
 
     filter(e) {
-      if(_this.term.value != "") {
+      e.preventDefault();
+      if(_this.refs.term.value != "") {
         $(".uk-form-icon i").attr("class", "uk-icon-spin uk-icon-spinner")
-        common.get(url + "@{{objects}}/search/"+_this.term.value, function(d) {
+        common.get(url + "@{{objects}}/search/"+_this.refs.term.value, function(d) {
           _this.data = d.data
           $(".uk-pagination").hide()
           $(".uk-form-icon i").attr("class", "uk-icon-search")

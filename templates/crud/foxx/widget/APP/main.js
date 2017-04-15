@@ -56,8 +56,8 @@ loadFields({});
 router.get('/page/:page', function (req, res) {
   res.send({ data: db._query(`
     LET count = LENGTH(@@collection)
-    LET datausers = (FOR doc IN @@collection SORT doc._key DESC LIMIT @offset,25 RETURN doc)
-    RETURN { count: count, users: datausers }
+    LET data = (FOR doc IN @@collection SORT doc._key DESC LIMIT @offset,25 RETURN doc)
+    RETURN { count: count, data: data }
     `, { "@collection": collName, "offset": (req.pathParams.page - 1) * 25})._documents });
 
 })

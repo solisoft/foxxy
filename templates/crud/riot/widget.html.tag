@@ -72,7 +72,7 @@
 
     this.loadFirstPage = function() {
       common.get(url + "@{{objects}}/page/1", function(d) {
-        _this.data = d.data[0].users
+        _this.data = d.data[0].data
         _this.cols = common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"])
         _this.count = d.data[0].count
         UIkit.pagination(".uk-pagination", { items: _this.count, itemsOnPage: per_page });
@@ -106,7 +106,7 @@
       UIkit.modal.confirm("Are you sure?", function() {
         common.delete(url + "@{{objects}}/" + e.item.row._key, function() {
           common.get(url + "@{{objects}}/page/1", function(d) {
-            _this.data = d.data[0].users
+            _this.data = d.data[0].data
             _this.count = d.data[0].count
             _this.update()
           })
@@ -116,7 +116,7 @@
 
     $('body').on('select.uk.pagination', '.uk-pagination', function(e, pageIndex){
         common.get(url + "@{{objects}}/page/" + (pageIndex+1), function(d) {
-          _this.data = d.data[0].users
+          _this.data = d.data[0].data
           _this.count = d.data[0].count
           _this.update()
         })

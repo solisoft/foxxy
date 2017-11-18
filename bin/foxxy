@@ -85,6 +85,7 @@ var foxxy_welcome = `
                 |___|`
 
 console.log(foxxy_welcome.yellow)
+console.log('Version 0.2.21'.yellow)
 
 hasbin('foxx-manager', function(result) {
   if(result) {
@@ -93,12 +94,11 @@ hasbin('foxx-manager', function(result) {
       console.log("Samples :");
       console.log("- Create a new app : foxxy new app_name --database db_name --user username --password secret --endpoint http+tcp://127.0.0.1:8529");
       console.log("- - endpoint, username and password are not mandatory");
-      console.log("- Generate a page : foxxy g page page_name");
-      console.log("- Generate a widget : foxxy g crud users");
-      console.log("------------------------------------------");
-      console.log("# Widgets are : [crud, eu]");
-      console.log("## crud : a basic CRUD widget");
-      console.log("## eu : a basic Edit/Update widget");
+      console.log("- Generate a CRUD : foxxy g crud user");
+      console.log("- Generate an Edit/Update only : foxxy g eu user");
+      console.log("- Generate a basic service & widget : foxxy g basic user");
+      console.log("- Generate a basic service only : foxxy g service user");
+
 
       //console.log("## hcrud : a CRUD widget within a Hierachical structure (tree)");
     } else {
@@ -223,7 +223,7 @@ hasbin('foxx-manager', function(result) {
           console.log("Usage : foxxy g <type> <model>".red)
         } else {
           var action = argv._[1];
-          if(["crud", "eu", "basic"].indexOf(action) < 0) throw "No action found ! Please check manual..."
+          if(["crud", "eu", "basic", "service"].indexOf(action) < 0) throw "No action found ! Please check manual..."
           var model = argv._[2]
           var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
           // First install foxx service
@@ -248,11 +248,13 @@ hasbin('foxx-manager', function(result) {
 
             // Widget
             console.log("Creating widget " + model)
-            var src_file = path.join(__dirname, `../templates/${action}/riot/widget.html.tag`);
-            var dest_file = path.join(process.cwd(), `app/widgets/${pluralize(model)}.html.tag`);
-            copyFileSync(src_file, dest_file)
-            replaceInFile(dest_file, /@\{\{object\}\}/g, model)
-            replaceInFile(dest_file, /@\{\{objects\}\}/g, pluralize(model))
+            try {
+              var src_file = path.join(__dirname, `../templates/${action}/riot/widget.html.tag`);
+              var dest_file = path.join(process.cwd(), `app/widgets/${pluralize(model)}.html.tag`);
+              copyFileSync(src_file, dest_file)
+              replaceInFile(dest_file, /@\{\{object\}\}/g, model)
+              replaceInFile(dest_file, /@\{\{objects\}\}/g, pluralize(model))
+            } catch(e) {}
 
             dest_file= path.join(process.cwd(), `app/assets/index.html`);
             var whtml = "require('widgets/"+pluralize(model)+".html.tag');\n      /*@{{riot_components}}*/"

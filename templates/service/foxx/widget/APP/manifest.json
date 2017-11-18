@@ -1,7 +1,7 @@
 {
-    "name": "@{{objects}}",
+    "name": "@{{object}}",
     "version": "0.0.0",
-    "description": "@{{objects}}",
+    "description": "@{{object}}",
     "engines": {
         "arangodb": "^3.0.0"
     },

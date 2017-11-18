@@ -85,7 +85,7 @@ var foxxy_welcome = `
                 |___|`
 
 console.log(foxxy_welcome.yellow)
-console.log('Version 0.2.22'.yellow)
+console.log('Version 0.2.23'.yellow)
 
 hasbin('foxx-manager', function(result) {
   if(result) {

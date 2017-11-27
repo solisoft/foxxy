@@ -155,6 +155,7 @@ hasbin('foxx-manager', function(result) {
                     // Set dev mode
                     var cmd = `foxx-manager development /auth --server.endpoint ${argv.endpoint} --server.database ${argv.database} --server.username ${argv.user} ${password}`
                     exec(cmd, function(error, stdout, stderr) {
+                      console.log("User demo@foxxy.ovh with password demo created successfully".cyan)
                       console.log("App Created ! Grrrrr!".green)
                       if(arangodb3AppsPath == '') {
 
@@ -259,13 +260,16 @@ hasbin('foxx-manager', function(result) {
               replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
             } catch(e) {}
 
-            if(action != "service" && action != "upload") {
+            if(action != "service") {
               dest_file= path.join(process.cwd(), `app/assets/index.html`);
               var whtml = "require('widgets/"+final_model_name+".html.tag');\n      /*@{{riot_components}}*/"
               replaceInFile(dest_file, /\/\*@\{\{riot_components\}\}\*\//g, whtml)
               replaceInFile(dest_file, /\{\{DBNAME\}\}/g, arangoconf.database)
+
               // Create Menu Item
-              replaceInFile(dest_file, "<!-- item_menu -->", `<li><a href="/#${final_model_name}">${model[0].toUpperCase() +  final_model_name.slice(1)}</a></li>\n        <!-- item_menu -->`)
+              if(action != "upload") {
+                replaceInFile(dest_file, "<!-- item_menu -->", `<li><a href="/#${final_model_name}">${model[0].toUpperCase() +  final_model_name.slice(1)}</a></li>\n        <!-- item_menu -->`)
+              }
 
 
               // Router

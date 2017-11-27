@@ -13,7 +13,9 @@ if (!db._collection(settings)) {
     jwt_secret: uuid,
     mailgun_apikey: "mailgun_apikey",
     mailgun_domain: "mailgun_domain",
-    mailgun_from: "mailgun_from"
+    mailgun_from: "mailgun_from",
+    upload_path: '/somewhere/',
+    upload_url: 'http://example.com/'
   });
 }
 

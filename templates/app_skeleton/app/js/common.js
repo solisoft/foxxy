@@ -18,7 +18,8 @@ var Common = {
   },
 
   buildForm: function buildForm(obj, fields, formId, back_str) {
-    var html = "";
+    var html = ""
+    var uploads = []
     fields.forEach(function(l, i) {
       if (l.h !== undefined) {
         html += '<div class="uk-grid uk-grid-small uk-margin-top"><h3>'+ l.h +'</h3></div>'
@@ -32,7 +33,8 @@ var Common = {
         if (l.j._flags.presence === "required") {
           l.l = "<strong>" + l.l + "*</strong>"
         }
-        html += '<label for="" class="uk-form-label">'+ l.l +'</label>'
+        if(!(l.t === "file" && obj._id === undefined))
+          html += '<label for="" class="uk-form-label">'+ l.l +'</label>'
         var value = obj[l.n]
         if(value === undefined) value = ""
         if(l.t === "string") html += '<input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
@@ -49,6 +51,27 @@ var Common = {
           })
           html += '</select>'
         }
+        if(l.t === "image" && obj._id) {
+          html += '<div id="upload-drop_'+l.n+'" class="uk-placeholder">'
+          html += 'Drop your pictures'
+          html += '</div>'
+          html += '<div id="progressbar_'+l.n+'" class="uk-progress uk-hidden">'
+          html += '<div class="uk-progress-bar" style="width: 0%;">0%</div>'
+          html += '</div>'
+          html += '<images field="'+l.n+'" id="'+obj._id+'" />'
+          uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.(jpg|jpeg|gif|png)', '#progressbar_'+l.n, '#upload-drop_'+l.n])
+        }
+        if(l.t === "file" && obj._id) {
+          html += '<div id="upload-drop_'+l.n+'" class="uk-placeholder">'
+          html += 'Drop your files'
+          html += '</div>'
+          html += '<div id="progressbar_'+l.n+'" class="uk-progress uk-hidden">'
+          html += '<div class="uk-progress-bar" style="width: 0%;">0%</div>'
+          html += '</div>'
+          html += '<files field="'+l.n+'" id="'+obj._id+'" />'
+          uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.*', '#progressbar_'+l.n, '#upload-drop_'+l.n])
+        }
+
         html += '</div>'
       }
     })
@@ -60,6 +83,11 @@ var Common = {
     html += '<button class="uk-button uk-button-success"><i class="uk-icon-save"></i> Save</button></div></div><hr>'
 
     $(formId).html(html)
+    var _this = this
+    uploads.forEach(function(u) {
+      _this.prepare_upload(u[0], u[1], u[2], u[3], u[4], u[5])
+    })
+    riot.mount("images"); riot.mount("files")
     riot.update()
   },
 
@@ -176,6 +204,50 @@ var Common = {
     var keys = []
     for(var k in h) keys.push(k)
     return keys
+  },
+
+  prepare_upload: function(key, collection, field, filter, progressbar_id, drop_id) {
+    var progressbar = $(progressbar_id),
+      bar         = progressbar.find('.uk-progress-bar'),
+      settings    = {
+
+      action: url + '/uploads/' + key + '/' + collection + '/' + field, // upload url
+
+      headers: {
+        'X-Session-Id': localStorage.getItem('X-Session-Id')
+      },
+
+      allow : filter,
+
+      loadstart: function() {
+        bar.css("width", "0%").text("0%");
+        progressbar.removeClass("uk-hidden");
+      },
+
+      progress: function(percent) {
+        percent = Math.ceil(percent);
+        bar.css("width", percent+"%").text(percent+"%");
+      },
+
+      allcomplete: function(response) {
+
+        bar.css("width", "100%").text("100%");
+        setTimeout(function(){
+          progressbar.addClass("uk-hidden");
+          riot.mount("images"); riot.mount("files")
+          riot.update()
+
+        }, 250);
+        UIkit.notify({
+          message : 'File(s) uploaded successfully',
+          status  : 'success',
+          timeout : 1000,
+          pos     : 'bottom-right'
+        });
+      }
+    };
+
+    UIkit.uploadDrop($(drop_id), settings);
   }
 
 };

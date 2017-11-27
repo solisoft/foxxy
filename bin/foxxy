@@ -10,7 +10,7 @@ var argv = require('yargs').argv;
 var hasbin = require('hasbin');
 var pluralize = require('pluralize');
 var colors = require('colors');
-
+var version = '0.2.24';
 
 var copyFileSync = function(src, dest) {
   fs.writeFileSync(dest, fs.readFileSync(src, { encoding: "utf8" }));
@@ -85,7 +85,7 @@ var foxxy_welcome = `
                 |___|`
 
 console.log(foxxy_welcome.yellow)
-console.log('Version 0.2.23'.yellow)
+console.log(('Version ' + version).yellow)
 
 hasbin('foxx-manager', function(result) {
   if(result) {
@@ -223,8 +223,9 @@ hasbin('foxx-manager', function(result) {
           console.log("Usage : foxxy g <type> <model>".red)
         } else {
           var action = argv._[1];
-          if(["crud", "eu", "basic", "service"].indexOf(action) < 0) throw "No action found ! Please check manual..."
+          if(["crud", "eu", "basic", "service", "upload"].indexOf(action) < 0) throw "No action found ! Please check manual..."
           var model = argv._[2]
+          if(action == "upload") model = "upload"
           var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
           // First install foxx service
           var src_folder = path.join(__dirname, `../templates/${action}/foxx/widget`);
@@ -258,43 +259,47 @@ hasbin('foxx-manager', function(result) {
               replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
             } catch(e) {}
 
-            dest_file= path.join(process.cwd(), `app/assets/index.html`);
-            var whtml = "require('widgets/"+final_model_name+".html.tag');\n      /*@{{riot_components}}*/"
-            replaceInFile(dest_file, /\/\*@\{\{riot_components\}\}\*\//g, whtml)
-            replaceInFile(dest_file, /\{\{DBNAME\}\}/g, arangoconf.database)
-            // Create Menu Item
-            replaceInFile(dest_file, "<!-- item_menu -->", `<li><a href="/#${final_model_name}">${model[0].toUpperCase() +  final_model_name.slice(1)}</a></li>\n        <!-- item_menu -->`)
+            if(action != "service" && action != "upload") {
+              dest_file= path.join(process.cwd(), `app/assets/index.html`);
+              var whtml = "require('widgets/"+final_model_name+".html.tag');\n      /*@{{riot_components}}*/"
+              replaceInFile(dest_file, /\/\*@\{\{riot_components\}\}\*\//g, whtml)
+              replaceInFile(dest_file, /\{\{DBNAME\}\}/g, arangoconf.database)
+              // Create Menu Item
+              replaceInFile(dest_file, "<!-- item_menu -->", `<li><a href="/#${final_model_name}">${model[0].toUpperCase() +  final_model_name.slice(1)}</a></li>\n        <!-- item_menu -->`)
 
 
-            // Router
-            dest_file= path.join(process.cwd(), `app/js/js.js`);
-            src_file = path.join(__dirname, `../templates/${action}/router/router.js`)
-            try {
-              fs.statSync(src_file)
-              var js = fs.readFileSync(src_file, { encoding: "utf8" })
-              replaceInFile(dest_file, /\/\*@\{\{router\}\}\*\//g, js)
-              replaceInFile(dest_file, /@\{\{object\}\}/g, model)
-              replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
-            } catch(e) {}
+              // Router
+              dest_file= path.join(process.cwd(), `app/js/js.js`);
+              src_file = path.join(__dirname, `../templates/${action}/router/router.js`)
+              try {
+                fs.statSync(src_file)
+                var js = fs.readFileSync(src_file, { encoding: "utf8" })
+                replaceInFile(dest_file, /\/\*@\{\{router\}\}\*\//g, js)
+                replaceInFile(dest_file, /@\{\{object\}\}/g, model)
+                replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
+              } catch(e) {}
 
 
-            src_file = path.join(__dirname, `../templates/${action}/router/router_ca.js`)
-            try {
-              fs.statSync(src_file)
-              var js = fs.readFileSync(src_file, { encoding: "utf8" })
-              replaceInFile(dest_file, /\/\*@\{\{router_ca\}\}\*\//g, js)
-              replaceInFile(dest_file, /@\{\{object\}\}/g, model)
-              replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
-            } catch(e) {}
+              src_file = path.join(__dirname, `../templates/${action}/router/router_ca.js`)
+              try {
+                fs.statSync(src_file)
+                var js = fs.readFileSync(src_file, { encoding: "utf8" })
+                replaceInFile(dest_file, /\/\*@\{\{router_ca\}\}\*\//g, js)
+                replaceInFile(dest_file, /@\{\{object\}\}/g, model)
+                replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
+              } catch(e) {}
 
-            src_file = path.join(__dirname, `../templates/${action}/router/router_cia.js`)
-            try {
-              fs.statSync(src_file)
-              var js = fs.readFileSync(src_file, { encoding: "utf8" })
-              replaceInFile(dest_file, /\/\*@\{\{router_cia\}\}\*\//g, js)
-              replaceInFile(dest_file, /@\{\{object\}\}/g, model)
-              replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
-            } catch(e) {}
+              src_file = path.join(__dirname, `../templates/${action}/router/router_cia.js`)
+              try {
+                fs.statSync(src_file)
+                var js = fs.readFileSync(src_file, { encoding: "utf8" })
+                replaceInFile(dest_file, /\/\*@\{\{router_cia\}\}\*\//g, js)
+                replaceInFile(dest_file, /@\{\{object\}\}/g, model)
+                replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
+              } catch(e) {}
+
+            }
+
 
             console.log(action.toUpperCase() + " "+ model +" created successfully!".green)
 

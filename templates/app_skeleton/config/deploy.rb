@@ -1,7 +1,7 @@
 require 'mina/bundler'
 require 'mina/rails'
 require 'mina/git'
-require "YAML"
+require 'YAML'
 
 begin
   YAML.load(IO.read("config/local_env.yml")).each do |key, value|
@@ -40,6 +40,9 @@ task :setup => :environment do
 
   queue! %[mkdir -p "#{deploy_to}/#{shared_path}/config"]
   queue! %[chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/config"]
+
+  queue! %[mkdir -p "#{deploy_to}/#{shared_path}/uploads"]
+  queue! %[chmod g+rx,u+rwx "#{deploy_to}/#{shared_path}/uploads"]
 
   if repository
     repo_host = repository.split(%r{@|://}).last.split(%r{:|\/}).first

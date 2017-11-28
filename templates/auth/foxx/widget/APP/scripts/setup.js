@@ -3,9 +3,9 @@ const db = require('@arangodb').db;
 const crypt = require('@arangodb/crypto');
 const settings = 'foxxy_settings';
 const users = 'users';
+const auth = require('@arangodb/foxx/auth')();
 
 const uuid = crypt.genRandomAlphaNumbers(80);
-
 
 if (!db._collection(settings)) {
   db._createDocumentCollection(settings);
@@ -28,3 +28,11 @@ db._collection(users).ensureIndex({
   fields: ['username'],
   unique: true
 });
+
+if(db.users.count() == 0) {
+  db.users.save({
+    username: 'demo@foxxy.ovh',
+    authData: auth.create('demo'),
+    a: true
+  })
+}

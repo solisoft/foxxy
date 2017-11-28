@@ -16,7 +16,11 @@
       _this.@{{object}} = d.data
       common.buildForm(_this.@{{object}}, d.fields, '#form_@{{object}}', '@{{objects}}')
     })
-    this.on('updated', function() { $("select").select2() })
+    this.on('updated', function() {
+      $(".select_list").select2()
+      $(".select_mlist").select2()
+      $(".select_tag").select2({ tags: true })
+    })
   </script>
 </@{{object}}_edit>
 
@@ -33,7 +37,11 @@
     common.get(url + "@{{objects}}/fields", function(d) {
       common.buildForm({}, d.fields, '#form_new_@{{object}}', '@{{objects}}');
     })
-    this.on('updated', function() { $("select").select2() })
+    this.on('updated', function() {
+      $(".select_list").select2()
+      $(".select_mlist").select2()
+      $(".select_tag").select2({ tags: true })
+    })
   </script>
 </@{{object}}_new>
 

@@ -14,8 +14,8 @@ if (!db._collection(settings)) {
     mailgun_apikey: "mailgun_apikey",
     mailgun_domain: "mailgun_domain",
     mailgun_from: "mailgun_from",
-    upload_path: '/somewhere/',
-    upload_url: 'http://example.com/'
+    upload_path: '@{{dirname}}',
+    upload_url: 'http://localhost:3001/'
   });
 }
 
@@ -32,7 +32,7 @@ db._collection(users).ensureIndex({
 if(db.users.count() == 0) {
   db.users.save({
     username: 'demo@foxxy.ovh',
-    authData: auth.create('demo'),
+    authData: auth.create('@{{password}}'),
     a: true
   })
 }

@@ -10,8 +10,8 @@ var argv = require('yargs').argv;
 var hasbin = require('hasbin');
 var pluralize = require('pluralize');
 var colors = require('colors');
-var version = '0.2.25';
-
+var version = '0.2.28';
+var user_password = +new Date();
 var copyFileSync = function(src, dest) {
   fs.writeFileSync(dest, fs.readFileSync(src, { encoding: "utf8" }));
 }
@@ -23,6 +23,7 @@ var copyFileSync = function(src, dest) {
  */
 var copyRecursiveSync = function(src, dest, model) {
   var exists = fs.existsSync(src);
+  var dirname = path.join(process.cwd(), argv._[1], "public") + "/";
   var stats = exists && fs.statSync(src);
   var isDirectory = exists && stats.isDirectory();
   if (exists && isDirectory) {
@@ -35,6 +36,9 @@ var copyRecursiveSync = function(src, dest, model) {
   } else {
 
     copyFileSync(src, dest);
+
+    replaceInFile(dest, /@\{\{dirname\}\}/g, dirname)
+    replaceInFile(dest, /@\{\{password\}\}/g, user_password)
     if(model !== undefined) {
       replaceInFile(dest, /@\{\{object\}\}/g, model)
       replaceInFile(dest, /@\{\{objects\}\}/g, pluralize(model))
@@ -155,7 +159,7 @@ hasbin('foxx-manager', function(result) {
                     // Set dev mode
                     var cmd = `foxx-manager development /auth --server.endpoint ${argv.endpoint} --server.database ${argv.database} --server.username ${argv.user} ${password}`
                     exec(cmd, function(error, stdout, stderr) {
-                      console.log("User demo@foxxy.ovh with password demo created successfully".cyan)
+                      console.log("User 'demo@foxxy.ovh' with password '"+user_password+"' created successfully".cyan)
                       console.log("App Created ! Grrrrr!".green)
                       if(arangodb3AppsPath == '') {
 

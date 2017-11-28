@@ -16,6 +16,11 @@
       _this.obj = d.data
       common.buildForm(_this.obj, d.fields, '#form_@{{objects}}')
     })
+
+    this.on('updated', function() {
+      $(".select_list").select2()
+      $(".select_tag").select2({ tags: true })
+    })
   </script>
 </@{{objects}}>
 

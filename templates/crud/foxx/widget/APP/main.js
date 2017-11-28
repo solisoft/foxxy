@@ -32,17 +32,37 @@ module.context.use(function (req, res, next) {
 
 var loadFields = function(req) {
   // Sample to load an external collection as list
-  //var data = []
-  //try {
-  //  data = db._query(`FOR doc in @@collection
-  //  FILTER doc.foreign_key == @key
-  //  RETURN [doc._key, doc.desired_field_name]
-  //  `, { "@collection": "whatever", key: req.session.data.key })._documents
-  //} catch(e) {}
+  // var data = []
+  // try {
+  //   data = db._query(`FOR doc in @@collection
+  //   FILTER doc.foreign_key == @key
+  //   RETURN [doc._key, doc.desired_field_name]
+  //   `, { "@collection": "whatever", key: req.session.data.key })._documents
+  // } catch(e) {}
   // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: data },
+
+  // Tags definition sample
+  // var tags = db._query(`
+  //   LET tags = (
+  //     FOR doc IN posts
+  //       RETURN doc.tags
+  //   )
+  //   RETURN UNIQUE(FLATTEN(tags))
+  // `).toArray()
 
 
   // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: [["data", "list"]] },
+
+  // { r: true, c: "1-1", n: "field1", t: "string", j: joi.string().required(), l: "Field1" },
+  // { r: true, c: "1-1", n: "field2", t: "integer", j: joi.number().integer(), l: "Field2" },
+  // { r: true, c: "1-1", n: "field3", t: "date", j: joi.date().format('DD-MM-YYYY').raw().required(), l: "Field3" },
+  // { r: true, c: "1-1", n: "field4", t: "time", j: joi.string(), l: "Field4" },
+  // { r: true, c: "1-1", n: "field5", t: "text", j: joi.string(), l: "Field5" },
+  // { r: true, c: "1-1", n: "field6", t: "list", j: joi.string(), l: "Field6", d: data },
+  // { r: true, c: "1-1", n: "field7", t: "image", j: joi.string(), l: "Field7" },
+  // { r: true, c: "1-1", n: "field8", t: "file", j: joi.string(), l: "Field8" },
+  // { r: true, c: "1-1", n: "field9", t: "tags", j: joi.array(), l: "Field5", d: tags },
+
   fields = [
   ]
 

@@ -40,16 +40,34 @@ var Common = {
         if(l.t === "string") html += '<input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "integer") html += '<input type="number" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "date") html += '<div class="uk-form-icon uk-width-1-1"><i class="uk-icon-calendar"></i><input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" data-uk-datepicker="{format:\'DD-MM-YYYY\'}" value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-          if(l.t === "time") html += '<div class="uk-form-icon uk-width-1-1"><i class="uk-icon-clock-o"></i><input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" data-uk-timepicker value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+        if(l.t === "time") html += '<div class="uk-form-icon uk-width-1-1"><i class="uk-icon-clock-o"></i><input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" data-uk-timepicker value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "text") html += '<textarea id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "list") {
-          html += '<select name="'+ l.n +'" class="uk-width-1-1" id="'+l.n+'">'
+          html += '<select name="'+ l.n +'" class="uk-width-1-1 select_list" id="'+l.n+'">'
           l.d.forEach(function(o) {
             value = ""
             if(obj[l.n] === o[0]) value="selected='selected'"
             html += '<option value="'+ o[0] +'" '+value+'>'+ o[1] +'</option>'
           })
           html += '</select>'
+        }
+        if(l.t === "multilist") {
+          html += '<select name="'+ l.n +'" class="uk-width-1-1 select_mlist" multiple="multiple" id="'+l.n+'">'
+          l.d.forEach(function(o) {
+            value = ""
+            if(obj[l.n] && obj[l.n].indexOf(o[0]) >= 0) value="selected='selected'"
+            html += '<option value="'+ o[0] +'" '+value+'>'+ o[1] +'</option>'
+          })
+          html += '</select>'
+        }
+        if(l.t === "tags") {
+          html +='<select name="'+l.n+'" class="uk-width-1-1 select_tag" multiple="multiple">'
+          l.d[0].forEach(function(o) {
+            value = ""
+            if(obj[l.n] && obj[l.n].indexOf(o) >= 0) value="selected='selected'"
+            html += '<option value="'+ o +'" '+value+'>'+ o +'</option>'
+          })
+          html +='</select>'
         }
         if(l.t === "image" && obj._id) {
           html += '<div id="upload-drop_'+l.n+'" class="uk-placeholder">'
@@ -124,7 +142,13 @@ var Common = {
   saveForm: function (formID, path, objID) {
     objID = objID||""
     var _this = this;
-    var json = JSON.stringify($("#"+ formID).serializeObject())
+    var json = $("#"+ formID).serializeObject()
+    $('.select_tag, .select_mlist').each(function(i, st) {
+      if(typeof json[$(st).attr("name")] === "string") {
+        json[$(st).attr("name")] = [ json[$(st).attr("name")] ]
+      }
+    })
+    json = JSON.stringify(json)
     $("div[data-hint]").html("")
     _this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {
       $("#"+ formID + " input, #"+ formID + " select").removeClass("uk-form-danger")

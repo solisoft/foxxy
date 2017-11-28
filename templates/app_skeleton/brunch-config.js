@@ -20,7 +20,7 @@ module.exports = {
       fs.createReadStream('node_modules/uikit/dist/js/components/form-select.js').pipe(fs.createWriteStream('app/vendors/uikit-form-select.js'));
       fs.createReadStream('node_modules/uikit/dist/js/components/datepicker.js').pipe(fs.createWriteStream('app/vendors/uikit-datepicker.js'));
       fs.createReadStream('node_modules/uikit/dist/js/components/notify.js').pipe(fs.createWriteStream('app/vendors/uikit-notify.js'));
-      fs.createReadStream('node_modules/uikit/dist/js/components/timepicker.js').pipe(fs.createWriteStream('app/vendors/uikit-timepicker.js'));
+      //fs.createReadStream('node_modules/uikit/dist/js/components/timepicker.js').pipe(fs.createWriteStream('app/vendors/uikit-timepicker.js'));
       fs.createReadStream('node_modules/uikit/dist/js/components/upload.js').pipe(fs.createWriteStream('app/vendors/uikit-upload.js'));
       fs.createReadStream('node_modules/select2/dist/js/select2.js').pipe(fs.createWriteStream('app/vendors/select2.js'));
       // CSS

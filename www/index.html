@@ -213,6 +213,8 @@
     { r: true, c: "1-2", n: "date", t: "date", j: joi.string().required(), l: "Publishing Date" },
     { r: false, c: "1-2", n: "draft", t: "list", j: joi.string().required(), l: "Draft?", d: [["y", "Yes"], ["n", "No"]] },
     { r: true, c: "1-1", n: "text", t: "text", j: joi.string().required(), l: "Text"}
+    { r: true, c: "1-2", n: "picture", t: "image", j: joi.string(), l: "Pictures"}
+    { r: false, c: "1-2", n: "asset", t: "file", j: joi.string(), l: "Files"}
   ]
 
   schema = {}
@@ -254,6 +256,10 @@
         </div>
       </div>
 
+      <div class="uk-grid">
+        <h4>New in 0.2.24 : Manage assets</h4>
+        <iframe src="https://player.vimeo.com/video/244731017" width="100%" height="503" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+      </div>
       <div class="uk-grid">
 
         <div class="uk-width-1-1"><h2>Screenshots</h2></div>

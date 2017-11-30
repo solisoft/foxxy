@@ -59,7 +59,7 @@ var loadFields = function(req) {
   // { r: true, c: "1-1", n: "image", t: "image", j: joi.string(), l: "Pictures" },
   // { r: true, c: "1-1", n: "file", t: "file", j: joi.string(), l: "Files" },
   // { r: true, c: "1-1", n: "tags", t: "tags", j: joi.array(), l: "Tags", d: tags },
-  // { r: true, c: "1-1", n: "online", t: "boolean", j: joi.array(), l: "Online?" },
+  // { r: true, c: "1-1", n: "online", t: "boolean", j: joi.boolean().default(false), l: "Online?" },
 
   fields = [
   ]

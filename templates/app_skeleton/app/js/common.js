@@ -33,11 +33,11 @@ var Common = {
         if (l.j._flags.presence === "required") {
           l.l = "<strong>" + l.l + "*</strong>"
         }
-        if(!(l.t === "file" && obj._id === undefined))
+        if(!((l.t === "file" || l.t === "image") && obj._id === undefined))
           html += '<label for="" class="uk-form-label">'+ l.l +'</label>'
         var value = obj[l.n]
         if(value === undefined) value = ""
-        if(l.t === "string") html += '<input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+        if(l.t.match(/string/)) html += '<input type="'+(l.t.split(":").length == 2 ? l.t.split(":")[1] : "text")+'" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "integer") html += '<input type="number" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "date") html += '<div class="uk-form-icon uk-width-1-1"><i class="uk-icon-calendar"></i><input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" data-uk-datepicker="{format:\'DD-MM-YYYY\'}" value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "time") html += '<div class="uk-form-icon uk-width-1-1"><i class="uk-icon-clock-o"></i><input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" data-uk-timepicker value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'

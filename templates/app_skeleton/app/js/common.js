@@ -89,7 +89,10 @@ var Common = {
           html += '<files field="'+l.n+'" id="'+obj._id+'" />'
           uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.*', '#progressbar_'+l.n, '#upload-drop_'+l.n])
         }
-
+        if(l.t === "boolean") {
+          var checked = obj[l.n] === true ? " checked='checked' " : ''
+          html += ' <input name="'+ l.n +'" '+ checked +' type="checkbox" value="1"  /> '
+        }
         html += '</div>'
       }
     })

@@ -1,5 +1,6 @@
 const db = require('@arangodb').db
 const joi = require('joi')
+require("@arangodb/aql/cache").properties({ mode: "on" })
 
 // Sample to load an external collection as list
 // var users = db._query(`

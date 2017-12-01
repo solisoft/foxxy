@@ -30,17 +30,14 @@ module.context.use(function (req, res, next) {
   next();
 });
 
-var loadFields = function() {
-  schema = {}
-  each(fields, function(f) {
-    schema[f.n] = f.j
-  })
-}
-loadFields()
+each(fields, function(f) {
+  schema[f.n] = f.j
+})
+
 // -----------------------------------------------------------------------------
 router.get('/', function (req, res) {
   loadFields();
-  res.send({ fields: fields, data: db._query("FOR doc IN @@collection RETURN doc", { "@collection": collName})._documents[0] });
+  res.send({ fields: fields(), data: db._query("FOR doc IN @@collection RETURN doc", { "@collection": collName})._documents[0] });
 })
 .description('Returns first @{{object}}');
 // -----------------------------------------------------------------------------
@@ -56,7 +53,7 @@ router.get('/check_form', function (req, res) {
 router.post('/:id', function (req, res) {
   var obj = collection.document(req.pathParams.id)
   var data = {}
-  each(fields, function(f) {data[f.n] = req.body[f.n]})
+  each(fields(), function(f) {data[f.n] = req.body[f.n]})
   collection.update(obj, data)
   res.send({ success: true });
 })

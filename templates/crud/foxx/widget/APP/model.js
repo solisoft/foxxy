@@ -6,7 +6,6 @@ const joi = require('joi')
 //   FOR doc in users RETURN [doc._key, doc.username]
 // `).toArray()
 
-
 // Tags definition sample
 // var tags = db._query(`
 //   LET tags = (
@@ -16,7 +15,6 @@ const joi = require('joi')
 //   )
 //   RETURN UNIQUE(FLATTEN(tags))
 // `).toArray()
-
 
 // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: [["data", "list"]] },
 
@@ -29,9 +27,13 @@ const joi = require('joi')
 // { r: true, c: "1-1", n: "image", t: "image", j: joi.string(), l: "Pictures" },
 // { r: true, c: "1-1", n: "file", t: "file", j: joi.string(), l: "Files" },
 // { r: true, c: "1-1", n: "tags", t: "tags", j: joi.array(), l: "Tags", d: tags },
-// { r: true, c: "1-1", n: "online", t: "boolean", j: joi.boolean().default(false), l: "Online?" },
 
-const fields = [
-]
+const load_fields = function() {
 
-module.exports = fields
+  return [
+    // Define your model here ...
+  ]
+
+}
+
+module.exports = load_fields

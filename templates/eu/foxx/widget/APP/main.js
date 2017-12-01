@@ -2,6 +2,7 @@
 const collName = "@{{objects}}"
 const db = require('@arangodb').db;
 const joi = require('joi');
+const fields = require('./model.js');
 const each = require('lodash').each;
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
@@ -20,7 +21,6 @@ const sessions = sessionsMiddleware({
 module.context.use(sessions);
 module.context.use(router);
 
-var fields = []
 var schema = {}
 
 // Comment this block if you want to avoid authorization
@@ -31,22 +31,19 @@ module.context.use(function (req, res, next) {
 });
 
 var loadFields = function() {
-  // { r: new_row, c: classname, n: name/id, t: type, j: joi validation, l: label, d: data list }
-  fields = [
-  ]
   schema = {}
   each(fields, function(f) {
     schema[f.n] = f.j
   })
 }
 loadFields()
-
+// -----------------------------------------------------------------------------
 router.get('/', function (req, res) {
   loadFields();
   res.send({ fields: fields, data: db._query("FOR doc IN @@collection RETURN doc", { "@collection": collName})._documents[0] });
 })
 .description('Returns first @{{object}}');
-
+// -----------------------------------------------------------------------------
 router.get('/check_form', function (req, res) {
     var errors = []
   try {
@@ -55,7 +52,7 @@ router.get('/check_form', function (req, res) {
   res.send({errors: errors });
 })
 .description('Check the form for live validation');
-
+// -----------------------------------------------------------------------------
 router.post('/:id', function (req, res) {
   var obj = collection.document(req.pathParams.id)
   var data = {}

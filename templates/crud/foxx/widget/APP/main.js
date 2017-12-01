@@ -2,6 +2,7 @@
 const collName = "@{{objects}}"
 const db = require('@arangodb').db;
 const joi = require('joi');
+const fields = require('./model.js');
 const each = require('lodash').each;
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
@@ -20,7 +21,6 @@ const sessions = sessionsMiddleware({
 module.context.use(sessions);
 module.context.use(router);
 
-var fields = []
 var schema = {}
 
 // Comment this block if you want to avoid authorization
@@ -31,46 +31,13 @@ module.context.use(function (req, res, next) {
 });
 
 var loadFields = function(req) {
-  // Sample to load an external collection as list
-  // var users = db._query(`
-  //   FOR doc in users RETURN [doc._key, doc.username]
-  // `).toArray()
-
-
-  // Tags definition sample
-  // var tags = db._query(`
-  //   LET tags = (
-  //     FOR doc IN posts
-  //       FILTER doc.tags != NULL
-  //       RETURN doc.tags
-  //   )
-  //   RETURN UNIQUE(FLATTEN(tags))
-  // `).toArray()
-
-
-  // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: [["data", "list"]] },
-
-  // { r: true, c: "1-1", n: "title", t: "string", j: joi.string().required(), l: "Title" },
-  // { r: true, c: "1-1", n: "position", t: "integer", j: joi.number().integer(), l: "Position" },
-  // { r: true, c: "1-1", n: "published_at", t: "date", j: joi.date().format('DD-MM-YYYY').raw().required(), l: "Published_at" },
-  // { r: true, c: "1-1", n: "time", t: "time", j: joi.string(), l: "Time" },
-  // { r: true, c: "1-1", n: "desc", t: "text", j: joi.string(), l: "Description" },
-  // { r: true, c: "1-1", n: "user_key", t: "list", j: joi.string(), l: "User", d: users },
-  // { r: true, c: "1-1", n: "image", t: "image", j: joi.string(), l: "Pictures" },
-  // { r: true, c: "1-1", n: "file", t: "file", j: joi.string(), l: "Files" },
-  // { r: true, c: "1-1", n: "tags", t: "tags", j: joi.array(), l: "Tags", d: tags },
-  // { r: true, c: "1-1", n: "online", t: "boolean", j: joi.boolean().default(false), l: "Online?" },
-
-  fields = [
-  ]
-
   schema = {}
   each(fields, function(f) {
     schema[f.n] = f.j
   })
 }
 loadFields({});
-
+// -----------------------------------------------------------------------------
 router.get('/page/:page', function (req, res) {
   res.send({ data: db._query(`
     LET count = LENGTH(@@collection)
@@ -80,7 +47,7 @@ router.get('/page/:page', function (req, res) {
 
 })
 .description('Returns all objects');
-
+// -----------------------------------------------------------------------------
 router.get('/search/:term', function (req, res) {
   res.send({ data: db._query(`
     FOR u IN FULLTEXT(@@collection, 'search', @term)
@@ -88,13 +55,13 @@ router.get('/search/:term', function (req, res) {
     RETURN u`, { "@collection": collName, "term": req.pathParams.term})._documents });
 })
 .description('Returns all objects');
-
+// -----------------------------------------------------------------------------
 router.get('/:id', function (req, res) {
   loadFields(req);
   res.send({fields: fields, data: collection.document(req.pathParams.id) });
 })
 .description('Returns object within ID');
-
+// -----------------------------------------------------------------------------
 router.get('/check_form', function (req, res) {
   var errors = []
   try {
@@ -103,13 +70,13 @@ router.get('/check_form', function (req, res) {
   res.send({errors: errors });
 })
 .description('Check the form for live validation');
-
+// -----------------------------------------------------------------------------
 router.get('/fields', function (req, res) {
   loadFields(req);
   res.send({ fields: fields });
 })
 .description('Get all fields to build form');
-
+// -----------------------------------------------------------------------------
 router.post('/', function (req, res) {
   var data = {}
   each(fields, function(f) {data[f.n] = req.body[f.n]})
@@ -118,7 +85,7 @@ router.post('/', function (req, res) {
 })
 .body(joi.object(schema), 'data')
 .description('Create a new object.');
-
+// -----------------------------------------------------------------------------
 router.post('/:id', function (req, res) {
   var object = collection.document(req.pathParams.id)
   var data = {}
@@ -129,7 +96,7 @@ router.post('/:id', function (req, res) {
 })
 .body(joi.object(schema), 'data')
 .description('Update a object.');
-
+// -----------------------------------------------------------------------------
 router.delete('/:id', function (req, res) {
   collection.remove(collName + "/"+req.pathParams.id)
   res.send({success: true });

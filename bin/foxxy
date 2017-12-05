@@ -10,7 +10,7 @@ var argv = require('yargs').argv;
 var hasbin = require('hasbin');
 var pluralize = require('pluralize');
 var colors = require('colors');
-var version = '0.2.37';
+var version = '0.2.38';
 var user_password = +new Date();
 var copyFileSync = function(src, dest) {
   fs.writeFileSync(dest, fs.readFileSync(src, { encoding: "utf8" }));
@@ -66,7 +66,7 @@ var foxxAppsFolder = function() {
     return '/usr/local/var/lib/arangodb3-apps'
   }
 
-  // centOS7  and surely a lot of linux ditri
+  // centOS7 and surely a lot of linux ditri
   if(fs.existsSync('/var/lib/arangodb3-apps')) {
     return '/var/lib/arangodb3-apps';
   }
@@ -115,6 +115,8 @@ hasbin('foxx-manager', function(result) {
             //execSync(`cp -Rf ${arangodb3AppsPath}/_db/${argv.database}/* ${path.join(process.cwd(), argv._[1] + "/foxx")}`)
             execSync(`rm -Rf ${arangodb3AppsPath}/_db/${argv.database}`);
             execSync(`ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} ${arangodb3AppsPath}/_db/${argv.database}`);
+          } else {
+            console.log("Beware! arangodb3AppsPath is not set".red)
           }
           argv.user = argv.user || "root"
           argv.password = argv.password || ""
@@ -199,12 +201,8 @@ hasbin('foxx-manager', function(result) {
             execSync(`rm -Rf ${arangodb3AppsPath}/_db/${arangoconf.database}`);
             execSync(`ln -s ${path.join(process.cwd(), "/foxx")} ${arangodb3AppsPath}/_db/${arangoconf.database}`);
           } else {
-            cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${arangoconf.database}`
-            console.log(cmd.cyan)
-            cmd = `ln -s ${path.join(process.cwd(), "/foxx")} /usr/local/var/lib/arangodb3-apps/_db/${arangoconf.database}`
-            console.log(cmd.cyan)
+            console.log("Sorry, arangodb3AppsPath is not set".red)
           }
-
         })
       }
 
@@ -217,7 +215,6 @@ hasbin('foxx-manager', function(result) {
               install_service(file);
             }
           })
-
           exec("rm foxx/tmp.zip", function(error, stdout, stderr) {})
         })
       }
@@ -305,10 +302,7 @@ hasbin('foxx-manager', function(result) {
                 replaceInFile(dest_file, /@\{\{object\}\}/g, model)
                 replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
               } catch(e) {}
-
             }
-
-
             console.log(action.toUpperCase() + " "+ model +" created successfully!".green)
 
           });

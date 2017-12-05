@@ -15,7 +15,7 @@ if (!db._collection(settings)) {
     mailgun_domain: "mailgun_domain",
     mailgun_from: "mailgun_from",
     upload_path: '@{{dirname}}',
-    upload_url: 'http://localhost:3001/'
+    upload_url: 'http://localhost:3333/'
   });
 }
 

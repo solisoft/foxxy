@@ -37,7 +37,7 @@ var loadFields = function(req) {
   //   data = db._query(`FOR doc in @@collection
   //   FILTER doc.foreign_key == @key
   //   RETURN [doc._key, doc.desired_field_name]
-  //   `, { "@collection": "whatever", key: req.session.data.key })._documents
+  //   `, { "@collection": "whatever", key: req.session.data.key }).toArray()
   // } catch(e) {}
   // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: data },
 
@@ -78,7 +78,7 @@ router.get('/page/:page', function (req, res) {
     LET count = LENGTH(@@collection)
     LET data = (FOR doc IN @@collection SORT doc._key DESC LIMIT @offset,25 RETURN doc)
     RETURN { count: count, data: data }
-    `, { "@collection": collName, "offset": (req.pathParams.page - 1) * 25})._documents });
+    `, { "@collection": collName, "offset": (req.pathParams.page - 1) * 25}).toArray() });
 
 })
 .description('Returns all objects');
@@ -87,7 +87,7 @@ router.get('/search/:term', function (req, res) {
   res.send({ data: db._query(`
     FOR u IN FULLTEXT(@@collection, 'search', @term)
     LIMIT 100
-    RETURN u`, { "@collection": collName, "term": req.pathParams.term})._documents });
+    RETURN u`, { "@collection": collName, "term": req.pathParams.term}).toArray() });
 })
 .description('Returns all objects');
 

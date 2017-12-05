@@ -43,7 +43,7 @@ loadFields()
 
 router.get('/', function (req, res) {
   loadFields();
-  res.send({ fields: fields, data: db._query("FOR doc IN @@collection RETURN doc", { "@collection": collName})._documents[0] });
+  res.send({ fields: fields, data: db._query("FOR doc IN @@collection RETURN doc", { "@collection": collName}).toArray()[0] });
 })
 .description('Returns first @{{object}}');
 

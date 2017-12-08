@@ -9,7 +9,7 @@ const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
 require("@arangodb/aql/cache").properties({ mode: "on" });
 
 const router = createRouter();
-const collection = db.{{objects}};
+const collection = db.@{{objects}};
 
 const _settings = db.foxxy_settings.firstExample();
 
@@ -33,18 +33,18 @@ each(fields(), function(f) {schema[f.n] = f.j })
 // -----------------------------------------------------------------------------
 router.get('/page/:page', function (req, res) {
   res.send({ data: db._query(`
-    LET count = LENGTH(@@collection)
-    LET data = (FOR doc IN @@collection SORT doc._key DESC LIMIT @offset,25 RETURN doc)
+    LET count = LENGTH(@{{objects}})
+    LET data = (FOR doc IN @{{objects}} SORT doc._key DESC LIMIT @offset,25 RETURN doc)
     RETURN { count: count, data: data }
-    `, { "@collection": collName, "offset": (req.pathParams.page - 1) * 25}).toArray() });
+    `, { "offset": (req.pathParams.page - 1) * 25}).toArray() });
 })
 .description('Returns all objects');
 // -----------------------------------------------------------------------------
 router.get('/search/:term', function (req, res) {
   res.send({ data: db._query(`
-    FOR u IN FULLTEXT(@@collection, 'search', @term)
+    FOR u IN FULLTEXT(@{{objects}}, 'search', @term)
     LIMIT 100
-    RETURN u`, { "@collection": collName, "term": req.pathParams.term}).toArray() });
+    RETURN u`, { "term": req.pathParams.term}).toArray() });
 })
 .description('Returns all objects');
 // -----------------------------------------------------------------------------

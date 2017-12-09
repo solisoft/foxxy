@@ -36,3 +36,9 @@
 .select2-selection--multiple {
   height: auto;
 }
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+  border: 1px solid #99baca;
+}
+.select2-container--default .select2-selection--multiple {
+  border: 1px solid #ddd;
+}

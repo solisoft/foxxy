@@ -52,7 +52,7 @@ var Common = {
           html += '</select>'
         }
         if(l.t === "multilist") {
-          html += '<select name="'+ l.n +'" class="uk-width-1-1 select_mlist" multiple="multiple" id="'+l.n+'">'
+          html += '<select name="'+ l.n +'" style="width:100%" class="select_mlist" multiple="multiple" id="'+l.n+'">'
           l.d.forEach(function(o) {
             value = ""
             if(obj[l.n] && obj[l.n].indexOf(o[0]) >= 0) value="selected='selected'"
@@ -61,7 +61,7 @@ var Common = {
           html += '</select>'
         }
         if(l.t === "tags") {
-          html +='<select name="'+l.n+'" class="uk-width-1-1 select_tag" multiple="multiple">'
+          html +='<select name="'+l.n+'" style="width:100%" class="select_tag" multiple="multiple">'
           l.d[0].forEach(function(o) {
             value = ""
             if(obj[l.n] && obj[l.n].indexOf(o) >= 0) value="selected='selected'"

@@ -1,6 +1,7 @@
 <loading>
   <div class="uk-text-center">
     Loading app ...
+    <br><div uk-spinner></div>
   </div>
 
   <script>

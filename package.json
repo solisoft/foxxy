@@ -1,7 +1,7 @@
 {
   "name": "foxx-framework",
   "preferGlobal": "true",
-  "version": "0.3.02",
+  "version": "0.3.03",
   "description": "Foxx framework based on RiotJS + ArangoDB/Foxx",
   "main": "index.js",
   "scripts": {

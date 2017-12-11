@@ -10,7 +10,7 @@ var argv = require('yargs').argv;
 var hasbin = require('hasbin');
 var pluralize = require('pluralize');
 var colors = require('colors');
-var version = '0.2.40';
+var version = '0.3.00';
 var user_password = +new Date();
 var copyFileSync = function(src, dest) {
   fs.writeFileSync(dest, fs.readFileSync(src, { encoding: "utf8" }));
@@ -121,6 +121,7 @@ hasbin('foxx-manager', function(result) {
           argv.user = argv.user || "root"
           argv.password = argv.password || ""
           argv.endpoint = argv.endpoint || "http+tcp://127.0.0.1:8529"
+          argv.theme = argv.theme || "uikit3"
 
           // Create database if not exist
           var password = "--server.password \"\"";
@@ -128,18 +129,19 @@ hasbin('foxx-manager', function(result) {
           var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${argv.database}') < 0) db._createDatabase('${argv.database}');" --server.endpoint ${argv.endpoint} --server.username ${argv.user} ${password}`
           console.log(cmd)
           exec(cmd, function(error, stdout, stderr) {
-            var src_folder = path.join(__dirname, '../templates/app_skeleton');
+            var src_folder = path.join(__dirname, `../templates/${argv.theme}_app_skeleton`);
             var dest_folder = path.join(process.cwd(), argv._[1]);
 
             fs.stat(dest_folder, function(err, stats) {
               if(err !== null) {
                 copyRecursiveSync(src_folder, dest_folder)
-                var dest_file = path.join(process.cwd(), `${argv._[1]}/app/assets/index.html`);
+                var dest_file = path.join(process.cwd(), `${argv._[1]}/app/index.html`);
                 replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
 
-                var dest_file = path.join(process.cwd(), `${argv._[1]}/app/assets/login.html`);
+                var dest_file = path.join(process.cwd(), `${argv._[1]}/app/login.html`);
                 replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
-                fs.writeFileSync(dest_folder + "/.arangodb.yml", yaml.safeDump({ database: argv.database, username: argv.user, password: argv.password, endpoint: argv.endpoint }))
+                fs.writeFileSync(dest_folder + "/.arangodb.yml", yaml.safeDump({ database: argv.database, username: argv.user, password: argv.password, endpoint: argv.endpoint}))
+                fs.writeFileSync(dest_folder + "/.foxxy.yml", yaml.safeDump({ theme: argv.theme }))
 
                 if(argv.no_widgets === undefined) {
                   src_folder = path.join(__dirname, '../templates/auth/foxx/widget')
@@ -229,6 +231,10 @@ hasbin('foxx-manager', function(result) {
           var model = argv._[2]
           if(action == "upload") model = "upload"
           var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
+          var foxxyconf = { theme: "uikit2" }
+          if(fs.existsSync(process.cwd() + "/.foxxy.yml")) {
+            foxxyconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.foxxy.yml"))
+          }
           // First install foxx service
           var src_folder = path.join(__dirname, `../templates/${action}/foxx/widget`);
           var final_model_name = model;
@@ -254,7 +260,7 @@ hasbin('foxx-manager', function(result) {
             // Widget
             console.log("Creating widget " + model)
             try {
-              var src_file = path.join(__dirname, `../templates/${action}/riot/widget.html.tag`);
+              var src_file = path.join(__dirname, `../templates/${action}/riot/${foxxyconf.theme}_widget.html.tag`);
               var dest_file = path.join(process.cwd(), `app/widgets/${final_model_name}.html.tag`);
               copyFileSync(src_file, dest_file)
               replaceInFile(dest_file, /@\{\{object\}\}/g, model)
@@ -262,7 +268,7 @@ hasbin('foxx-manager', function(result) {
             } catch(e) {}
 
             if(action != "service") {
-              dest_file= path.join(process.cwd(), `app/assets/index.html`);
+              dest_file= path.join(process.cwd(), `app/index.html`);
               var whtml = "require('widgets/"+final_model_name+".html.tag');\n      /*@{{riot_components}}*/"
               replaceInFile(dest_file, /\/\*@\{\{riot_components\}\}\*\//g, whtml)
               replaceInFile(dest_file, /\{\{DBNAME\}\}/g, arangoconf.database)

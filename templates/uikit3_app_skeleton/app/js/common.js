@@ -254,8 +254,23 @@ var Common = {
         allow: filter,
 
         error: function () {
-          console.log('error', arguments);
+          UIkit.notification({
+            message: arguments[0],
+            status: 'danger',
+            pos: 'top-right',
+            timeout: 5000
+          })
         },
+
+        fail: function () {
+          UIkit.notification({
+            message: arguments[0],
+            status: 'danger',
+            pos: 'top-right',
+            timeout: 5000
+          })
+        },
+
 
         loadStart: function (e) {
           bar.removeAttribute('hidden');

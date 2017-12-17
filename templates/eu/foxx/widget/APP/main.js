@@ -2,6 +2,7 @@
 const collName = "@{{objects}}"
 const db = require('@arangodb').db;
 const joi = require('joi');
+const fields = require('./model.js');
 const each = require('lodash').each;
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
@@ -20,8 +21,21 @@ const sessions = sessionsMiddleware({
 module.context.use(sessions);
 module.context.use(router);
 
-var fields = []
+var fieldsToData = function(fields, req) {
+  var data = {}
+  each(fields(), function(f) {
+    if(f.tr != true) {
+      data[f.n] = req.body[f.n]
+    } else {
+      data[f.n] = {}
+      data[f.n][req.headers['foxx-locale']] = req.body[f.n]
+    }
+  })
+  return data
+}
+
 var schema = {}
+each(fields(), function(f) {schema[f.n] = f.j })
 
 // Comment this block if you want to avoid authorization
 module.context.use(function (req, res, next) {
@@ -30,23 +44,13 @@ module.context.use(function (req, res, next) {
   next();
 });
 
-var loadFields = function() {
-  // { r: new_row, c: classname, n: name/id, t: type, j: joi validation, l: label, d: data list }
-  fields = [
-  ]
-  schema = {}
-  each(fields, function(f) {
-    schema[f.n] = f.j
-  })
-}
-loadFields()
-
+// -----------------------------------------------------------------------------
 router.get('/', function (req, res) {
-  loadFields();
-  res.send({ fields: fields, data: db._query("FOR doc IN @@collection RETURN doc", { "@collection": collName})._documents[0] });
+  res.send({ fields: fields(), data: db._query("FOR doc IN @@collection RETURN doc", { "@collection": collName}).toArray()[0] });
 })
+.header('X-Session-Id')
 .description('Returns first @{{object}}');
-
+// -----------------------------------------------------------------------------
 router.get('/check_form', function (req, res) {
     var errors = []
   try {
@@ -54,14 +58,16 @@ router.get('/check_form', function (req, res) {
   } catch(e) {}
   res.send({errors: errors });
 })
+.header('X-Session-Id')
 .description('Check the form for live validation');
-
+// -----------------------------------------------------------------------------
 router.post('/:id', function (req, res) {
   var obj = collection.document(req.pathParams.id)
-  var data = {}
-  each(fields, function(f) {data[f.n] = req.body[f.n]})
+  var data = fieldsToData()
   collection.update(obj, data)
   res.send({ success: true });
 })
 .body(joi.object(schema), 'data')
+.header('foxx-locale')
+.header('X-Session-Id')
 .description('Update @{{object}}.');

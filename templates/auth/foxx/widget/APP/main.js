@@ -11,15 +11,14 @@ const queues = require('@arangodb/foxx/queues');
 const crypt = require('@arangodb/crypto');
 
 const request = require('@arangodb/request');
-const _ = require('underscore');
 const auth = createAuth();
 const router = createRouter();
-const users = db._collection('users');
+const users = db.users;
 
 const each = require('lodash').each;
 const queue = queues.create('mailer');
 
-const _settings = db._collection('foxxy_settings').firstExample();
+const _settings = db.foxxy_settings.firstExample();
 
 const sessions = sessionsMiddleware({
   storage: jwtStorage(_settings.jwt_secret),
@@ -27,7 +26,6 @@ const sessions = sessionsMiddleware({
 });
 module.context.use(sessions);
 module.context.use(router);
-
 
 var fields = []
 var schema = {}
@@ -52,6 +50,7 @@ var loadFields = function() {
 
 loadFields();
 
+// -----------------------------------------------------------------------------
 router.get('/check_form', function (req, res) {
   var errors = []
   try {
@@ -60,13 +59,13 @@ router.get('/check_form', function (req, res) {
   res.send({errors: errors });
 })
 .description('Check the form for live validation');
-
+// -----------------------------------------------------------------------------
 router.get('/fields', function (req, res) {
   loadFields()
   res.send({ fields: fields });
 })
 .description('Get all fields to build form');
-
+// -----------------------------------------------------------------------------
 // GET whoami
 router.get('/whoami', function (req, res) {
   if(!req.session.uid) res.throw('unauthorized')
@@ -78,7 +77,7 @@ router.get('/whoami', function (req, res) {
   }
 })
 .description('Returns the currently active username.');
-
+// -----------------------------------------------------------------------------
 // POST login
 router.post('/login', function (req, res) {
   // This may return a user object or null
@@ -102,7 +101,7 @@ router.post('/login', function (req, res) {
   password: joi.string().required()
 }).required(), 'Credentials')
 .description('Logs a registered user in.');
-
+// -----------------------------------------------------------------------------
 // POST logout
 router.post('/logout', function (req, res) {
   if (req.session.uid) {
@@ -111,7 +110,7 @@ router.post('/logout', function (req, res) {
   res.send({success: true});
 })
 .description('Logs the current user out.');
-
+// -----------------------------------------------------------------------------
 // POST signup
 router.post('/signup', function (req, res) {
   const user = req.body;
@@ -141,7 +140,7 @@ router.post('/signup', function (req, res) {
 })
 .body(joi.object(schema), 'Credentials')
 .description('Creates a new user and logs them in.');
-
+// -----------------------------------------------------------------------------
 router.post('/confirm', function (req, res) {
   const user = users.firstExample({
     email_code: req.body.uuid

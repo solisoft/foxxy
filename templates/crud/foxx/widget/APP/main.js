@@ -1,7 +1,7 @@
 'use strict';
-const collName = "@{{objects}}"
 const db = require('@arangodb').db;
 const joi = require('joi');
+const fields = require('./model.js');
 const each = require('lodash').each;
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
@@ -9,9 +9,9 @@ const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
 require("@arangodb/aql/cache").properties({ mode: "on" });
 
 const router = createRouter();
-const collection = db._collection(collName);
+const collection = db.@{{objects}};
 
-const _settings = db._collection('foxxy_settings').firstExample();
+const _settings = db.foxxy_settings.firstExample();
 
 const sessions = sessionsMiddleware({
   storage: jwtStorage(_settings.jwt_secret),
@@ -20,8 +20,18 @@ const sessions = sessionsMiddleware({
 module.context.use(sessions);
 module.context.use(router);
 
-var fields = []
-var schema = {}
+var fieldsToData = function(fields, req) {
+  var data = {}
+  each(fields(), function(f) {
+    if(f.tr != true) {
+      data[f.n] = req.body[f.n]
+    } else {
+      data[f.n] = {}
+      data[f.n][req.headers['foxx-locale']] = req.body[f.n]
+    }
+  })
+  return data
+}
 
 // Comment this block if you want to avoid authorization
 module.context.use(function (req, res, next) {
@@ -30,53 +40,36 @@ module.context.use(function (req, res, next) {
   next();
 });
 
-var loadFields = function(req) {
-  // Sample to load an external collection as list
-  //var data = []
-  //try {
-  //  data = db._query(`FOR doc in @@collection
-  //  FILTER doc.foreign_key == @key
-  //  RETURN [doc._key, doc.desired_field_name]
-  //  `, { "@collection": "whatever", key: req.session.data.key })._documents
-  //} catch(e) {}
-  // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: data },
+var schema = {}
+each(fields(), function(f) {schema[f.n] = f.j })
 
-
-  // { r: new_row, c: "classname", n: "name/id", t: "type", j: joi.validation(), l: "Label", d: [["data", "list"]] },
-  fields = [
-  ]
-
-  schema = {}
-  each(fields, function(f) {
-    schema[f.n] = f.j
-  })
-}
-loadFields({});
-
+// -----------------------------------------------------------------------------
 router.get('/page/:page', function (req, res) {
   res.send({ data: db._query(`
-    LET count = LENGTH(@@collection)
-    LET data = (FOR doc IN @@collection SORT doc._key DESC LIMIT @offset,25 RETURN doc)
+    LET count = LENGTH(@{{objects}})
+    LET data = (FOR doc IN @{{objects}} SORT doc._key DESC LIMIT @offset,25 RETURN doc)
     RETURN { count: count, data: data }
-    `, { "@collection": collName, "offset": (req.pathParams.page - 1) * 25})._documents });
-
+    `, { "offset": (req.pathParams.page - 1) * 25}).toArray() });
 })
+.header('X-Session-Id')
 .description('Returns all objects');
-
+// -----------------------------------------------------------------------------
 router.get('/search/:term', function (req, res) {
   res.send({ data: db._query(`
-    FOR u IN FULLTEXT(@@collection, 'search', @term)
+    FOR u IN FULLTEXT(@{{objects}}, 'search', @term)
     LIMIT 100
-    RETURN u`, { "@collection": collName, "term": req.pathParams.term})._documents });
+    RETURN u`, { "term": req.pathParams.term}).toArray() });
 })
+.header('foxx-locale')
+.header('X-Session-Id')
 .description('Returns all objects');
-
+// -----------------------------------------------------------------------------
 router.get('/:id', function (req, res) {
-  loadFields(req);
-  res.send({fields: fields, data: collection.document(req.pathParams.id) });
+  res.send({fields: fields(), data: collection.document(req.pathParams.id) });
 })
+.header('X-Session-Id')
 .description('Returns object within ID');
-
+// -----------------------------------------------------------------------------
 router.get('/check_form', function (req, res) {
   var errors = []
   try {
@@ -84,36 +77,40 @@ router.get('/check_form', function (req, res) {
   } catch(e) {}
   res.send({errors: errors });
 })
+.header('X-Session-Id')
 .description('Check the form for live validation');
-
+// -----------------------------------------------------------------------------
 router.get('/fields', function (req, res) {
-  loadFields(req);
-  res.send({ fields: fields });
+  res.send({ fields: fields() });
 })
+.header('X-Session-Id')
 .description('Get all fields to build form');
-
+// -----------------------------------------------------------------------------
 router.post('/', function (req, res) {
-  var data = {}
-  each(fields, function(f) {data[f.n] = req.body[f.n]})
+  var data = fieldsToData(fields, req)
   // data.search = update with what you want to search for
   res.send({ success: true, key: collection.save(data, { waitForSync: true }) });
 })
 .body(joi.object(schema), 'data')
+.header('foxx-locale')
+.header('X-Session-Id')
 .description('Create a new object.');
-
+// -----------------------------------------------------------------------------
 router.post('/:id', function (req, res) {
   var object = collection.document(req.pathParams.id)
-  var data = {}
-  each(fields, function(f) {data[f.n] = req.body[f.n]})
+  var data = fieldsToData(fields, req)
   // data.search = update with what you want to search for
   collection.update(object, data)
   res.send({ success: true });
 })
 .body(joi.object(schema), 'data')
+.header('foxx-locale')
+.header('X-Session-Id')
 .description('Update a object.');
-
+// -----------------------------------------------------------------------------
 router.delete('/:id', function (req, res) {
   collection.remove(collName + "/"+req.pathParams.id)
   res.send({success: true });
 })
+.header('X-Session-Id')
 .description('delete a object.');

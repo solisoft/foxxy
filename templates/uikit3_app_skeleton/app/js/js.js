@@ -1,5 +1,7 @@
 $(function() {
 
+  riot.mount('rightnav')
+
   route('/', function(name) {
     // Here set the / mount
     riot.mount('div#app', 'loading')

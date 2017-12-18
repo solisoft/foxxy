@@ -21,7 +21,7 @@ require("@arangodb/aql/cache").properties({ mode: "on" })
 
 // { r: true, c: "1-1", n: "title", t: "string", j: joi.string().required(), l: "Title", tr: true },
 // { r: true, c: "1-1", n: "position", t: "integer", j: joi.number().integer(), l: "Position" },
-// { r: true, c: "1-1", n: "published_at", t: "date", j: joi.date().format('DD-MM-YYYY').raw().required(), l: "Published_at" },
+// { r: true, c: "1-1", n: "published_at", t: "date", j: joi.date().format('YYYY-MM-DD').raw().required(), l: "Published_at" },
 // { r: true, c: "1-1", n: "time", t: "time", j: joi.string(), l: "Time" },
 // { r: true, c: "1-1", n: "desc", t: "text", j: joi.string(), l: "Description" },
 // { r: true, c: "1-1", n: "user_key", t: "list", j: joi.string(), l: "User", d: users },

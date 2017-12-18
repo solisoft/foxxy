@@ -29,12 +29,7 @@
 
       </div>
       <div class="uk-navbar-right">
-        <ul class="uk-navbar-nav">
-
-            <li><a onclick="changeLang('en')">EN</a></li>
-
-            <li><a href="#logout"><i class="uk-icon-sign-out"></i> Logout</a></li>
-        </ul>
+        <rightnav></rightnav>
       </div>
     </nav>
 
@@ -72,10 +67,6 @@
       /*@{{riot_components}}*/
       require("js/js.js");
 
-      var changeLang = function(lang) {
-        window.localStorage.setItem('foxx-locale', lang)
-        document.location.reload()
-      }
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.35/js/uikit-icons.min.js"></script>

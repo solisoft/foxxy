@@ -109,7 +109,7 @@ router.post('/:id', function (req, res) {
 .description('Update a object.');
 // -----------------------------------------------------------------------------
 router.delete('/:id', function (req, res) {
-  collection.remove(collName + "/"+req.pathParams.id)
+  collection.remove("@{{objects}}/"+req.pathParams.id)
   res.send({success: true });
 })
 .header('X-Session-Id')

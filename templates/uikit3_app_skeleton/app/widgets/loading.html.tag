@@ -23,3 +23,19 @@
   <p>Find me in <code>app/widgets/loading.html.tag</code></p>
 
 </welcome>
+
+<rightnav>
+  <ul class="uk-navbar-nav">
+    <li each={lang in langs} class="{lang == window.localStorage.getItem('foxx-locale') ? 'uk-active' : ''}"><a onclick={changeLang}>{lang}</a></li>
+
+    <li><a href="#logout"><i class="uk-icon-sign-out"></i> Logout</a></li>
+  </ul>
+
+  <script>
+    this.langs = ['en', 'fr']
+    changeLang(e) {
+      window.localStorage.setItem('foxx-locale', e.item.lang)
+      document.location.reload()
+    }
+  </script>
+</rightnav>

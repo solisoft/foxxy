@@ -39,13 +39,13 @@ var Common = {
         var value = obj[l.n]
         if(l.tr == true && obj[l.n]) value = obj[l.n][window.localStorage.getItem('foxx-locale')]
         if(value === undefined) value = ""
-        if(l.t.match(/string/)) html += '<input type="'+(l.t.split(":").length == 2 ? l.t.split(":")[1] : "text")+'" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-        if(l.t === "integer") html += '<input type="number" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-        if(l.t === "date") html += '<div class="uk-form-icon uk-width-1-1"><i class="uk-icon-calendar"></i><input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" data-uk-datepicker="{format:\'DD-MM-YYYY\'}" value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-        if(l.t === "time") html += '<div class="uk-form-icon uk-width-1-1"><i class="uk-icon-clock-o"></i><input type="text" id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" data-uk-timepicker value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-        if(l.t === "text") html += '<textarea id="'+l.n+'" class="uk-width-1-1" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+        if(l.t.match(/string/)) html += '<input type="'+(l.t.split(":").length == 2 ? l.t.split(":")[1] : "text")+'" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+        if(l.t === "integer") html += '<input type="number" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+        if(l.t === "date") html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="date" id="'+l.n+'" data-date-format="YYYY/MM/DD" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
+        if(l.t === "time") html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="time" id="'+l.n+'" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
+        if(l.t === "text") html += '<textarea id="'+l.n+'" class="uk-textarea" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
         if(l.t === "list") {
-          html += '<select name="'+ l.n +'" style="width:100%" class="uk-width-1-1 select_list" id="'+l.n+'">'
+          html += '<select name="'+ l.n +'" style="width:100%" class="uk-select select_list" id="'+l.n+'">'
           l.d.forEach(function(o) {
             selected = ""
             if(value === o[0]) selected="selected='selected'"
@@ -54,7 +54,7 @@ var Common = {
           html += '</select>'
         }
         if(l.t === "multilist") {
-          html += '<select name="'+ l.n +'" style="width:100%" class="select_mlist" multiple="multiple" id="'+l.n+'">'
+          html += '<select name="'+ l.n +'" style="width:100%" class="uk-select select_mlist" multiple="multiple" id="'+l.n+'">'
           l.d.forEach(function(o) {
             selected = ""
             if(value && value.indexOf(o[0]) >= 0) selected="selected='selected'"
@@ -77,24 +77,31 @@ var Common = {
           html +='</select>'
         }
         if(l.t === "image" && obj._id) {
-          html += '<div id="upload-drop_'+l.n+'" class="uk-placeholder">'
-          html += 'Drop your pictures'
+          html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'
+          html += '    <span uk-icon="icon: cloud-upload"></span>'
+          html += '    <span class="uk-text-middle">Attach images by dropping them here or</span>'
+          html += '    <div uk-form-custom>'
+          html += '        <input type="file" multiple>'
+          html += '        <span class="uk-link">selecting one</span>'
+          html += '    </div>'
           html += '</div>'
-          html += '<div id="progressbar_'+l.n+'" class="uk-progress uk-hidden">'
-          html += '<div class="uk-progress-bar" style="width: 0%;">0%</div>'
-          html += '</div>'
-          html += '<images field="'+l.n+'" id="'+obj._id+'" />'
-          uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.(jpg|jpeg|gif|png)', '#progressbar_'+l.n, '#upload-drop_'+l.n])
+          html += '<progress id="progressbar_'+l.n+'" class="uk-progress" value="0" max="100" hidden></progress>'
+
+          html += '<images i18n="'+l.tr+'" field="'+l.n+'" id="'+obj._id+'" />'
+          uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.(jpg|jpeg|gif|png)', 'progressbar_'+l.n, '#upload-drop_'+l.n, l.tr])
         }
         if(l.t === "file" && obj._id) {
-          html += '<div id="upload-drop_'+l.n+'" class="uk-placeholder">'
-          html += 'Drop your files'
+          html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'
+          html += '    <span uk-icon="icon: cloud-upload"></span>'
+          html += '    <span class="uk-text-middle">Attach binaries by dropping them here or</span>'
+          html += '    <div uk-form-custom>'
+          html += '        <input type="file" multiple>'
+          html += '        <span class="uk-link">selecting one</span>'
+          html += '    </div>'
           html += '</div>'
-          html += '<div id="progressbar_'+l.n+'" class="uk-progress uk-hidden">'
-          html += '<div class="uk-progress-bar" style="width: 0%;">0%</div>'
-          html += '</div>'
-          html += '<files field="'+l.n+'" id="'+obj._id+'" />'
-          uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.*', '#progressbar_'+l.n, '#upload-drop_'+l.n])
+          html += '<progress id="progressbar_'+l.n+'" class="uk-progress" value="0" max="100" hidden></progress>'
+          html += '<files i18n="'+l.tr+'" field="'+l.n+'" id="'+obj._id+'" />'
+          uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.*', 'progressbar_'+l.n, '#upload-drop_'+l.n, l.tr])
         }
         if(l.t === "boolean") {
           var checked = obj[l.n] === true ? " checked='checked' " : ''
@@ -106,14 +113,14 @@ var Common = {
     html += '</div>'
     html += '<hr><div class="uk-grid uk-grid-small uk-text-right"><div class="uk-width-1-1">'
     if (back_str != undefined) {
-      html += '<a href="/#'+ back_str +'" class="uk-button"><i class="uk-icon-chevron-left"></i> Back</a> '
+      html += '<a href="/#'+ back_str +'" class="uk-button">Back</a> '
     }
-    html += '<button class="uk-button uk-button-success"><i class="uk-icon-save"></i> Save</button></div></div><hr>'
+    html += '<button class="uk-button uk-button-primary">Save</button></div></div><hr>'
 
     $(formId).html(html)
     var _this = this
     uploads.forEach(function(u) {
-      _this.prepare_upload(u[0], u[1], u[2], u[3], u[4], u[5])
+      _this.prepare_upload(u[0], u[1], u[2], u[3], u[4], u[5], u[6])
     })
     riot.mount("images"); riot.mount("files")
     riot.update()
@@ -172,7 +179,7 @@ var Common = {
         })
       } else {
         _this.ajax(url + path + "/" + objID, "POST", json, function(d) {
-          UIkit.notify({
+          UIkit.notification({
             message : 'Successfully saved!',
             status  : 'success',
             timeout : 1000,
@@ -241,48 +248,50 @@ var Common = {
     return keys
   },
 
-  prepare_upload: function(key, collection, field, filter, progressbar_id, drop_id) {
-    var progressbar = $(progressbar_id),
-      bar         = progressbar.find('.uk-progress-bar'),
-      settings    = {
+  prepare_upload: function(key, collection, field, filter, progressbar_id, drop_id, i18n) {
 
-      action: url + '/uploads/' + key + '/' + collection + '/' + field, // upload url
+    var bar = document.getElementById(progressbar_id);
 
+    UIkit.upload(drop_id, {
+      url: url + '/uploads/' + key + '/' + collection + '/' + field, // upload url,
+      multiple: true,
       headers: {
-        'X-Session-Id': localStorage.getItem('X-Session-Id')
+        'X-Session-Id': localStorage.getItem('X-Session-Id'),
+        'foxx-locale': i18n == true ? localStorage.getItem('foxx-locale') : null
+      },
+      allow: filter,
+
+      error: function () {
+        console.log('error', arguments);
       },
 
-      allow : filter,
-
-      loadstart: function() {
-        bar.css("width", "0%").text("0%");
-        progressbar.removeClass("uk-hidden");
+      loadStart: function (e) {
+        bar.removeAttribute('hidden');
+        bar.max = e.total;
+        bar.value = e.loaded;
       },
 
-      progress: function(percent) {
-        percent = Math.ceil(percent);
-        bar.css("width", percent+"%").text(percent+"%");
+      progress: function (e) {
+        bar.max = e.total;
+        bar.value = e.loaded;
       },
 
-      allcomplete: function(response) {
+      loadEnd: function (e) {
+        bar.max = e.total;
+        bar.value = e.loaded;
+      },
 
-        bar.css("width", "100%").text("100%");
+      completeAll: function () {
+        bar.value = 100;
         setTimeout(function(){
-          progressbar.addClass("uk-hidden");
+          bar.setAttribute('hidden', null);
           riot.mount("images"); riot.mount("files")
           riot.update()
 
         }, 250);
-        UIkit.notify({
-          message : 'File(s) uploaded successfully',
-          status  : 'success',
-          timeout : 1000,
-          pos     : 'bottom-right'
-        });
       }
-    };
 
-    UIkit.uploadDrop($(drop_id), settings);
+    });
   }
 
 };

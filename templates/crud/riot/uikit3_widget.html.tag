@@ -126,7 +126,7 @@
     }
 
     destroy_object(e) {
-      UIkit.modal.confirm("Are you sure?", function() {
+      UIkit.modal.confirm("Are you sure?").then(function() {
         common.delete(url + "@{{objects}}/" + e.item.row._key, function() {
           common.get(url + "@{{objects}}/page/1", function(d) {
             _this.data = d.data[0].data
@@ -134,7 +134,7 @@
             _this.update()
           })
         })
-      });
+      }, function() {})
     }
 
   </script>

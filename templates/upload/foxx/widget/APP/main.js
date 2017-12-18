@@ -28,15 +28,29 @@ module.context.use(function (req, res, next) {
 // -----------------------------------------------------------------------------
 // GET /uploads/:key/:type/:field
 router.get('/:key/:type/:field', function(req, res) {
-  res.send(
-    db.uploads.byExample(
-      {
-        field: req.pathParams.field,
-        object_id: req.pathParams.key + '/' + req.pathParams.type
-      }
-    ).toArray()
-  )
+  var obj = {
+    field: req.pathParams.field,
+    object_id: req.pathParams.key + '/' + req.pathParams.type
+  }
+
+  res.send(db.uploads.byExample(obj).toArray())
 })
+.header('foxx-locale')
+.header('X-Session-Id')
+.description("Get all files for a specific id and field")
+// -----------------------------------------------------------------------------
+// GET /uploads/:key/:type/:field/:lang
+router.get('/:key/:type/:field/:lang', function(req, res) {
+  var obj = {
+    field: req.pathParams.field,
+    object_id: req.pathParams.key + '/' + req.pathParams.type
+  }
+
+  if(req.pathParams.lang) obj['lang'] = req.pathParams.lang
+  res.send(db.uploads.byExample(obj).toArray())
+})
+.header('foxx-locale')
+.header('X-Session-Id')
 .description("Get all files for a specific id and field")
 // -----------------------------------------------------------------------------
 // POST /uploads/:key/:type/:field
@@ -53,26 +67,21 @@ router.post('/:key/:type/:field', function(req, res) {
 
     if(_settings.resize_ovh) {
       // upload to resize.ovh service
-      var res = request.post('https://resize.ovh/upload_http', {form: {name: urldest, api: _settings.resize_ovh }});
+      var res = request.post('https://resize.ovh/upload_http', {
+        form: {name: urldest, key: _settings.resize_ovh }
+      });
+      urldest = `https://resize.ovh/o/${res.body}`
     }
 
-    var obj = {
+    var upload = {
       path: filedest,
       url: urldest,
       filename: filename,
       length: data.data.length,
       mime: data.headers["Content-Type"],
-    }
-
-    var upload = {
       object_id: req.pathParams.type + '/' + req.pathParams.key,
-      field: req.pathParams.field
-    }
-
-    if(req.headers['foxx-locale']) {
-      upload[req.headers['foxx-locale']] = obj
-    } else {
-      upload = _.merge(upload, obj)
+      field: req.pathParams.field,
+      lang: req.headers['foxx-locale']
     }
 
     docs.push(

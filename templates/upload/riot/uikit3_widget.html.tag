@@ -18,8 +18,11 @@
     </table>
   </div>
   <script>
-    var _this = this;
-    common.get(url + "uploads/" + opts.id + '/' + opts.field, function(d) {
+    var _this = this
+    this.data = []
+    var use_i18n = ""
+    if(opts.i18n != "undefined") use_i18n = "/" + window.localStorage.getItem("foxx-locale")
+    common.get(url + "uploads/" + opts.id + '/' + opts.field + use_i18n, function(d) {
       _this.data = d
       _this.update()
     })
@@ -55,7 +58,12 @@
   </div>
   <script>
     var _this = this;
-    common.get(url + "uploads/" + opts.id + '/' + opts.field, function(d) {
+    this.data = []
+
+    var use_i18n = ""
+    if(opts.i18n != "undefined") use_i18n = "/" + window.localStorage.getItem("foxx-locale")
+
+    common.get(url + "uploads/" + opts.id + '/' + opts.field + use_i18n, function(d) {
       _this.data = d
       _this.update()
     })

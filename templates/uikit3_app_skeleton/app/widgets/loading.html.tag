@@ -32,7 +32,7 @@
   </ul>
 
   <script>
-    this.langs = ['en', 'fr']
+    this.langs = ['en']
     changeLang(e) {
       window.localStorage.setItem('foxx-locale', e.item.lang)
       document.location.reload()

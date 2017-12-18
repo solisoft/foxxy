@@ -1,5 +1,5 @@
 'use strict';
-const collName = "@{{objects}}"
+
 const db = require('@arangodb').db;
 const joi = require('joi');
 const fields = require('./model.js');
@@ -10,7 +10,6 @@ const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
 require("@arangodb/aql/cache").properties({ mode: "on" });
 
 const router = createRouter();
-const collection = db._collection(collName);
 
 const _settings = db._collection('foxxy_settings').firstExample();
 
@@ -46,7 +45,7 @@ module.context.use(function (req, res, next) {
 
 // -----------------------------------------------------------------------------
 router.get('/', function (req, res) {
-  res.send({ fields: fields(), data: db._query("FOR doc IN @@collection RETURN doc", { "@collection": collName}).toArray()[0] });
+  res.send({ fields: fields(), data: db._query("FOR doc IN @{{objects}} RETURN doc").toArray()[0] });
 })
 .header('X-Session-Id')
 .description('Returns first @{{object}}');
@@ -63,7 +62,7 @@ router.get('/check_form', function (req, res) {
 // -----------------------------------------------------------------------------
 router.post('/:id', function (req, res) {
   var obj = collection.document(req.pathParams.id)
-  var data = fieldsToData()
+  var data = fieldsToData(fields, req)
   collection.update(obj, data)
   res.send({ success: true });
 })

@@ -16,10 +16,28 @@ var Common = {
       return o;
     };
   },
+  startEditor: function(name, mode, id) {
+    var editor = ace.edit(name);
+    editor.getSession().setMode(mode);
+    editor.setOptions({
+      maxLines: Infinity,
+      enableEmmet: mode == "ace/mode/html",
+      tabSize: 2, useSoftTabs: true
+    });
+    editor.getSession().setUseWrapMode(true);
+    editor.getSession().setValue($("#"+id).val());
+    editor.getSession().on('change', function(){
+      $("#"+id).val(editor.getSession().getValue());
+    });
+
+    return editor;
+  },
 
   buildForm: function buildForm(obj, fields, formId, back_str) {
     var html = ""
     var uploads = []
+    var _this = this
+    var editors = []
     fields.forEach(function(l, i) {
       if (l.h !== undefined) {
         html += '<div class="uk-grid uk-grid-small uk-margin-top"><h3>'+ l.h +'</h3></div>'
@@ -44,6 +62,12 @@ var Common = {
         if(l.t === "date") html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="date" id="'+l.n+'" data-date-format="YYYY/MM/DD" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
         if(l.t === "time") html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="time" id="'+l.n+'" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
         if(l.t === "text") html += '<textarea id="'+l.n+'" class="uk-textarea" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+        if(l.t.match(/^code/)) {
+          html += '<input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="'+value+'">'
+          html += '<div id="editor_'+l.n+'" class="editor"></div>'
+          editors.push(["editor_"+l.n, "ace/mode/" + l.t.split(":")[1], l.n])
+
+        }
         if(l.t === "list") {
           html += '<select name="'+ l.n +'" style="width:100%" class="uk-select select_list" id="'+l.n+'">'
           l.d.forEach(function(o) {
@@ -118,6 +142,9 @@ var Common = {
     html += '<button class="uk-button uk-button-primary">Save</button></div></div><hr>'
 
     $(formId).html(html)
+    editors.forEach(function(e, i) {
+      _this.startEditor(e[0], e[1], e[2])
+    })
     var _this = this
     uploads.forEach(function(u) {
       _this.prepare_upload(u[0], u[1], u[2], u[3], u[4], u[5], u[6])

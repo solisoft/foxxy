@@ -1,3 +1,7 @@
+# v0.4.5
+
+- Fix regression for tags
+
 # v0.4.4
 
 - escape / unescape forms data. Now input can contain any string ("')

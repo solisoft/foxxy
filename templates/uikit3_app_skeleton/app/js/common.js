@@ -100,9 +100,11 @@ var Common = {
             o = l.tr == true ? o[window.localStorage.getItem('foxx-locale')] : [o]
             if(o === undefined || o == "undefined") o = []
             o.forEach(function(v) {
-              selected = ""
-              if(value && value.indexOf(v) >= 0) selected="selected='selected'"
-              html += '<option value="'+ v +'" '+selected+'>'+ v +'</option>'
+              if(v != '') {
+                selected = ""
+                if(value && value.indexOf(v) >= 0) selected="selected='selected'"
+                html += '<option value="'+ v +'" '+selected+'>'+ v +'</option>'
+              }
             })
 
           })
@@ -137,7 +139,7 @@ var Common = {
         }
         if(l.t === "boolean") {
           var checked = obj[l.n] === true ? " checked='checked' " : ''
-          html += ' <input name="'+ l.n +'" '+ checked +' type="checkbox" value="1"  /> '
+          html += ' <input name="'+ l.n +'" '+ checked +'  class="uk-checkbox" type="checkbox" value="1"  /> '
         }
         html += '</div>'
       }

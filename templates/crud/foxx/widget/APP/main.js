@@ -2,7 +2,7 @@
 const db = require('@arangodb').db;
 const joi = require('joi');
 const fields = require('./model.js');
-const each = require('lodash').each;
+const _ = require('lodash');
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
 const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
@@ -22,12 +22,22 @@ module.context.use(router);
 
 var fieldsToData = function(fields, req) {
   var data = {}
-  each(fields(), function(f) {
+  _.each(fields(), function(f) {
     if(f.tr != true) {
-      data[f.n] = req.body[f.n]
+      if(_.isArray(req.body[f.n])) {
+        data[f.n] = _.map(req.body[f.n], function(v) { return unescape(v) })
+      } else {
+        data[f.n] = unescape(req.body[f.n])
+      }
     } else {
       data[f.n] = {}
-      data[f.n][req.headers['foxx-locale']] = req.body[f.n]
+      if(_.isArray(req.body[f.n])) {
+        data[f.n][req.headers['foxx-locale']] = _.map(
+          req.body[f.n], function(v) { return unescape(v) }
+        )
+      } else {
+        data[f.n][req.headers['foxx-locale']] = unescape(req.body[f.n])
+      }
     }
   })
   return data
@@ -41,7 +51,7 @@ module.context.use(function (req, res, next) {
 });
 
 var schema = {}
-each(fields(), function(f) {schema[f.n] = f.j })
+_.each(fields(), function(f) {schema[f.n] = f.j })
 
 // -----------------------------------------------------------------------------
 router.get('/page/:page', function (req, res) {

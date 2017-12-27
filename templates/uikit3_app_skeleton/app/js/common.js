@@ -136,10 +136,12 @@ var Common = {
     var json = JSON.stringify($("#"+ formID).serializeObject())
     $("div[data-hint]").html("")
     var errors = null
+    var selector = "# " + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
+
     this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {
-      $("#"+ formID + " input, #"+ formID + " select").removeClass("uk-form-danger")
-      $("#"+ formID + " input, #"+ formID + " select").removeClass("uk-form-success")
-      $("#"+ formID + " input, #"+ formID + " select").addClass("uk-form-success")
+      $(selector).removeClass("uk-form-danger")
+      $(selector).removeClass("uk-form-success")
+      $(selector).addClass("uk-form-success")
       if(d.errors.length > 0) {
         errors = d.errors
         d.errors.forEach(function(e) {
@@ -150,7 +152,7 @@ var Common = {
       }
 
       setTimeout(function() {
-        $("#"+ formID +" input, #"+ formID +" select").removeClass("uk-form-success")
+        $(selector).removeClass("uk-form-success")
       }, 300 )
       callback(errors)
     })
@@ -167,10 +169,11 @@ var Common = {
     })
     json = JSON.stringify(json)
     $("div[data-hint]").html("")
+    var selector = "# " + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
     _this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {
-      $("#"+ formID + " input, #"+ formID + " select").removeClass("uk-form-danger")
-      $("#"+ formID + " input, #"+ formID + " select").removeClass("uk-form-success")
-      $("#"+ formID + " input, #"+ formID + " select").addClass("uk-form-success")
+      $(selector).removeClass("uk-form-danger")
+      $(selector).removeClass("uk-form-success")
+      $(selector).addClass("uk-form-success")
       if(d.errors.length > 0) {
         d.errors.forEach(function(e) {
           $("#" + e.path).removeClass("uk-form-success")
@@ -192,7 +195,7 @@ var Common = {
         })
       }
       setTimeout(function() {
-        $("#"+ formID +" input, #"+ formID +" select").removeClass("uk-form-success")
+        $(selector).removeClass("uk-form-success")
       }, 300 )
     })
   },

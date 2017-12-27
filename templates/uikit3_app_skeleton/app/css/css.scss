@@ -42,3 +42,7 @@
 .select2-container--default .select2-selection--multiple {
   border: 1px solid #ddd;
 }
+.select2-container .select2-search__field {
+  line-height: 24px !important;
+  margin-top: 9px !important;
+}

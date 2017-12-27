@@ -136,7 +136,7 @@ var Common = {
     var json = JSON.stringify($("#"+ formID).serializeObject())
     $("div[data-hint]").html("")
     var errors = null
-    var selector = "# " + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
+    var selector = "#" + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
 
     this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {
       $(selector).removeClass("uk-form-danger")
@@ -169,7 +169,7 @@ var Common = {
     })
     json = JSON.stringify(json)
     $("div[data-hint]").html("")
-    var selector = "# " + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
+    var selector = "#" + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
     _this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {
       $(selector).removeClass("uk-form-danger")
       $(selector).removeClass("uk-form-success")

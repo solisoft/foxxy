@@ -1,5 +1,7 @@
 const config = function() {
-  collection: '@{{objects}}'
+  return {
+    collection: '@{{objects}}'
+  }
 }
 
 module.exports = config

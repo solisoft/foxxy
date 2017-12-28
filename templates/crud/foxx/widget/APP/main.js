@@ -2,7 +2,7 @@
 const db = require('@arangodb').db;
 const joi = require('joi');
 const fields = require('./model.js');
-const config = require('./config.js');
+const config = require('./config.js')();
 const _ = require('lodash');
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
@@ -10,7 +10,7 @@ const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
 require("@arangodb/aql/cache").properties({ mode: "on" });
 
 const router = createRouter();
-const collection = db._collections(config.collection);
+const collection = db._collection(config.collection);
 
 const _settings = db.foxxy_settings.firstExample();
 

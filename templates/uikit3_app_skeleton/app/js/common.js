@@ -178,7 +178,6 @@ var Common = {
     $("div[data-hint]").html("")
     var errors = null
     var selector = "#" + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
-
     this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {
       $(selector).removeClass("uk-form-danger")
       $(selector).removeClass("uk-form-success")
@@ -208,10 +207,11 @@ var Common = {
         json[$(st).attr("name")] = [ json[$(st).attr("name")] ]
       }
     })
-    json = escape(JSON.stringify(json))
+
+
     $("div[data-hint]").html("")
     var selector = "#" + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
-    _this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {
+    _this.ajax(url + path + "/check_form?data=" + escape(JSON.stringify(json)), "GET", "", function(d) {
       $(selector).removeClass("uk-form-danger")
       $(selector).removeClass("uk-form-success")
       $(selector).addClass("uk-form-success")
@@ -222,7 +222,7 @@ var Common = {
           $("div[data-hint="+e.path+"]").html("<div>"+e.message.replace(/"(.*)"/, '').trim()+"</div>")
         })
       } else {
-        _this.ajax(url + path + "/" + objID, "POST", json, function(d) {
+        _this.ajax(url + path + "/" + objID, "POST", JSON.stringify(json), function(d) {
           UIkit.notification({
             message : 'Successfully saved!',
             status  : 'success',

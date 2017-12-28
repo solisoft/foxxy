@@ -174,7 +174,7 @@ var Common = {
   },
 
   checkForm: function(formID, path, callback) {
-    var json = JSON.stringify($("#"+ formID).serializeObject())
+    var json = escape(JSON.stringify($("#"+ formID).serializeObject()))
     $("div[data-hint]").html("")
     var errors = null
     var selector = "#" + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
@@ -208,7 +208,7 @@ var Common = {
         json[$(st).attr("name")] = [ json[$(st).attr("name")] ]
       }
     })
-    json = JSON.stringify(json)
+    json = escape(JSON.stringify(json))
     $("div[data-hint]").html("")
     var selector = "#" + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
     _this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {

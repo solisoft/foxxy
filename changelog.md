@@ -1,3 +1,7 @@
+# v0.4.6
+
+- Fix an issue about escaping & unescaping for form check
+
 # v0.4.5
 
 - Fix regression for tags

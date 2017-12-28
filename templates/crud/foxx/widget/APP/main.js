@@ -83,7 +83,7 @@ router.get('/:id', function (req, res) {
 router.get('/check_form', function (req, res) {
   var errors = []
   try {
-    errors = joi.validate(JSON.parse(req.queryParams.data), schema, { abortEarly: false }).error.details
+    errors = joi.validate(JSON.parse(unescape(req.queryParams.data)), schema, { abortEarly: false }).error.details
   } catch(e) {}
   res.send({errors: errors });
 })

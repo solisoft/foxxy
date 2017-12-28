@@ -29,6 +29,10 @@ require("@arangodb/aql/cache").properties({ mode: "on" })
 // { r: true, c: "1-1", n: "file", t: "file", j: joi.string(), l: "Files" },
 // { r: true, c: "1-1", n: "tags", t: "tags", j: joi.array(), l: "Tags", d: tags },
 // { r: true, c: "1-1", n: "items", t: "multilist", j: joi.array(), l: "Multi List of tags", d: tags },
+// { r: true, c: "1-1", n: "html", t: "code:html", j: joi.any(), l: "Some HTML" },
+// { r: true, c: "1-1", n: "scss", t: "code:scss", j: joi.any(), l: "Some SCSS" },
+// { r: true, c: "1-1", n: "javascript", t: "code:javascript", j: joi.any(), l: "Some JS" },
+// { r: true, c: "1-1", n: "json", t: "code:json", j: joi.any(), l: "Some Json" },
 
 const load_fields = function() {
 

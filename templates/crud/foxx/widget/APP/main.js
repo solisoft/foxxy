@@ -2,6 +2,7 @@
 const db = require('@arangodb').db;
 const joi = require('joi');
 const fields = require('./model.js');
+const config = require('./config.js');
 const _ = require('lodash');
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
@@ -9,7 +10,7 @@ const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
 require("@arangodb/aql/cache").properties({ mode: "on" });
 
 const router = createRouter();
-const collection = db.@{{objects}};
+const collection = db._collections(config.collection);
 
 const _settings = db.foxxy_settings.firstExample();
 
@@ -56,8 +57,8 @@ _.each(fields(), function(f) {schema[f.n] = f.j })
 // -----------------------------------------------------------------------------
 router.get('/page/:page', function (req, res) {
   res.send({ data: db._query(`
-    LET count = LENGTH(@{{objects}})
-    LET data = (FOR doc IN @{{objects}} SORT doc._key DESC LIMIT @offset,25 RETURN doc)
+    LET count = LENGTH(${config.collection})
+    LET data = (FOR doc IN ${config.collection} SORT doc._key DESC LIMIT @offset,25 RETURN doc)
     RETURN { count: count, data: data }
     `, { "offset": (req.pathParams.page - 1) * 25}).toArray() });
 })
@@ -66,7 +67,7 @@ router.get('/page/:page', function (req, res) {
 // -----------------------------------------------------------------------------
 router.get('/search/:term', function (req, res) {
   res.send({ data: db._query(`
-    FOR u IN FULLTEXT(@{{objects}}, 'search', @term)
+    FOR u IN FULLTEXT(${config.collection}, 'search', @term)
     LIMIT 100
     RETURN u`, { "term": req.pathParams.term}).toArray() });
 })
@@ -84,7 +85,8 @@ router.get('/check_form', function (req, res) {
   var errors = []
   try {
     errors = joi.validate(JSON.parse(unescape(req.queryParams.data)), schema, { abortEarly: false }).error.details
-  } catch(e) {}
+  }
+  catch(e) {}
   res.send({errors: errors });
 })
 .header('X-Session-Id')
@@ -116,11 +118,11 @@ router.post('/:id', function (req, res) {
 .body(joi.object(schema), 'data')
 .header('foxx-locale')
 .header('X-Session-Id')
-.description('Update a object.');
+.description('Update an object.');
 // -----------------------------------------------------------------------------
 router.delete('/:id', function (req, res) {
-  collection.remove("@{{objects}}/"+req.pathParams.id)
+  collection.remove(config.collection+"/"+req.pathParams.id)
   res.send({success: true });
 })
 .header('X-Session-Id')
-.description('delete a object.');
+.description('delete an object.');

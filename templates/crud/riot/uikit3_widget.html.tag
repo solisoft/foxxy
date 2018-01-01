@@ -12,7 +12,7 @@
 
     var _this = this;
 
-    common.get(url + "@{{objects}}/" + opts.@{{object}}_id, function(d) {
+    common.get(url + "/cruds/@{{objects}}/" + opts.@{{object}}_id, function(d) {
       _this.@{{object}} = d.data
       common.buildForm(_this.@{{object}}, d.fields, '#form_@{{object}}', '@{{objects}}')
     })

@@ -51,7 +51,7 @@ module.context.use(function (req, res, next) {
 // -----------------------------------------------------------------------------
 router.get('/:service/page/:page', function (req, res) {
   res.send({ data: db._query(`
-    LET count = LENGTH(@@collection})
+    LET count = LENGTH(@@collection)
     LET data = (FOR doc IN @@collection SORT doc._key DESC LIMIT @offset,25 RETURN doc)
     RETURN { count: count, data: data }
     `, { "@collection": req.pathParams.service,
@@ -72,6 +72,7 @@ router.get('/:service/search/:term', function (req, res) {
 .description('Returns all objects');
 // -----------------------------------------------------------------------------
 router.get('/:service/:id', function (req, res) {
+  const collection = db._collection(req.pathParams.service)
   res.send({ fields: models[req.pathParams.service],
              data: collection.document(req.pathParams.id) });
 })
@@ -93,24 +94,19 @@ router.post('/:service', function (req, res) {
   try {
     var schema = {}
     _.each(fields, function(f) {schema[f.n] = f.j })
-
     errors = joi.validate(body, schema, { abortEarly: false }).error.details
   }
   catch(e) {}
   if(errors.length == 0) {
-    var data = fieldsToData(fields, req.body, req.headers)
+    var data = fieldsToData(fields, body, req.headers)
     obj = collection.save(data, { waitForSync: true })
   }
   res.send({ success: errors.length == 0, data: obj, errors: errors });
-
-  var data = fieldsToData(fields, req.body, req.headers)
-  // data.search = update with what you want to search for
-  res.send({ success: errors.length == 0, errors: errors });
 }).header('foxx-locale')
 .header('X-Session-Id')
 .description('Create a new object.');
 // -----------------------------------------------------------------------------
-router.patch('/:service/:id', function (req, res) {
+router.post('/:service/:id', function (req, res) {
   const collection = db._collection(req.pathParams.service)
   const fields = models[req.pathParams.service]
   const body = JSON.parse(req.body.toString())

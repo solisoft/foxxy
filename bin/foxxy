@@ -325,7 +325,15 @@ hasbin('foxx-manager', function(result) {
                 copyFileSync(src_file, dest_file)
                 var model_file = path.join(process.cwd(), `foxx/cruds/APP/models.js`)
                 replaceInFile(model_file, "/*@{{models}}*/", final_model_name + ": require('./models/"+final_model_name+".js')(),\n    /*@{{models}}*/")
-
+                var setup_file = path.join(process.cwd(), `foxx/cruds/APP/scripts/setup.js`)
+                var setup_js = `if (!db._collection('${final_model_name}')) {db._createDocumentCollection('${final_model_name}'); }
+db._collection('${final_model_name}').ensureIndex({
+  type: 'fulltext',
+  fields: ['search']
+});`
+                replaceInFile(setup_file, "/*@{{setup}}*/", setup_js + "\n/*@{{setup}}*/")
+                var cmd = `foxx-manager setup /${service_endpoint} --server.endpoint ${arangoconf.endpoint} --server.database ${arangoconf.database} --server.username ${arangoconf.username} ${password}`
+                execSync(cmd)
               }
             }
             console.log(action.toUpperCase() + " "+ model +" created successfully!".green)

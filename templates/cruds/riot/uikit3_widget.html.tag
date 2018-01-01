@@ -7,7 +7,7 @@
   <script>
     save_form(e) {
       e.preventDefault()
-      common.saveForm("form_@{{object}}", "@{{objects}}", opts.@{{object}}_id)
+      common.saveForm("form_@{{object}}", "cruds/@{{objects}}", opts.@{{object}}_id)
     }
 
     var _this = this;
@@ -31,7 +31,7 @@
   <script>
     save_form(e) {
       e.preventDefault()
-      common.saveForm("form_new_@{{object}}", "@{{objects}}")
+      common.saveForm("form_new_@{{object}}", "cruds/@{{objects}}")
     }
 
     common.get(url + "/cruds/@{{objects}}/fields", function(d) {

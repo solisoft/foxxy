@@ -173,31 +173,6 @@ var Common = {
     })
   },
 
-  checkForm: function(formID, path, callback) {
-    var json = escape(JSON.stringify($("#"+ formID).serializeObject()))
-    $("div[data-hint]").html("")
-    var errors = null
-    var selector = "#" + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
-    this.ajax(url + path + "/check_form?data=" + json, "GET", "", function(d) {
-      $(selector).removeClass("uk-form-danger")
-      $(selector).removeClass("uk-form-success")
-      $(selector).addClass("uk-form-success")
-      if(d.errors.length > 0) {
-        errors = d.errors
-        d.errors.forEach(function(e) {
-          $("#" + e.path).removeClass("uk-form-success")
-          $("#" + e.path).addClass("uk-form-danger")
-          $("div[data-hint="+e.path+"]").html("<div>"+e.message.replace(/"(.*)"/, '').trim()+"</div>")
-        })
-      }
-
-      setTimeout(function() {
-        $(selector).removeClass("uk-form-success")
-      }, 300 )
-      callback(errors)
-    })
-  },
-
   saveForm: function (formID, path, objID) {
     objID = objID||""
     var _this = this;
@@ -208,13 +183,14 @@ var Common = {
       }
     })
 
-
     $("div[data-hint]").html("")
     var selector = "#" + formID + " textarea, #"+ formID + " input, #"+ formID + " select"
-    _this.ajax(url + path + "/check_form?data=" + escape(JSON.stringify(json)), "GET", "", function(d) {
-      $(selector).removeClass("uk-form-danger")
-      $(selector).removeClass("uk-form-success")
-      $(selector).addClass("uk-form-success")
+
+    $(selector).removeClass("uk-form-danger")
+    $(selector).removeClass("uk-form-success")
+    $(selector).addClass("uk-form-success")
+
+    _this.ajax(url + path + "/" + objID, "POST", JSON.stringify(json), function(d) {
       if(d.errors.length > 0) {
         d.errors.forEach(function(e) {
           $("#" + e.path).removeClass("uk-form-success")
@@ -222,23 +198,24 @@ var Common = {
           $("div[data-hint="+e.path+"]").html("<div>"+e.message.replace(/"(.*)"/, '').trim()+"</div>")
         })
       } else {
-        _this.ajax(url + path + "/" + objID, "POST", JSON.stringify(json), function(d) {
-          UIkit.notification({
-            message : 'Successfully saved!',
-            status  : 'success',
-            timeout : 1000,
-            pos     : 'bottom-right'
-          });
-          if(objID == "") {
-            objID = d.key._key
-            route("/"+ path +"/" + objID + "/edit")
-          }
-        })
+        UIkit.notification({
+          message : 'Successfully saved!',
+          status  : 'success',
+          timeout : 1000,
+          pos     : 'bottom-right'
+        });
+
+        if(objID == "") {
+          objID = d.data._key
+          path = path.split("/").length == 2 ? path.split("/")[1] : path
+          route("/"+ path +"/" + objID + "/edit")
+        }
       }
       setTimeout(function() {
         $(selector).removeClass("uk-form-success")
       }, 300 )
     })
+
   },
 
   ajax: function(url, method, dataForm, callback, errorCallback) {

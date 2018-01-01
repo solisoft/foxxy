@@ -3,6 +3,7 @@
 const db = require('@arangodb').db;
 const joi = require('joi');
 const fields = require('./model.js');
+const config = require('./config.js')();
 const each = require('lodash').each;
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
@@ -22,12 +23,22 @@ module.context.use(router);
 
 var fieldsToData = function(fields, req) {
   var data = {}
-  each(fields(), function(f) {
+  _.each(fields(), function(f) {
     if(f.tr != true) {
-      data[f.n] = req.body[f.n]
+      if(_.isArray(req.body[f.n])) {
+        data[f.n] = _.map(req.body[f.n], function(v) { return unescape(v) })
+      } else {
+        data[f.n] = unescape(req.body[f.n])
+      }
     } else {
       data[f.n] = {}
-      data[f.n][req.headers['foxx-locale']] = req.body[f.n]
+      if(_.isArray(req.body[f.n])) {
+        data[f.n][req.headers['foxx-locale']] = _.map(
+          req.body[f.n], function(v) { return unescape(v) }
+        )
+      } else {
+        data[f.n][req.headers['foxx-locale']] = unescape(req.body[f.n])
+      }
     }
   })
   return data
@@ -45,10 +56,10 @@ module.context.use(function (req, res, next) {
 
 // -----------------------------------------------------------------------------
 router.get('/', function (req, res) {
-  res.send({ fields: fields(), data: db._query("FOR doc IN @{{objects}} RETURN doc").toArray()[0] });
+  res.send({ fields: fields(), data: db._query(`FOR doc IN ${config.collection} RETURN doc`).toArray()[0] });
 })
 .header('X-Session-Id')
-.description('Returns first @{{object}}');
+.description(`Returns first ${config.collection}`);
 // -----------------------------------------------------------------------------
 router.get('/check_form', function (req, res) {
     var errors = []
@@ -69,4 +80,4 @@ router.post('/:id', function (req, res) {
 .body(joi.object(schema), 'data')
 .header('foxx-locale')
 .header('X-Session-Id')
-.description('Update @{{object}}.');
+.description(`Update ${config.collection}.`);

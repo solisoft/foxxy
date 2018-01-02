@@ -39,6 +39,7 @@ var Common = {
     var _this = this
     var editors = []
     var values = []
+    var positions = []
     fields.forEach(function(l, i) {
       if (l.h !== undefined) {
         html += '<div class="uk-grid uk-grid-small uk-margin-top"><h3>'+ l.h +'</h3></div>'
@@ -110,6 +111,14 @@ var Common = {
           })
           html +='</select>'
         }
+        if(l.t === "map") {
+          if(value === "") value = [0,0]
+          html += '<div class="uk-text-center" id="'+l.n+'_infos"><span class="uk-label"></span></div>'
+          html += '<div id="map_'+l.n+'" class="map" style="'+l.s+'"></div>'
+          html += '<input id="'+l.n+'_lat" type="hidden" name="'+l.n+'" />'
+          html += '<input id="'+l.n+'_lng" type="hidden" name="'+l.n+'" />'
+          positions.push([l.n, value])
+        }
         if(l.t === "image" && obj._id) {
           html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'
           html += '    <span uk-icon="icon: cloud-upload"></span>'
@@ -157,6 +166,26 @@ var Common = {
     })
     editors.forEach(function(e, i) {
       _this.startEditor(e[0], e[1], e[2])
+    })
+    positions.forEach(function(p, i) {
+      var mymap = L.map("map_"+p[0], { dragging: true, tap: false}).setView(p[1], 6)
+      L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        subdomains: 'abcd',
+        minZoom: 0,
+        maxZoom: 20,
+        ext: 'png',
+
+      }).addTo(mymap)
+      mymap.scrollWheelZoom.disable()
+      var marker = L.marker(p[1], { draggable: true }).addTo(mymap)
+      $('#'+p[0]+'_infos span').html(p[1].join(', '))
+      marker.on('dragend', function(data) {
+        var coords = data.target.getLatLng()
+        $('#'+p[0]+'_lat').val(coords.lat)
+        $('#'+p[0]+'_lng').val(coords.lng)
+        $('#'+p[0]+'_infos span').html([coords.lat, coords.lng].join(', '))
+      })
     })
     var _this = this
     uploads.forEach(function(u) {

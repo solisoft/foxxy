@@ -5,16 +5,13 @@
     <title>Foxxy App UIKIT3</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.35/css/uikit.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css">
 
     <link rel="stylesheet" href="DIGEST(css/css.css)">
-
   </head>
   <body>
-
     <nav class="uk-navbar-container" uk-navbar>
       <div class="uk-navbar-left uk-hidden@m">
         <a class="uk-navbar-toggle" href="#">
@@ -26,7 +23,6 @@
           <li class="uk-active"><a href="#">Foxx App</a></li>
           <!-- item_menu -->
         </ul>
-
       </div>
       <div class="uk-navbar-right">
         <rightnav></rightnav>
@@ -58,7 +54,6 @@
       var locale = window.localStorage.getItem('foxx-locale') || 'en'
       window.localStorage.setItem('foxx-locale', locale)
 
-
       var UIkit = require("vendors/uikit.js");
       var common = require("js/common.js");
 
@@ -75,6 +70,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/mode-javascript.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/mode-json.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.35/js/uikit-icons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.js"></script>
 
   </body>
 

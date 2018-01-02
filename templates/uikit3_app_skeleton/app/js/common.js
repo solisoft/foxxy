@@ -74,7 +74,7 @@ var Common = {
         if(l.t.match(/^code/)) {
           html += '<input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="">'
           values.push([l.n, value])
-          html += '<div id="editor_'+l.n+'" class="editor"></div>'
+          html += '<div id="editor_'+l.n+'" class="editor" style="'+l.s+'"></div>'
           editors.push(["editor_"+l.n, "ace/mode/" + l.t.split(":")[1], l.n])
         }
         if(l.t === "list") {

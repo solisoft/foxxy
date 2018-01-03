@@ -1,7 +1,7 @@
 'use strict';
 const db = require('@arangodb').db;
 const joi = require('joi');
-const fields = require('./model.js');
+const fields = require('./model.js')();
 const config = require('./config.js')();
 const _ = require('lodash');
 const createRouter = require('@arangodb/foxx/router');
@@ -23,7 +23,7 @@ module.context.use(router);
 
 var fieldsToData = function(fields, req) {
   var data = {}
-  _.each(fields(), function(f) {
+  _.each(fields, function(f) {
     if(f.tr != true) {
       if(_.isArray(req.body[f.n])) {
         data[f.n] = _.map(req.body[f.n], function(v) { return unescape(v) })
@@ -52,7 +52,7 @@ module.context.use(function (req, res, next) {
 });
 
 var schema = {}
-_.each(fields(), function(f) {schema[f.n] = f.j })
+_.each(fields, function(f) {schema[f.n] = f.j })
 
 // -----------------------------------------------------------------------------
 router.get('/page/:page', function (req, res) {
@@ -76,49 +76,53 @@ router.get('/search/:term', function (req, res) {
 .description('Returns all objects');
 // -----------------------------------------------------------------------------
 router.get('/:id', function (req, res) {
-  res.send({fields: fields(), data: collection.document(req.pathParams.id) });
+  res.send({fields: fields, data: collection.document(req.pathParams.id) });
 })
 .header('X-Session-Id')
 .description('Returns object within ID');
 // -----------------------------------------------------------------------------
-router.get('/check_form', function (req, res) {
-  var errors = []
-  try {
-    errors = joi.validate(JSON.parse(unescape(req.queryParams.data)), schema, { abortEarly: false }).error.details
-  }
-  catch(e) {}
-  res.send({errors: errors });
-})
-.header('X-Session-Id')
-.description('Check the form for live validation');
-// -----------------------------------------------------------------------------
 router.get('/fields', function (req, res) {
-  res.send({ fields: fields() });
+  res.send({ fields: fields });
 })
 .header('X-Session-Id')
 .description('Get all fields to build form');
 // -----------------------------------------------------------------------------
 router.post('/', function (req, res) {
-  var data = fieldsToData(fields, req)
-  // data.search = update with what you want to search for
-  res.send({ success: true, key: collection.save(data, { waitForSync: true }) });
-})
-.body(joi.object(schema), 'data')
-.header('foxx-locale')
+  const body = JSON.parse(req.body.toString())
+  var obj = null
+  var errors = []
+  try {
+    errors = joi.validate(body, schema, { abortEarly: false }).error.details
+  }
+  catch(e) {}
+  if(errors.length == 0) {
+    var data = fieldsToData(fields, body, req.headers)
+    obj = collection.save(data, { waitForSync: true })
+  }
+  res.send({ success: errors.length == 0, data: obj, errors: errors });
+}).header('foxx-locale')
 .header('X-Session-Id')
 .description('Create a new object.');
 // -----------------------------------------------------------------------------
 router.post('/:id', function (req, res) {
-  var object = collection.document(req.pathParams.id)
-  var data = fieldsToData(fields, req)
-  // data.search = update with what you want to search for
-  collection.update(object, data)
-  res.send({ success: true });
+  const body = JSON.parse(req.body.toString())
+  var obj = null
+  var errors = []
+  try {
+    errors = joi.validate(body, schema, { abortEarly: false }).error.details
+  }
+  catch(e) {}
+  if(errors.length == 0) {
+    var object = collection.document(req.pathParams.id)
+    var data = fieldsToData(fields, body, req.headers)
+    // data.search = update with what you want to search for
+    obj = collection.update(object, data)
+  }
+  res.send({ success: errors.length == 0, data: obj, errors: errors });
 })
-.body(joi.object(schema), 'data')
 .header('foxx-locale')
 .header('X-Session-Id')
-.description('Update an object.');
+.description('Update a object.');
 // -----------------------------------------------------------------------------
 router.delete('/:id', function (req, res) {
   collection.remove(config.collection+"/"+req.pathParams.id)

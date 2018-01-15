@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/solisoft/foxx-framework#readme",
   "dependencies": {
+    "arangojs": "^6.0.0",
     "colors": "^1.1.2",
     "hasbin": "^1.2.3",
     "js-yaml": "^3.6.1",

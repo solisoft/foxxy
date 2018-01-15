@@ -4,6 +4,10 @@
 var exec = require('child_process').exec
 var execSync = require('child_process').execSync
 var yaml = require('js-yaml')
+
+var arangojs = require('arangojs');
+var db;// = new arangojs.Database();
+
 var fs = require('fs')
 var path = require('path')
 var argv = require('yargs').argv
@@ -75,6 +79,16 @@ var foxxAppsFolder = function() {
   return ''
 }
 
+var connectDB = async function(database, user, pass, endpoint) {
+  db = new arangojs.Database({ url: endpoint });
+  var names = await db.listDatabases();
+  if(names.indexOf(database) < 0) {
+    db.createDatabase(database, [{ user: user, passwd: pass }])
+  }
+  db.useDatabase(database);
+  db.useBasicAuth(user, pass);
+}
+
 const arangodb3AppsPath = foxxAppsFolder()
 
 var replaceInFile = function(filename, find, replace) {
@@ -92,44 +106,42 @@ var foxxy_welcome = `
 console.log(foxxy_welcome.yellow)
 console.log(('Version ' + version).yellow)
 
-hasbin('foxx-manager', function(result) {
-  if(result) {
-    if(argv._.length == 0) {
-      console.log("Usage : foxxy <command> <options> --database db_name --user username --password secret --endpoint http+tcp://127.0.0.1:8529".green)
-      console.log("Samples :")
-      console.log("- Create a new app : foxxy new app_name --database db_name --user username --password secret --endpoint http+tcp://127.0.0.1:8529")
-      console.log("- - endpoint, username and password are not mandatory")
-      console.log("- Generate a CRUD : foxxy g crud user")
-      console.log("- Generate an Edit/Update only : foxxy g eu user")
-      console.log("- Generate a basic service & widget : foxxy g basic user")
-      console.log("- Generate a basic service only : foxxy g service user")
+async function app() {
+  hasbin('arangosh', function(result) {
+    if(result) {
+      if(argv._.length == 0) {
+        console.log("Usage : foxxy <command> <options> --database db_name --user username --password secret --endpoint http+tcp://127.0.0.1:8529".green)
+        console.log("Samples :")
+        console.log("- Create a new app : foxxy new app_name --database db_name --user username --password secret --endpoint http+tcp://127.0.0.1:8529")
+        console.log("- - endpoint, username and password are not mandatory")
+        console.log("- Generate a CRUD : foxxy g crud user")
+        console.log("- Generate an Edit/Update only : foxxy g eu user")
+        console.log("- Generate a basic service & widget : foxxy g basic user")
+        console.log("- Generate a basic service only : foxxy g service user")
 
 
-      //console.log("## hcrud : a CRUD widget within a Hierachical structure (tree)")
-    } else {
-      // Create a new application
-      if(argv._[0] == "new") {
-        if(argv._.length == 1 || argv.database === undefined) {
-          console.log("Usage : foxxy new <app_name> --database db_name".red)
-        } else {
-          if(arangodb3AppsPath != '') {
-            //execSync(`cp -Rf ${arangodb3AppsPath}/_db/${argv.database}/* ${path.join(process.cwd(), argv._[1] + "/foxx")}`)
-            execSync(`rm -Rf ${arangodb3AppsPath}/_db/${argv.database}`)
-            execSync(`ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} ${arangodb3AppsPath}/_db/${argv.database}`)
+        //console.log("## hcrud : a CRUD widget within a Hierachical structure (tree)")
+      } else {
+        // Create a new application
+        if(argv._[0] == "new") {
+          if(argv._.length == 1 || argv.database === undefined) {
+            console.log("Usage : foxxy new <app_name> --database db_name".red)
           } else {
-            console.log("Beware! arangodb3AppsPath is not set".red)
-          }
-          argv.user = argv.user || "root"
-          argv.password = argv.password || ""
-          argv.endpoint = argv.endpoint || "http+tcp://127.0.0.1:8529"
-          argv.theme = argv.theme || "uikit3"
+            if(arangodb3AppsPath != '') {
+              //execSync(`cp -Rf ${arangodb3AppsPath}/_db/${argv.database}/* ${path.join(process.cwd(), argv._[1] + "/foxx")}`)
+              execSync(`rm -Rf ${arangodb3AppsPath}/_db/${argv.database}`)
+              execSync(`ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} ${arangodb3AppsPath}/_db/${argv.database}`)
+            } else {
+              console.log("Beware! arangodb3AppsPath is not set".red)
+            }
+            argv.user = argv.user || "root"
+            argv.password = argv.password || ""
+            argv.endpoint = argv.endpoint || "http://127.0.0.1:8529"
+            argv.theme = argv.theme || "uikit3"
 
-          // Create database if not exist
-          var password = "--server.password \"\""
-          if(argv.password != "") password = `--server.password ${argv.password}`
-          var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${argv.database}') < 0) db._createDatabase('${argv.database}');" --server.endpoint ${argv.endpoint} --server.username ${argv.user} ${password}`
-          console.log(cmd)
-          exec(cmd, function(error, stdout, stderr) {
+            connectDB(argv.database, argv.user, argv.password, argv.endpoint)
+
+            // Create database if not exist
             var src_folder = path.join(__dirname, `../templates/${argv.theme}_app_skeleton`)
             var dest_folder = path.join(process.cwd(), argv._[1])
 
@@ -151,35 +163,25 @@ hasbin('foxx-manager', function(result) {
 
                   copyRecursiveSync(src_folder, dest_folder)
                   console.log("Installing Foxx service...".blue)
-                  var password = "--server.password \"\""
-                  if(argv.password != "") password = `--server.password ${argv.password}`
-                  var cmd = `foxx-manager install ${dest_folder} /auth --server.endpoint ${argv.endpoint} --server.database ${argv.database} --server.username ${argv.user} ${password}`
-                  console.log("running : " + cmd)
-                  exec(cmd, function(error, stdout, stderr) {
-                    if(error) console.log(error.red)
-                    if(stdout) console.log(stdout.green)
-                    if(stderr) console.log(stderr.red)
-                    deleteFolderRecursive(path.join(process.cwd(), argv._[1]+"/foxx_tmp"))
 
-                    // Set dev mode
-                    var cmd = `foxx-manager development /auth --server.endpoint ${argv.endpoint} --server.database ${argv.database} --server.username ${argv.user} ${password}`
-                    exec(cmd, function(error, stdout, stderr) {
-                      console.log("User 'demo@foxxy.ovh' with password '"+user_password+"' created successfully".cyan)
-                      console.log("App Created ! Grrrrr!".green)
-                      if(arangodb3AppsPath == '') {
+                  await db.installService('/auth', dest_folder);
+                  deleteFolderRecursive(path.join(process.cwd(), argv._[1]+"/foxx_tmp"))
 
-                        console.log("\nNow move auth foxx app and create a symlink to your arangodb app path from your app foxx folder")
+                  // Set dev mode
+                  db.enableServiceDevelopmentMode('/auth')
+                  console.log("User 'demo@foxxy.ovh' with password '"+user_password+"' created successfully".cyan)
+                  console.log("App Created ! Grrrrr!".green)
+                  if(arangodb3AppsPath == '') {
 
-                        var cmd = `cp -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}/* ${path.join(process.cwd(), argv._[1] + "/foxx")}`
-                        console.log(cmd.cyan)
-                        cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
-                        console.log(cmd.cyan)
-                        cmd = `ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
-                        console.log(cmd.cyan)
-                      }
+                    console.log("\nNow move auth foxx app and create a symlink to your arangodb app path from your app foxx folder")
 
-                    })
-                  })
+                    var cmd = `cp -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}/* ${path.join(process.cwd(), argv._[1] + "/foxx")}`
+                    console.log(cmd.cyan)
+                    cmd = `rm -Rf /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
+                    console.log(cmd.cyan)
+                    cmd = `ln -s ${path.join(process.cwd(), argv._[1] + "/foxx")} /usr/local/var/lib/arangodb3-apps/_db/${argv.database}`
+                    console.log(cmd.cyan)
+                  }
 
                 } else {
                   console.log("App Created ! Grrrrr!".green)
@@ -188,80 +190,74 @@ hasbin('foxx-manager', function(result) {
                 console.log("Folder already exists ... aborting ... ".red)
               }
             })
-          })
-        }
-      }
 
-      if(argv._[0] == "symlinks") {
-        var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
-        console.log(arangoconf)
-        var password = "--server.password \"\""
-        if(arangoconf.password != "") password = `--server.password ${arangoconf.password}`
-        var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${arangoconf.database}') < 0) db._createDatabase('${arangoconf.database}');" --server.endpoint ${arangoconf.endpoint} --server.username ${arangoconf.user} ${password}`
-        //console.log(cmd)
-        exec(cmd, function(error, stdout, stderr) {
+          }
+        }
+
+        if(argv._[0] == "symlinks") {
+          var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
+          console.log(arangoconf)
+          connectDB(arangoconf.database, arangoconf.user, arangoconf.password, arangoconf.endpoint)
+          var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${arangoconf.database}') < 0) db._createDatabase('${arangoconf.database}');" --server.endpoint ${arangoconf.endpoint} --server.username ${arangoconf.user} ${password}`
+          //console.log(cmd)
           if(arangodb3AppsPath != '') {
             execSync(`rm -Rf ${arangodb3AppsPath}/_db/${arangoconf.database}`)
             execSync(`ln -s ${path.join(process.cwd(), "/foxx")} ${arangodb3AppsPath}/_db/${arangoconf.database}`)
           } else {
             console.log("Sorry, arangodb3AppsPath is not set".red)
           }
-        })
-      }
+        }
 
-      if(argv._[0] == "setup") {
-        var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
-        fs.readdir(process.cwd() + "/foxx", function(err, files) {
-          files.forEach(function(file, index) {
-            var stats = fs.statSync(process.cwd() + "/foxx/" + file)
-            if(stats.isDirectory()) {
-              install_service(file)
-            }
-          })
-          exec("rm foxx/tmp.zip", function(error, stdout, stderr) {})
-        })
-      }
-
-      if(argv._[0] == "g") {
-        fs.mkdirSync(path.join(process.cwd(), "foxx_tmp"))
-        if(argv._.length != 3) {
-          console.log("Usage : foxxy g <type> <model>".red)
-        } else {
-          var action = argv._[1]
-          if(["crud", "eu", "basic", "service", "upload", "cruds"].indexOf(action) < 0) throw "No action found ! Please check manual..."
-          var model = argv._[2]
-          if(action == "upload") model = "upload"
+        if(argv._[0] == "setup") {
           var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
-          var foxxyconf = { theme: "uikit2" }
-          if(fs.existsSync(process.cwd() + "/.foxxy.yml")) {
-            foxxyconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.foxxy.yml"))
-          }
-          // First install foxx service
-          var src_folder = path.join(__dirname, `../templates/${action}/foxx/widget`)
-          var final_model_name = model
-          if(action != "service") final_model_name = pluralize(model)
-          var dest_folder = process.cwd() +"/foxx_tmp/" + final_model_name
-          copyRecursiveSync(src_folder, dest_folder, model)
-          console.log("Installing Foxx service...".blue)
-          var password = "--server.password \"\""
-          if(arangoconf.password != "") password = `--server.password ${arangoconf.password}`
-          var service_endpoint = final_model_name;
-          if(action == 'cruds') service_endpoint = 'cruds'
-          var cmd = `foxx-manager install ${dest_folder} /${service_endpoint} --server.endpoint ${arangoconf.endpoint} --server.database ${arangoconf.database} --server.username ${arangoconf.username} ${password};`
-          cmd += `foxx-manager development /${service_endpoint} --server.endpoint ${arangoconf.endpoint} --server.database ${arangoconf.database} --server.username ${arangoconf.username} ${password}`
-          // don't install service if already existing ... bug go ahead.
-          if(fs.existsSync(process.cwd() + '/foxx/' + service_endpoint)) cmd = `echo ''`
-          console.log("running : " + cmd)
-          exec(cmd, function(error, stdout, stderr) {
-            if(error) console.log(error.red)
-            if(stdout) console.log(stdout.green)
-            if(stderr) console.log(stderr.red)
+          fs.readdir(process.cwd() + "/foxx", function(err, files) {
+            files.forEach(function(file, index) {
+              var stats = fs.statSync(process.cwd() + "/foxx/" + file)
+              if(stats.isDirectory()) {
+                install_service(file)
+              }
+            })
+            exec("rm foxx/tmp.zip", function(error, stdout, stderr) {})
+          })
+        }
+
+        if(argv._[0] == "g") {
+          fs.mkdirSync(path.join(process.cwd(), "foxx_tmp"))
+          if(argv._.length != 3) {
+            console.log("Usage : foxxy g <type> <model>".red)
+          } else {
+            var action = argv._[1]
+            if(["crud", "eu", "basic", "service", "upload", "cruds"].indexOf(action) < 0) throw "No action found ! Please check manual..."
+            var model = argv._[2]
+            if(action == "upload") model = "upload"
+            var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
+            connectDB(arangoconf.database, arangoconf.user, arangoconf.password, arangoconf.endpoint)
+            var foxxyconf = { theme: "uikit2" }
+            if(fs.existsSync(process.cwd() + "/.foxxy.yml")) {
+              foxxyconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.foxxy.yml"))
+            }
+            // First install foxx service
+            var src_folder = path.join(__dirname, `../templates/${action}/foxx/widget`)
+            var final_model_name = model
+            if(action != "service") final_model_name = pluralize(model)
+            var dest_folder = process.cwd() +"/foxx_tmp/" + final_model_name
+            copyRecursiveSync(src_folder, dest_folder, model)
+            console.log("Installing Foxx service...".blue)
+
+            var service_endpoint = final_model_name;
+            if(action == 'cruds') service_endpoint = 'cruds'
+
+
+            // don't install service if already existing ... bug go ahead.
+            if(fs.existsSync(process.cwd() + '/foxx/' + service_endpoint)) {
+              console.log("folder is existing ... avoiding ... ")
+            } else {
+              await db.installService(`/${service_endpoint}`, dest_folder);
+              db.enableServiceDevelopmentMode(`/${service_endpoint}`)
+
+            }
 
             deleteFolderRecursive(path.join(process.cwd(), "foxx_tmp"))
-
-            // Set dev mode
-            var cmd = `foxx-manager development /${final_model_name} --server.endpoint ${arangoconf.endpoint} --server.database ${arangoconf.database} --server.username ${arangoconf.username} ${password}`
-            exec(cmd, function(error, stdout, stderr) {})
 
             // Widget
             console.log("Creating widget " + model)
@@ -328,10 +324,10 @@ hasbin('foxx-manager', function(result) {
                 replaceInFile(model_file, "/*@{{models}}*/", final_model_name + ": require('./models/"+final_model_name+".js')(),\n    /*@{{models}}*/")
                 var setup_file = path.join(process.cwd(), `foxx/cruds/APP/scripts/setup.js`)
                 var setup_js = `if (!db._collection('${final_model_name}')) {db._createDocumentCollection('${final_model_name}'); }
-db._collection('${final_model_name}').ensureIndex({
+  db._collection('${final_model_name}').ensureIndex({
   type: 'fulltext',
   fields: ['search']
-});`
+  });`
                 replaceInFile(setup_file, "/*@{{setup}}*/", setup_js + "\n/*@{{setup}}*/")
                 var cmd = `foxx-manager setup /${service_endpoint} --server.endpoint ${arangoconf.endpoint} --server.database ${arangoconf.database} --server.username ${arangoconf.username} ${password}`
                 execSync(cmd)
@@ -339,41 +335,45 @@ db._collection('${final_model_name}').ensureIndex({
             }
             console.log(action.toUpperCase() + " "+ model +" created successfully!".green)
 
-          })
 
+
+
+          }
+
+        }
+
+        // Install a new service. Useful for team development
+        var install_service = function(service) {
+          console.log("Install Service " + service)
+          var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
+          connectDB(arangoconf.database, arangoconf.user, arangoconf.password, arangoconf.endpoint)
+
+          execSync(cmd)
+          var password = "--server.password \"\""
+          if(arangoconf.password != "") password = `--server.password ${arangoconf.password}`
+          cmd = `cd foxx; rm -Rf tmp*; mv ${service} tmp; `
+          cmd += `zip -r tmp.zip tmp;`
+          execSync(cmd)
+          await db.uninstallService(`/${service}`);
+          await db.installService(`/${service}`, dest_folder);
+          db.enableServiceDevelopmentMode(`/${service}`)
+
+          cmd = `mv tmp ${service};`
+          cmd += `rm -Rf ${service}/tmp;`
+          cmd += `cd ..;`
+          execSync(cmd)
 
         }
 
       }
-
-      // Install a new service. Useful for team development
-      var install_service = function(service) {
-        console.log("Install Service " + service)
-        var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
-        var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${arangoconf.database}') < 0) db._createDatabase('${arangoconf.database}');" --server.endpoint ${arangoconf.endpoint} --server.username ${arangoconf.username} ${arangoconf.password}`
-
-        execSync(cmd)
-        var password = "--server.password \"\""
-        if(arangoconf.password != "") password = `--server.password ${arangoconf.password}`
-        cmd = `cd foxx; rm -Rf tmp*; mv ${service} tmp; `
-        cmd += `zip -r tmp.zip tmp;`
-        cmd += "foxx-manager uninstall /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
-        cmd += "foxx-manager install tmp.zip /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
-        cmd += "foxx-manager development /"+service+" --server.endpoint "+arangoconf.endpoint+" --server.database "+arangoconf.database+" --server.username "+arangoconf.username+" "+password+";"
-        cmd += `mv tmp ${service};`
-        cmd += `rm -Rf ${service}/tmp;`
-        cmd += `cd ..;`
-        console.log(cmd)
-        execSync(cmd)
-
-      }
-
+    } else {
+      console.log("You need first to install ArangoDB : https://www.arangodb.com/")
+      console.log("On OSX : brew update && brew install arangodb")
     }
-  } else {
-    console.log("You need first to install ArangoDB : https://www.arangodb.com/")
-    console.log("On OSX : brew update && brew install arangodb")
-  }
-})
+  })
+}
+
+app()
 //console.log(fs.readFileSync("../package.json"))
 
 

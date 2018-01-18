@@ -137,3 +137,63 @@ router.delete('/:service/:id', function (req, res) {
 })
 .header('X-Session-Id')
 .description('delete a object.');
+
+// Sub
+// -----------------------------------------------------------------------------
+router.get('/sub/:id/:service/:key/page/:page', function (req, res) {
+  res.send({ data: db._query(`
+    LET count = LENGTH(@@collection)
+    LET data = (FOR doc IN @@collection FILTER doc.@key == @id SORT doc._key DESC LIMIT @offset,25 RETURN doc)
+    RETURN { count: count, data: data }
+    `, { "@collection": req.pathParams.service,
+         "offset": (req.pathParams.page - 1) * 25,
+         "key": req.pathParams.key,
+         "id": req.pathParams.id }).toArray() });
+})
+.header('X-Session-Id')
+.description('Returns all sub objects');
+// -----------------------------------------------------------------------------
+router.post('/sub/:service/:subservice', function (req, res) {
+  const collection = db._collection(req.pathParams.subservice)
+  const fields = models[req.pathParams.service].sub_models[req.pathParams.subservice].fields
+  const body = JSON.parse(req.body.toString())
+  var obj = null
+  var errors = []
+  try {
+    var schema = {}
+    _.each(fields, function(f) {schema[f.n] = f.j })
+    errors = joi.validate(body, schema, { abortEarly: false }).error.details
+  }
+  catch(e) {}
+  if(errors.length == 0) {
+    var data = fieldsToData(fields, body, req.headers)
+    obj = collection.save(data, { waitForSync: true })
+  }
+  res.send({ success: errors.length == 0, data: obj, errors: errors });
+}).header('foxx-locale')
+.header('X-Session-Id')
+.description('Create a new sub object.');
+// -----------------------------------------------------------------------------
+router.post('/sub/:service/:subservice/:id', function (req, res) {
+  const collection = db._collection(req.pathParams.subservice)
+  const fields = models[req.pathParams.service].sub_models[req.pathParams.subservice].fields
+  const body = JSON.parse(req.body.toString())
+  var obj = null
+  var errors = []
+  try {
+    var schema = {}
+    _.each(fields, function(f) {schema[f.n] = f.j })
+    errors = joi.validate(body, schema, { abortEarly: false }).error.details
+  }
+  catch(e) {}
+  if(errors.length == 0) {
+    var object = collection.document(req.pathParams.id)
+    var data = fieldsToData(fields, body, req.headers)
+    // data.search = update with what you want to search for
+    obj = collection.update(object, data)
+  }
+  res.send({ success: errors.length == 0, data: obj, errors: errors });
+})
+.header('foxx-locale')
+.header('X-Session-Id')
+.description('Update a sub object.');

@@ -87,10 +87,11 @@ router.get('/:service/fields', function (req, res) {
 // -----------------------------------------------------------------------------
 router.post('/:service', function (req, res) {
   const collection = db._collection(req.pathParams.service)
-  const fields = models[req.pathParams.service]
+  let fields = models[req.pathParams.service]
   const body = JSON.parse(req.body.toString())
   var obj = null
   var errors = []
+  if(!_.isArray(fields)) fields = fields.model
   try {
     var schema = {}
     _.each(fields, function(f) {schema[f.n] = f.j })
@@ -108,10 +109,11 @@ router.post('/:service', function (req, res) {
 // -----------------------------------------------------------------------------
 router.post('/:service/:id', function (req, res) {
   const collection = db._collection(req.pathParams.service)
-  const fields = models[req.pathParams.service]
+  let fields = models[req.pathParams.service]
   const body = JSON.parse(req.body.toString())
   var obj = null
   var errors = []
+  if(!_.isArray(fields)) fields = fields.model
   try {
     var schema = {}
     _.each(fields, function(f) {schema[f.n] = f.j })

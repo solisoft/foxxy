@@ -133,15 +133,17 @@
 
 <@{{object}}_edit>
 
-  <h3>Editing @{{object}}</h3>
-  <form onsubmit="{ save_form }" class="uk-form" id="form_@{{object}}">
-  </form>
-
   <ul uk-tab>
+    <li><a href="#">@{{objects}}</a></li>
     <li each={ i, k in sub_models }><a href="#">{ k }</a></li>
   </ul>
 
   <ul class="uk-switcher uk-margin">
+    <li>
+      <h3>Editing @{{object}}</h3>
+      <form onsubmit="{ save_form }" class="uk-form" id="form_@{{object}}">
+      </form>
+    </li>
     <li each={ i, k in sub_models }>
       <div id={ k } class="crud"></div>
     </li>

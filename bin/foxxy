@@ -10,7 +10,7 @@ var argv = require('yargs').argv
 var hasbin = require('hasbin')
 var pluralize = require('pluralize')
 var colors = require('colors')
-var version = '0.5.7'
+var version = '0.5.8'
 var user_password = +new Date()
 var copyFileSync = function(src, dest) {
   fs.writeFileSync(dest, fs.readFileSync(src, { encoding: "utf8" }))
@@ -228,6 +228,7 @@ hasbin('foxx-manager', function(result) {
         } else {
           var action = argv._[1]
           if(["crud", "eu", "basic", "service", "upload", "cruds"].indexOf(action) < 0) throw "No action found ! Please check manual..."
+          if(action == 'crud') action = 'cruds' // Ignore old crud method
           var model = argv._[2]
           if(action == "upload") model = "upload"
           var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))

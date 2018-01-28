@@ -10,7 +10,7 @@ var argv = require('yargs').argv
 var hasbin = require('hasbin')
 var pluralize = require('pluralize')
 var colors = require('colors')
-var version = '0.5.9'
+var version = '0.5.10'
 var user_password = +new Date()
 var copyFileSync = function(src, dest) {
   fs.writeFileSync(dest, fs.readFileSync(src, { encoding: "utf8" }))
@@ -78,7 +78,7 @@ var generate = function(action) {
   if(["crud", "eu", "basic", "service", "upload", "cruds", "model"].indexOf(action) < 0) throw "No action found ! Please check manual..."
   if(action == "model") {
     var setup_js = `create_collection('${pluralize(argv._[2])}');\n`
-    var setup_file = `${process.cwd()}/foxx/cruds/scripts/setup.js`
+    var setup_file = `${process.cwd()}/foxx/cruds/APP/scripts/setup.js`
     replaceInFile(setup_file, "/*@{{setup}}*/", setup_js + "\n/*@{{setup}}*/")
   } else {
     fs.mkdirSync(path.join(process.cwd(), "foxx_tmp"))

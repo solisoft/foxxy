@@ -119,20 +119,11 @@ var Common = {
 
         if(l.t === "map") {
           if(value === "") value = [0,0]
-<<<<<<< HEAD
           html += '<div class="uk-text-center" id="'+l.n+'_infos"><span class="uk-label"></span></div>'
           html += '<div id="map_'+l.n+'" class="map" style="'+l.s+'"></div>'
           html += '<input id="'+l.n+'_lat" type="hidden" name="'+l.n+'" value="'+value[0]+'" />'
           html += '<input id="'+l.n+'_lng" type="hidden" name="'+l.n+'" value="'+value[1]+'" />'
           positions.push([l.n, value])
-=======
-          var id = formId.replace('#','')+'_map_'+l.n
-          html += '<div class="uk-text-center" id="'+id+'_infos"><span class="uk-label"></span></div>'
-          html += '<div id="'+id+'" class="map" style="'+l.s+'"></div>'
-          html += '<input id="'+id+'_lat" type="hidden" name="'+l.n+'" />'
-          html += '<input id="'+id+'_lng" type="hidden" name="'+l.n+'" />'
-          positions.push([id, value])
->>>>>>> 488106e07a05db4ae6b1e2028ca1445826bc0230
         }
         if(l.t === "image" && obj._id) {
           html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'

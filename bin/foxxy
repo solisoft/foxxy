@@ -120,14 +120,11 @@ var generate = function(action, model) {
       // Widget
       console.log("Creating widget " + model)
       try {
-
         var src_file = path.join(__dirname, `../templates/${action}/riot/${foxxyconf.theme}_widget.html.tag`)
         var dest_file = path.join(process.cwd(), `app/widgets/${final_model_name}.html.tag`)
         copyFileSync(src_file, dest_file)
         replaceInFile(dest_file, /@\{\{object\}\}/g, model)
         replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
-
-
       } catch(e) {}
 
       if(action != "service") {
@@ -173,6 +170,7 @@ var generate = function(action, model) {
 
         // models (for CRUDs)
         if(action == 'cruds') {
+
           var exists = fs.existsSync(path.join(process.cwd(), 'foxx/uploads'))
           if(!exists) generate('upload', 'upload') // Generate the upload service
           dest_file= path.join(process.cwd(), `foxx/cruds/APP/models/${final_model_name}.js`)

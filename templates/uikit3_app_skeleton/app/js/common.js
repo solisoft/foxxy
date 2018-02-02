@@ -115,8 +115,8 @@ var Common = {
           if(value === "") value = [0,0]
           html += '<div class="uk-text-center" id="'+l.n+'_infos"><span class="uk-label"></span></div>'
           html += '<div id="map_'+l.n+'" class="map" style="'+l.s+'"></div>'
-          html += '<input id="'+l.n+'_lat" type="hidden" name="'+l.n+'" />'
-          html += '<input id="'+l.n+'_lng" type="hidden" name="'+l.n+'" />'
+          html += '<input id="'+l.n+'_lat" type="hidden" name="'+l.n+'" value="'+value[0]+'" />'
+          html += '<input id="'+l.n+'_lng" type="hidden" name="'+l.n+'" value="'+value[1]+'" />'
           positions.push([l.n, value])
         }
         if(l.t === "image" && obj._id) {

@@ -1,4 +1,9 @@
-# v0.5.0
+# v0.5.X
+
+- cruds with 1-n relation
+- map widget for position purpose
+- assets upload
+- fix map persistent data
 
 # v0.4.6
 

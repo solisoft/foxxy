@@ -38,8 +38,23 @@ require("@arangodb/aql/cache").properties({ mode: "on" })
 // { r: true, c: "1-1", n: "json", t: "code:json", j: joi.any(), l: "Some Json" },
 
 const model = function() {
-  return [
-  ]
+  return {
+    model: [
+      // { r: true, c: "1-1", n: "name", t: "string", j: joi.string().required(), l: "Name" },
+    ],
+    // 1-n relations
+    // Don't forget to create your collection in setup.js
+    //sub_models: {
+    //  authors: {
+    //    fields: [
+    //      { r: true, c: "1-1", n: "post_id", t: "hidden", j: joi.string().required(), l: "Post ID" },
+    //      { r: true, c: "1-1", n: "name", t: "string", j: joi.string().required(), l: "Name" },
+    //    ],
+    //    singular: "author",
+    //    key: "post_id",
+    //    columns: ["name"] // Display on listing
+    //  },
+    //}
+  }
 }
-
 module.exports = model

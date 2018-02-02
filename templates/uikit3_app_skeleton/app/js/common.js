@@ -33,7 +33,7 @@ var Common = {
     return editor;
   },
 
-  buildForm: function buildForm(obj, fields, formId, back_str) {
+  buildForm: function buildForm(obj, fields, formId, back_str, callback) {
     var html = ""
     var uploads = []
     var _this = this
@@ -41,6 +41,7 @@ var Common = {
     var values = []
     var positions = []
     fields.forEach(function(l, i) {
+
       if (l.h !== undefined) {
         html += '<div class="uk-grid uk-grid-small uk-margin-top"><h3>'+ l.h +'</h3></div>'
       }
@@ -49,12 +50,15 @@ var Common = {
         if (l.r) html += '<div class="uk-grid uk-grid-small">'
         if (l.c.indexOf("uk-width") == -1) l.c = "uk-width-" + l.c
 
-        html += '<div class="'+ l.c +'">'
+        var hidden = ''
+        if(l.t === "hidden") hidden = 'uk-hidden'
+        html += '<div class="'+ l.c + ' ' + hidden +'">'
+        var title = l.l
         if (l.j._flags.presence === "required") {
-          l.l = "<strong>" + l.l + "*</strong>"
+          title = "<strong>" + title + "*</strong>"
         }
         if(!((l.t === "file" || l.t === "image") && obj._id === undefined))
-          html += '<label for="" class="uk-form-label">'+ l.l +'</label>'
+          html += '<label for="" class="uk-form-label">'+ title +'</label>'
 
         var value = obj[l.n]
         if(l.tr == true && obj[l.n]) value = obj[l.n][window.localStorage.getItem('foxx-locale')]
@@ -68,6 +72,7 @@ var Common = {
           html += '<input type="number" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
           values.push([l.n, value])
         }
+        if(l.t === "hidden") html += '<input type="hidden" id="'+l.n+'"  name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'">'
         if(l.t === "date") html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="date" id="'+l.n+'" data-date-format="YYYY/MM/DD" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
         if(l.t === "time") html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="time" id="'+l.n+'" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
         if(l.t === "text") html += '<textarea id="'+l.n+'" class="uk-textarea" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
@@ -111,13 +116,23 @@ var Common = {
           })
           html +='</select>'
         }
+
         if(l.t === "map") {
           if(value === "") value = [0,0]
+<<<<<<< HEAD
           html += '<div class="uk-text-center" id="'+l.n+'_infos"><span class="uk-label"></span></div>'
           html += '<div id="map_'+l.n+'" class="map" style="'+l.s+'"></div>'
           html += '<input id="'+l.n+'_lat" type="hidden" name="'+l.n+'" value="'+value[0]+'" />'
           html += '<input id="'+l.n+'_lng" type="hidden" name="'+l.n+'" value="'+value[1]+'" />'
           positions.push([l.n, value])
+=======
+          var id = formId.replace('#','')+'_map_'+l.n
+          html += '<div class="uk-text-center" id="'+id+'_infos"><span class="uk-label"></span></div>'
+          html += '<div id="'+id+'" class="map" style="'+l.s+'"></div>'
+          html += '<input id="'+id+'_lat" type="hidden" name="'+l.n+'" />'
+          html += '<input id="'+id+'_lng" type="hidden" name="'+l.n+'" />'
+          positions.push([id, value])
+>>>>>>> 488106e07a05db4ae6b1e2028ca1445826bc0230
         }
         if(l.t === "image" && obj._id) {
           html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'
@@ -155,20 +170,22 @@ var Common = {
     })
     html += '</div>'
     html += '<hr><div class="uk-grid uk-grid-small uk-text-right"><div class="uk-width-1-1">'
+
     if (back_str != undefined) {
       html += '<a href="/#'+ back_str +'" class="uk-button">Back</a> '
     }
     html += '<button class="uk-button uk-button-primary">Save</button></div></div><hr>'
 
     $(formId).html(html)
+
     values.forEach(function(v, i) {
-      $("#" + v[0]).val(v[1])
+      $(formId+" #" + v[0]).val(v[1])
     })
     editors.forEach(function(e, i) {
       _this.startEditor(e[0], e[1], e[2])
     })
     positions.forEach(function(p, i) {
-      var mymap = L.map("map_"+p[0], { dragging: true, tap: false}).setView(p[1], 6)
+      var mymap = L.map(p[0], { dragging: true, tap: false}).setView(p[1], 6)
       L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         subdomains: 'abcd',
@@ -194,6 +211,9 @@ var Common = {
 
     riot.mount("images"); riot.mount("files")
     riot.update()
+    if(callback !== undefined) {
+      callback()
+    }
   },
 
   checkLogin: function checkLogin() {
@@ -202,10 +222,12 @@ var Common = {
     })
   },
 
-  saveForm: function (formID, path, objID) {
+  saveForm: function (formID, path, objID, opts) {
     objID = objID||""
+    opts = opts||{}
     var _this = this;
     var json = $("#"+ formID).serializeObject()
+
     $('.select_tag, .select_mlist').each(function(i, st) {
       if(typeof json[$(st).attr("name")] === "string") {
         json[$(st).attr("name")] = [ json[$(st).attr("name")] ]
@@ -234,10 +256,13 @@ var Common = {
           pos     : 'bottom-right'
         });
 
-        if(objID == "") {
+        if(objID == "" && _.isEmpty(opts)) {
           objID = d.data._key
           path = path.split("/").length == 2 ? path.split("/")[1] : path
           route("/"+ path +"/" + objID + "/edit")
+        }
+        if(!_.isEmpty(opts)) {
+          riot.mount("#"+opts.id, "crud_index", opts)
         }
       }
       setTimeout(function() {

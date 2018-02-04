@@ -11,7 +11,10 @@
     </thead>
     <tbody>
       <tr each={ row in data } >
-        <td each={ col in cols }>{row[col]}</td>
+        <td each={ col in cols } class="{col.class}">
+          <virtual if={ col.tr == true }>{row[col.name][locale]}</virtual>
+          <virtual if={ col.tr != true }>{row[col.name]}</virtual>
+        </td>
         <td class="uk-text-center" width="110">
           <a onclick={edit} class="uk-button uk-button-primary uk-button-small" uk-icon="icon: pencil"></a>
           <a onclick={ destroy_object } class="uk-button uk-button-danger uk-button-small" uk-icon="icon: trash"></a>
@@ -37,7 +40,8 @@
     this.loadPage = function(pageIndex) {
       common.get(url + "/cruds/sub/"+opts.parent_id+"/"+opts.id+"/"+opts.key+"/page/"+pageIndex, function(d) {
         _this.data = d.data[0].data
-        _this.cols = opts.columns
+        _this.cols = _.map(common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
+        if(opts.columns) _this.cols = opts.columns
         _this.count = d.data[0].count
         _this.update()
       })
@@ -231,7 +235,10 @@
     </thead>
     <tbody>
       <tr each={ row in data } >
-        <td each={ col in cols }>{row[col]}</td>
+        <td each={ col in cols } class="{col.class}">
+          <virtual if={ col.tr == true }>{row[col.name][locale]}</virtual>
+          <virtual if={ col.tr != true }>{row[col.name]}</virtual>
+        </td>
         <td class="uk-text-center" width="110">
           <a onclick={edit} class="uk-button uk-button-primary uk-button-small" uk-icon="icon: pencil"></a>
           <a onclick={ destroy_object } class="uk-button uk-button-danger uk-button-small" uk-icon="icon: trash"></a>
@@ -254,7 +261,8 @@
     this.loadPage = function(pageIndex) {
       common.get(url + "/cruds/@{{objects}}/page/"+pageIndex, function(d) {
         _this.data = d.data[0].data
-        _this.cols = common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"])
+        _this.cols = _.map(common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
+        if(d.model.columns) _this.cols = d.model.columns
         _this.count = d.data[0].count
         _this.update()
       })

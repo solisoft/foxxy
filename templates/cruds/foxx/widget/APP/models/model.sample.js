@@ -42,6 +42,7 @@ const model = function() {
     model: [
       // { r: true, c: "1-1", n: "name", t: "string", j: joi.string().required(), l: "Name" },
     ],
+    //columns: [{ name: "title", tr: true, class: "uk-text-right" }, ...],
     // 1-n relations
     // Don't forget to create your collection in setup.js
     //sub_models: {
@@ -52,7 +53,7 @@ const model = function() {
     //    ],
     //    singular: "author",
     //    key: "post_id",
-    //    columns: ["name"] // Display on listing
+    //    columns: [{ name: "name", tr: false, class: ""}, ...] // Displayed on listing
     //  },
     //}
   }

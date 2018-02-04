@@ -1,3 +1,136 @@
+<crud_index>
+
+  <a href="#" class="uk-button uk-button-small uk-button-default" onclick={ new_item }>New { opts.singular }</a>
+
+  <table class="uk-table uk-table-striped" if={data.length > 0}>
+    <thead>
+      <tr>
+        <th each={ col in cols }>{col}</th>
+        <th width="70"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr each={ row in data } >
+        <td each={ col in cols }>{row[col]}</td>
+        <td class="uk-text-center" width="110">
+          <a onclick={edit} class="uk-button uk-button-primary uk-button-small" uk-icon="icon: pencil"></a>
+          <a onclick={ destroy_object } class="uk-button uk-button-danger uk-button-small" uk-icon="icon: trash"></a>
+        </td>
+      </tr>
+    </tbody>
+
+  </table>
+
+  <ul class="uk-pagination">
+    <li if={ page > 0 } ><a onclick={ previousPage }><span class="uk-margin-small-right" uk-pagination-previous></span> Previous</a></li>
+    <li if={ (page + 1) * perpage < count} class="uk-margin-auto-left"><a onclick={ nextPage }>Next <span class="uk-margin-small-left" uk-pagination-next></span></a></li>
+  </ul>
+
+  <script>
+    var _this = this
+    this.data = []
+    new_item(e) {
+      e.preventDefault()
+      riot.mount("#"+opts.id, "crud_new", opts)
+    }
+
+    this.loadPage = function(pageIndex) {
+      common.get(url + "/cruds/sub/"+opts.parent_id+"/"+opts.id+"/"+opts.key+"/page/"+pageIndex, function(d) {
+        _this.data = d.data[0].data
+        _this.cols = opts.columns
+        _this.count = d.data[0].count
+        _this.update()
+      })
+    }
+    this.loadPage(1)
+
+    edit(e) {
+      e.preventDefault()
+      opts.element_id = e.item.row._key
+      riot.mount("#"+opts.id, "crud_edit", opts)
+    }
+
+    nextPage(e) {
+      e.preventDefault()
+      _this.page += 1
+      _this.loadPage(_this.page + 1)
+    }
+
+    previousPage(e) {
+      e.preventDefault()
+      _this.page -= 1
+      _this.loadPage(_this.page + 1)
+    }
+
+    destroy_object(e) {
+      e.preventDefault()
+      UIkit.modal.confirm("Are you sure?").then(function() {
+        common.delete(url + "/cruds/" + opts.id + "/" + e.item.row._key, function() {
+          _this.loadPage(1)
+        })
+      }, function() {})
+    }
+  </script>
+</crud_index>
+
+<crud_edit>
+  <a href="#" class="uk-button uk-button-link" onclick={ goback }>Back to { opts.id }</a>
+  <form onsubmit="{ save_form }" class="uk-form" id="{opts.id}_crud_@{{object}}">
+  </form>
+
+  <script>
+    goback(e) {
+      e.preventDefault()
+      riot.mount("#"+opts.id, "crud_index", opts)
+    }
+
+    save_form(e) {
+      e.preventDefault()
+      common.saveForm(opts.id+'_crud_@{{object}}', "cruds/sub/@{{objects}}/"+ opts.id+"/"+opts.element_id, "", opts)
+    }
+
+    var _this = this;
+    common.get(url + "/cruds/" + opts.id + "/" + opts.element_id, function(d) {
+      _this.@{{object}} = d.data
+
+      common.buildForm(_this.@{{object}}, opts.fields, '#'+opts.id+'_crud_@{{object}}')
+    })
+    this.on('updated', function() {
+      $(".select_list").select2()
+      $(".select_mlist").select2()
+      $(".select_tag").select2({ tags: true })
+    })
+  </script>
+</crud_edit>
+
+<crud_new>
+  <a href="#" class="uk-button uk-button-link" onclick={ goback }>Back to { opts.id }</a>
+  <form onsubmit="{ save_form }" class="uk-form" id="{opts.id}_crud_@{{object}}">
+  </form>
+
+  <script>
+    var _this = this
+    this.crud = {}
+    this.crud[opts.key] = opts.parent_id
+
+    goback(e) {
+      e.preventDefault()
+      riot.mount("#"+opts.id, "crud_index", opts)
+    }
+
+    this.on('mount', function() {
+      common.buildForm(_this.crud, opts.fields, '#'+opts.id+'_crud_@{{object}}')
+    })
+
+    save_form(e) {
+      e.preventDefault()
+      common.saveForm(opts.id+'_crud_@{{object}}', "cruds/sub/@{{objects}}/"+ opts.id, "", opts)
+    }
+
+
+  </script>
+</crud_new>
+
 <@{{object}}_edit>
 
   <ul uk-tab>

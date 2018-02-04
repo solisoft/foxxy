@@ -123,7 +123,7 @@ var Common = {
           html += '<div id="map_'+l.n+'" class="map" style="'+l.s+'"></div>'
           html += '<input id="'+l.n+'_lat" type="hidden" name="'+l.n+'" value="'+value[0]+'" />'
           html += '<input id="'+l.n+'_lng" type="hidden" name="'+l.n+'" value="'+value[1]+'" />'
-          positions.push([l.n, value])
+          positions.push([id, value])
         }
         if(l.t === "image" && obj._id) {
           html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'
@@ -176,7 +176,7 @@ var Common = {
       _this.startEditor(e[0], e[1], e[2])
     })
     positions.forEach(function(p, i) {
-      var mymap = L.map(p[0], { dragging: true, tap: false}).setView(p[1], 6)
+      var mymap = L.map('map_' + p[0], { dragging: true, tap: false}).setView(p[1], 6)
       L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         subdomains: 'abcd',

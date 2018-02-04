@@ -163,7 +163,7 @@ var Common = {
     html += '<hr><div class="uk-grid uk-grid-small uk-text-right"><div class="uk-width-1-1">'
 
     if (back_str != undefined) {
-      html += '<a href="/#'+ back_str +'" class="uk-button">Back</a> '
+      html += '<a href="#'+ back_str +'" class="uk-button">Back</a> '
     }
     html += '<button class="uk-button uk-button-primary">Save</button></div></div><hr>'
 

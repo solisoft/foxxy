@@ -10,7 +10,7 @@ var argv = require('yargs').argv
 var hasbin = require('hasbin')
 var pluralize = require('pluralize')
 var colors = require('colors')
-var version = '0.5.14'
+var version = '0.5.15'
 var user_password = +new Date()
 var copyFileSync = function(src, dest) {
   fs.writeFileSync(dest, fs.readFileSync(src, { encoding: "utf8" }))
@@ -135,7 +135,7 @@ var generate = function(action, model) {
 
         // Create Menu Item
         if(action != "upload") {
-          replaceInFile(dest_file, "<!-- item_menu -->", `<li><a href="/#${final_model_name}">${model[0].toUpperCase() +  final_model_name.slice(1)}</a></li>\n        <!-- item_menu -->`)
+          replaceInFile(dest_file, "<!-- item_menu -->", `<li><a href="#${final_model_name}">${model[0].toUpperCase() +  final_model_name.slice(1)}</a></li>\n        <!-- item_menu -->`)
         }
 
         // Router

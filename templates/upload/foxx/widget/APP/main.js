@@ -9,7 +9,7 @@ const crypt = require('@arangodb/crypto');
 const fs = require("fs");
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
 const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
-
+const request = require('@arangodb/request')
 const _settings = db._collection('foxxy_settings').firstExample();
 
 const sessions = sessionsMiddleware({
@@ -32,8 +32,14 @@ router.get('/:key/:type/:field', function(req, res) {
     field: req.pathParams.field,
     object_id: req.pathParams.key + '/' + req.pathParams.type
   }
-
-  res.send(db.uploads.byExample(obj).toArray())
+  var uploads = db._query(`
+    FOR u IN uploads
+      FILTER u.field == @field
+      FILTER u.object_id == @object_id
+      SORT u.pos
+      RETURN u
+  `, obj).toArray()
+  res.send(uploads)
 })
 .header('foxx-locale')
 .header('X-Session-Id')
@@ -62,15 +68,16 @@ router.post('/:key/:type/:field', function(req, res) {
                               .split(';')[2].trim().replace(/"/g, ''))
                               .filename
     const filedest = _settings.upload_path + uuid + "."+ _.last(filename.split('.'))
-    const urldest = _settings.upload_url + uuid + "."+ _.last(filename.split('.'))
+    let urldest = _settings.upload_url + uuid + "."+ _.last(filename.split('.'))
     fs.write(filedest, data.data)
 
     if(_settings.resize_ovh) {
       // upload to resize.ovh service
       var res = request.post('https://resize.ovh/upload_http', {
-        form: {name: urldest, key: _settings.resize_ovh }
+        form: {image: urldest, key: _settings.resize_ovh }
       });
-      urldest = `https://resize.ovh/o/${res.body}`
+      var _uuid = JSON.parse(res.body).filename
+      urldest = `https://resize.ovh/o/${_uuid}`
     }
 
     var upload = {
@@ -81,7 +88,8 @@ router.post('/:key/:type/:field', function(req, res) {
       mime: data.headers["Content-Type"],
       object_id: req.pathParams.type + '/' + req.pathParams.key,
       field: req.pathParams.field,
-      lang: req.headers['foxx-locale']
+      lang: req.headers['foxx-locale'],
+      pos: 1000
     }
 
     docs.push(
@@ -94,6 +102,20 @@ router.post('/:key/:type/:field', function(req, res) {
 .header('foxx-locale')
 .header('X-Session-Id')
 .description("Upload a file")
+// -----------------------------------------------------------------------------
+// POST /uploads/reorder
+router.post('/reorder', function(req, res) {
+  db._query(`
+    FOR data IN @data
+      UPDATE { _key: data.k, pos: data.c } IN uploads
+  `, { data: req.body.ids })
+  res.send({ success: true })
+})
+.header('X-Session-Id')
+.body(joi.object({
+  ids: joi.array().required()
+}), 'data')
+.description("Reorder elements")
 // -----------------------------------------------------------------------------
 // DELETE /uploads/:key
 router.delete('/:key', function(req, res) {

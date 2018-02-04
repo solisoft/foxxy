@@ -4,6 +4,7 @@
 - map widget for position purpose
 - assets upload
 - fix map persistent data
+- Allow reorder assets
 
 # v0.4.6
 

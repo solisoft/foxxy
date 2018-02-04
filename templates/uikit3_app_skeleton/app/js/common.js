@@ -284,6 +284,11 @@ var Common = {
       statusCode: {
         401: function() { document.location.href = "login.html" },
         500: errorCallback(),
+        503: function() {
+          localStorage.removeItem('X-Session-Id')
+          localStorage.removeItem('foxx-locale')
+          document.location.href = "login.html"
+        }
       }
     });
   },

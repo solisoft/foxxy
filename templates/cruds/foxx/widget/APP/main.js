@@ -50,22 +50,27 @@ module.context.use(function (req, res, next) {
 
 // -----------------------------------------------------------------------------
 router.get('/:service/page/:page', function (req, res) {
-  res.send({ data: db._query(`
+  res.send({
+    model: models[req.pathParams.service],
+    data: db._query(`
     LET count = LENGTH(@@collection)
     LET data = (FOR doc IN @@collection SORT doc._key DESC LIMIT @offset,25 RETURN doc)
     RETURN { count: count, data: data }
     `, { "@collection": req.pathParams.service,
-         "offset": (req.pathParams.page - 1) * 25}).toArray() });
+         "offset": (req.pathParams.page - 1) * 25}).toArray()
+  });
 })
 .header('X-Session-Id')
 .description('Returns all objects');
 // -----------------------------------------------------------------------------
 router.get('/:service/search/:term', function (req, res) {
+  var locale = req.headers['foxx-locale']
+  if(locale.match(/[a-z]+/) == null) locale = 'en'
   res.send({ data: db._query(`
-    FOR u IN FULLTEXT(@@collection, 'search', @term)
+    FOR u IN FULLTEXT(@@collection, 'search.${locale}', @term)
     LIMIT 100
     RETURN u`, { "@collection": req.pathParams.service,
-                 "term": req.pathParams.term}).toArray() });
+                 "term": req.pathParams.term }).toArray() });
 })
 .header('foxx-locale')
 .header('X-Session-Id')
@@ -100,6 +105,17 @@ router.post('/:service', function (req, res) {
   catch(e) {}
   if(errors.length == 0) {
     var data = fieldsToData(fields, body, req.headers)
+    if(models[req.pathParams.service].search) {
+      var search_arr = []
+      _.each(models[req.pathParams.service].search, function(s) {
+        if(_.isPlainObject(data[s])) {
+          search_arr.push(data[s][req.headers['foxx-locale']])
+        } else {
+          search_arr.push(data[s])
+        }
+      })
+      data.search = search_arr.join(" ")
+    }
     obj = collection.save(data, { waitForSync: true })
   }
   res.send({ success: errors.length == 0, data: obj, errors: errors });
@@ -123,7 +139,19 @@ router.post('/:service/:id', function (req, res) {
   if(errors.length == 0) {
     var object = collection.document(req.pathParams.id)
     var data = fieldsToData(fields, body, req.headers)
-    // data.search = update with what you want to search for
+    if(models[req.pathParams.service].search) {
+      data.search = {}
+      var search_arr = []
+      _.each(models[req.pathParams.service].search, function(s) {
+        if(_.isPlainObject(data[s])) {
+          search_arr.push(data[s][req.headers['foxx-locale']])
+        } else {
+          search_arr.push(data[s])
+        }
+      })
+      data.search[req.headers['foxx-locale']] = search_arr.join(" ")
+    }
+
     obj = collection.update(object, data)
   }
   res.send({ success: errors.length == 0, data: obj, errors: errors });
@@ -169,6 +197,7 @@ router.post('/sub/:service/:subservice', function (req, res) {
   catch(e) {}
   if(errors.length == 0) {
     var data = fieldsToData(fields, body, req.headers)
+
     obj = collection.save(data, { waitForSync: true })
   }
   res.send({ success: errors.length == 0, data: obj, errors: errors });
@@ -191,7 +220,7 @@ router.post('/sub/:service/:subservice/:id', function (req, res) {
   if(errors.length == 0) {
     var object = collection.document(req.pathParams.id)
     var data = fieldsToData(fields, body, req.headers)
-    // data.search = update with what you want to search for
+
     obj = collection.update(object, data)
   }
   res.send({ success: errors.length == 0, data: obj, errors: errors });

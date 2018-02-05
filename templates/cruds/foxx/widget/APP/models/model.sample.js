@@ -43,6 +43,8 @@ const model = function() {
       // { r: true, c: "1-1", n: "name", t: "string", j: joi.string().required(), l: "Name" },
     ],
     //columns: [{ name: "title", tr: true, class: "uk-text-right" }, ...],
+    //search: ["title", "barcode", "desc"],
+    //
     // 1-n relations
     // Don't forget to create your collection in setup.js
     //sub_models: {

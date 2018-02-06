@@ -147,6 +147,7 @@
       <h3>Editing @{{object}}</h3>
       <form onsubmit="{ save_form }" class="uk-form" id="form_@{{object}}">
       </form>
+      <a class="uk-button uk-button-secondary" onclick="{ duplicate }">Duplicate</a>
     </li>
     <li each={ i, k in sub_models }>
       <div id={ k } class="crud"></div>
@@ -157,6 +158,20 @@
     save_form(e) {
       e.preventDefault()
       common.saveForm("form_@{{object}}", "cruds/@{{objects}}",opts.@{{object}}_id)
+    }
+
+    duplicate(e) {
+      UIkit.modal.confirm("Are you sure?").then(function() {
+        common.get(url + "/cruds/@{{objects}}/" + _this.product._key + "/duplicate", function(data) {
+          route('/@{{objects}}/' + data._key + '/edit')
+          UIkit.notification({
+            message : 'Successfully duplicated!',
+            status  : 'success',
+            timeout : 1000,
+            pos     : 'bottom-right'
+          });
+        })
+      }, function() {})
     }
 
     var _this = this;

@@ -2,11 +2,11 @@
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/solisoft/foxxy)
 
 
-# foxx-framework
+# foxxy
 
-foxx-framework is a simple tool which help you starting with your single page application using ArangoDB / Foxx for backend and API, riotjs for views and brunch to build your assets.
+foxxy is a simple tool which help you starting with your single page application using ArangoDB / Foxx for backend and API, riotjs for views and brunch to build your assets.
 
-https://www.foxx-framework.com
+https://www.foxxy.ovh
 
 ## Prerequisite
 
@@ -17,7 +17,7 @@ https://www.foxx-framework.com
 
 ## Installation
 
-`$ npm install foxx-framework -g`
+`$ npm install foxxy -g`
 
 ## Configurating application
 
@@ -57,7 +57,7 @@ Ok now you have your first CRUD created.
 
 ## Dev mode
 
-`$ yarn run brunch w -- --server` will start the live reloader and a server.
+`$ yarn start` will start the live reloader and a server.
 
 # Deployment
 

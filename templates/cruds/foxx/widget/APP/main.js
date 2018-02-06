@@ -158,7 +158,18 @@ router.post('/:service/:id', function (req, res) {
 })
 .header('foxx-locale')
 .header('X-Session-Id')
-.description('Update a object.');
+.description('Update an object.');
+// -----------------------------------------------------------------------------
+router.get('/:service/:id/duplicate', function (req, res) {
+  var new_obj = db._query(`
+    FOR doc IN @@collection
+    FILTER doc._key == @key
+    INSERT UNSET( doc, "_id", "_key", "_rev" ) IN @@collection RETURN NEW
+  `, { "@collection": req.pathParams.service, key: req.pathParams.id }).toArray()[0]
+  res.send(new_obj);
+})
+.header('X-Session-Id')
+.description('duplicate an object.');
 // -----------------------------------------------------------------------------
 router.delete('/:service/:id', function (req, res) {
   const collection = db._collection(req.pathParams.service)
@@ -166,7 +177,7 @@ router.delete('/:service/:id', function (req, res) {
   res.send({success: true });
 })
 .header('X-Session-Id')
-.description('delete a object.');
+.description('delete an object.');
 
 // Sub
 // -----------------------------------------------------------------------------

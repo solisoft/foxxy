@@ -25,7 +25,13 @@ var fieldsToData = function(fields, body, headers) {
       if(_.isArray(body[f.n])) {
         data[f.n] = _.map(body[f.n], function(v) { return unescape(v) })
       } else {
-        data[f.n] = unescape(body[f.n])
+        if(body[f.n] === undefined) {
+          if(f.t == "boolean") data[f.n] = false
+          else data[f.n] = null
+        } else {
+          if(f.t == "boolean") data[f.n] = true
+          else data[f.n] = unescape(body[f.n])
+        }
       }
     } else {
       data[f.n] = {}

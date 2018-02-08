@@ -79,7 +79,8 @@ var Common = {
         if(l.t === "text") html += '<textarea id="'+l.n+'" class="uk-textarea" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
           if(l.t === "wysiwyg") {
           wysiwygs.push(l.n)
-          html += '<div id="wysiwyg_'+l.n+'"></div><input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="'+value+'" /><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+          html += '<div id="wysiwyg_'+l.n+'"></div><input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="" /><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+          values.push([l.n, value])
         }
         if(l.t.match(/^code/)) {
           html += '<input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="">'

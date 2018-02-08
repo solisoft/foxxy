@@ -40,6 +40,7 @@ var Common = {
     var editors = []
     var values = []
     var positions = []
+    var wysiwygs = []
     fields.forEach(function(l, i) {
 
       if (l.h !== undefined) {
@@ -76,6 +77,10 @@ var Common = {
         if(l.t === "date") html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="date" id="'+l.n+'" data-date-format="YYYY/MM/DD" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
         if(l.t === "time") html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="time" id="'+l.n+'" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
         if(l.t === "text") html += '<textarea id="'+l.n+'" class="uk-textarea" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+          if(l.t === "wysiwyg") {
+          wysiwygs.push(l.n)
+          html += '<div id="wysiwyg_'+l.n+'"></div><input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="'+value+'" /><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+        }
         if(l.t.match(/^code/)) {
           html += '<input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="">'
           values.push([l.n, value])
@@ -175,6 +180,14 @@ var Common = {
     editors.forEach(function(e, i) {
       _this.startEditor(e[0], e[1], e[2])
     })
+    wysiwygs.forEach(function(e, i) {
+      const editor = pell.init({
+        element: document.getElementById("wysiwyg_"+e),
+        onChange: function(html) { $("#"+e).val(html) }
+      })
+      editor.content.innerHTML = $("#"+e).val()
+    })
+    $("button").attr("type", "button") // TODO : remove once Pell accept PR
     positions.forEach(function(p, i) {
       var mymap = L.map('map_' + p[0], { dragging: true, tap: false}).setView(p[1], 6)
       L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {

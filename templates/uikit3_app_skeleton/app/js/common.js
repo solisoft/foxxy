@@ -109,6 +109,9 @@ var Common = {
         if(l.t === "tags") {
           html +='<select name="'+l.n+'" style="width:100%" class="select_tag" multiple="multiple">'
           l.d[0].forEach(function(o) {
+            var tags = l.d[0]
+            if(l.tr) tags = _.map(l.d[0], function(t) { return t[window.localStorage.getItem('foxx-locale')]})
+            _.uniq(tags)
             o = l.tr == true ? o[window.localStorage.getItem('foxx-locale')] : [o]
             if(o === undefined || o == "undefined") o = []
             o.forEach(function(v) {

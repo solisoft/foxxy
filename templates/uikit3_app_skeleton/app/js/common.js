@@ -169,7 +169,7 @@ var Common = {
     if (back_str != undefined) {
       html += '<a href="#'+ back_str +'" class="uk-button">Back</a> '
     }
-    html += '<button class="uk-button uk-button-primary">Save</button></div></div><hr>'
+    html += '<input type="submit" class="uk-button uk-button-primary" value="Save" /></div></div><hr>'
 
     $(formId).html(html)
 

@@ -5,7 +5,9 @@
   <table class="uk-table uk-table-striped" if={data.length > 0}>
     <thead>
       <tr>
-        <th each={ col in cols }>{col}</th>
+        <th each={ col in cols }>
+          {col.name}
+        </th>
         <th width="70"></th>
       </tr>
     </thead>

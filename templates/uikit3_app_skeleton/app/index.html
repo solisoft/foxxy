@@ -2,13 +2,13 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Foxxy App UIKIT3</title>
+    <title>BeautyWished New Shop</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.35/css/uikit.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css">
-    <link rel="stylesheet" type="text/css" href="https://unpkg.com/pell/dist/pell.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/pell/0.7.0/pell.min.css">
 
     <link rel="stylesheet" href="DIGEST(css/css.css)">
   </head>
@@ -21,8 +21,9 @@
       </div>
       <div class="uk-navbar-nav-left uk-visible@m">
         <ul class="uk-navbar-nav">
-          <li class="uk-active"><a href="#">Foxx App</a></li>
-          <!-- item_menu -->
+          <li class="uk-active"><a href="#">BW - Admin</a></li>
+          <li><a href="#products">Products</a></li>
+        <!-- item_menu -->
         </ul>
       </div>
       <div class="uk-navbar-right">
@@ -30,7 +31,7 @@
       </div>
     </nav>
 
-    <div class="uk-container uk-container-center uk-margin-top">
+    <div class="uk-container uk-container-expand uk-container-center uk-margin-top">
       <div class="uk-grid">
         <div class="uk-width-1-1">
           <div id="app"></div>
@@ -42,28 +43,26 @@
     <script src="DIGEST(js/vendors.js)"></script>
     <script src="DIGEST(js/js.js)"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.min.js"></script>
-    <script src="https://unpkg.com/pell"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pell/0.7.0/pell.min.js"></script>
+
     <script>
 
-      var url = "http://localhost:8529/_db/{{DBNAME}}/";
+      var url = "http://localhost:8529/_db/cms_bw/"
 
-      // Production config
-      //if(window.location.hostname !== "localhost") {
-      //  url = "_db/uikit3/";
-      //}
-
-      var per_page = 25;
+      var per_page = 25
 
       var locale = window.localStorage.getItem('foxx-locale') || 'en'
       window.localStorage.setItem('foxx-locale', locale)
 
-      var UIkit = require("vendors/uikit.js");
-      var common = require("js/common.js");
+      var UIkit = require("vendors/uikit.js")
+      var common = require("js/common.js")
 
-      common.init();
-      require("widgets/loading.html.tag");
+      common.init()
+      require("widgets/loading.html.tag")
+      require('widgets/products.html.tag')
+      require('widgets/uploads.html.tag')
       /*@{{riot_components}}*/
-      require("js/js.js");
+      require("js/js.js")
 
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.9/ace.js"></script>

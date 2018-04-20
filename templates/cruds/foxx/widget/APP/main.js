@@ -1,7 +1,7 @@
 'use strict';
 const db = require('@arangodb').db;
 const joi = require('joi');
-const models = require('./models.js')();
+const models = require('./models.js');
 const _ = require('lodash');
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
@@ -55,15 +55,23 @@ module.context.use(function (req, res, next) {
 });
 
 // -----------------------------------------------------------------------------
-router.get('/:service/page/:page', function (req, res) {
+router.get('/:service/page/:page/:perpage', function (req, res) {
   res.send({
-    model: models[req.pathParams.service],
+    model: models()[req.pathParams.service],
     data: db._query(`
     LET count = LENGTH(@@collection)
-    LET data = (FOR doc IN @@collection SORT doc._key DESC LIMIT @offset,25 RETURN doc)
+    LET data = (
+      FOR doc IN @@collection
+        LET image = (FOR u IN uploads FILTER u.object_id == doc._id SORT u.pos LIMIT 1 RETURN u)[0]
+        SORT doc._key DESC
+        LIMIT @offset,@perpage
+        RETURN MERGE(doc, { image: image })
+    )
     RETURN { count: count, data: data }
     `, { "@collection": req.pathParams.service,
-         "offset": (req.pathParams.page - 1) * 25}).toArray()
+         "offset": (req.pathParams.page - 1) * parseInt(req.pathParams.perpage),
+         "perpage": parseInt(req.pathParams.perpage)
+    }).toArray()
   });
 })
 .header('X-Session-Id')
@@ -84,21 +92,21 @@ router.get('/:service/search/:term', function (req, res) {
 // -----------------------------------------------------------------------------
 router.get('/:service/:id', function (req, res) {
   const collection = db._collection(req.pathParams.service)
-  res.send({ fields: models[req.pathParams.service],
+  res.send({ fields: models()[req.pathParams.service],
              data: collection.document(req.pathParams.id) });
 })
 .header('X-Session-Id')
 .description('Returns object within ID');
 // -----------------------------------------------------------------------------
 router.get('/:service/fields', function (req, res) {
-  res.send({ fields: models[req.pathParams.service] });
+  res.send({ fields: models()[req.pathParams.service] });
 })
 .header('X-Session-Id')
 .description('Get all fields to build form');
 // -----------------------------------------------------------------------------
 router.post('/:service', function (req, res) {
   const collection = db._collection(req.pathParams.service)
-  let fields = models[req.pathParams.service]
+  let fields = models()[req.pathParams.service]
   const body = JSON.parse(req.body.toString())
   var obj = null
   var errors = []
@@ -111,9 +119,9 @@ router.post('/:service', function (req, res) {
   catch(e) {}
   if(errors.length == 0) {
     var data = fieldsToData(fields, body, req.headers)
-    if(models[req.pathParams.service].search) {
+    if(models()[req.pathParams.service].search) {
       var search_arr = []
-      _.each(models[req.pathParams.service].search, function(s) {
+      _.each(models()[req.pathParams.service].search, function(s) {
         if(_.isPlainObject(data[s])) {
           search_arr.push(data[s][req.headers['foxx-locale']])
         } else {
@@ -131,7 +139,7 @@ router.post('/:service', function (req, res) {
 // -----------------------------------------------------------------------------
 router.post('/:service/:id', function (req, res) {
   const collection = db._collection(req.pathParams.service)
-  let fields = models[req.pathParams.service]
+  let fields = models()[req.pathParams.service]
   const body = JSON.parse(req.body.toString())
   var obj = null
   var errors = []
@@ -145,10 +153,10 @@ router.post('/:service/:id', function (req, res) {
   if(errors.length == 0) {
     var object = collection.document(req.pathParams.id)
     var data = fieldsToData(fields, body, req.headers)
-    if(models[req.pathParams.service].search) {
+    if(models()[req.pathParams.service].search) {
       data.search = {}
       var search_arr = []
-      _.each(models[req.pathParams.service].search, function(s) {
+      _.each(models()[req.pathParams.service].search, function(s) {
         if(_.isPlainObject(data[s])) {
           search_arr.push(data[s][req.headers['foxx-locale']])
         } else {
@@ -187,13 +195,14 @@ router.delete('/:service/:id', function (req, res) {
 
 // Sub
 // -----------------------------------------------------------------------------
-router.get('/sub/:id/:service/:key/page/:page', function (req, res) {
+router.get('/sub/:id/:service/:key/page/:page/:perpage', function (req, res) {
   res.send({ data: db._query(`
     LET count = LENGTH(@@collection)
-    LET data = (FOR doc IN @@collection FILTER doc.@key == @id SORT doc._key DESC LIMIT @offset,25 RETURN doc)
+    LET data = (FOR doc IN @@collection FILTER doc.@key == @id SORT doc._key DESC LIMIT @offset,@perpage RETURN doc)
     RETURN { count: count, data: data }
     `, { "@collection": req.pathParams.service,
-         "offset": (req.pathParams.page - 1) * 25,
+         "offset": (req.pathParams.page - 1) * parseInt(req.pathParams.perpage),
+         "perpage": parseInt(req.pathParams.perpage),
          "key": req.pathParams.key,
          "id": req.pathParams.id }).toArray() });
 })
@@ -202,7 +211,7 @@ router.get('/sub/:id/:service/:key/page/:page', function (req, res) {
 // -----------------------------------------------------------------------------
 router.post('/sub/:service/:subservice', function (req, res) {
   const collection = db._collection(req.pathParams.subservice)
-  const fields = models[req.pathParams.service].sub_models[req.pathParams.subservice].fields
+  const fields = models()[req.pathParams.service].sub_models[req.pathParams.subservice].fields
   const body = JSON.parse(req.body.toString())
   var obj = null
   var errors = []
@@ -224,7 +233,7 @@ router.post('/sub/:service/:subservice', function (req, res) {
 // -----------------------------------------------------------------------------
 router.post('/sub/:service/:subservice/:id', function (req, res) {
   const collection = db._collection(req.pathParams.subservice)
-  const fields = models[req.pathParams.service].sub_models[req.pathParams.subservice].fields
+  const fields = models()[req.pathParams.service].sub_models[req.pathParams.subservice].fields
   const body = JSON.parse(req.body.toString())
   var obj = null
   var errors = []

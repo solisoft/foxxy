@@ -6,7 +6,7 @@
     <thead>
       <tr>
         <th each={ col in cols }>
-          {col.name}
+          {col.name == undefined ? col : col.name}
         </th>
         <th width="70"></th>
       </tr>
@@ -40,7 +40,7 @@
     }
 
     this.loadPage = function(pageIndex) {
-      common.get(url + "/cruds/sub/"+opts.parent_id+"/"+opts.id+"/"+opts.key+"/page/"+pageIndex, function(d) {
+      common.get(url + "/cruds/sub/"+opts.parent_id+"/"+opts.id+"/"+opts.key+"/page/"+pageIndex+"/"+per_page, function(d) {
         _this.data = d.data[0].data
         _this.cols = _.map(common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
         if(opts.columns) _this.cols = opts.columns
@@ -246,7 +246,7 @@
   <table class="uk-table uk-table-striped">
     <thead>
       <tr>
-        <th each={ col in cols }>{col}</th>
+        <th each={ col in cols }>{col.name == undefined ? col : col.name}</th>
         <th width="70"></th>
       </tr>
     </thead>
@@ -268,15 +268,19 @@
     <li if={ page > 0 } ><a onclick={ previousPage }><span class="uk-margin-small-right" uk-pagination-previous></span> Previous</a></li>
     <li if={ (page + 1) * perpage < count} class="uk-margin-auto-left"><a onclick={ nextPage }>Next <span class="uk-margin-small-left" uk-pagination-next></span></a></li>
   </ul>
+  Per Page : {perpage}
+  <a onclick={ setPerPage } class="uk-label">25</a>
+  <a onclick={ setPerPage } class="uk-label">50</a>
+  <a onclick={ setPerPage } class="uk-label">100</a>
   <script>
 
     var _this = this
     this.page = 0
-    this.perpage = 25
+    this.perpage = per_page
     this.locale = window.localStorage.getItem('foxx-locale')
 
     this.loadPage = function(pageIndex) {
-      common.get(url + "/cruds/@{{objects}}/page/"+pageIndex, function(d) {
+      common.get(url + "/cruds/@{{objects}}/page/"+pageIndex+"/"+per_page, function(d) {
         _this.data = d.data[0].data
         _this.cols = _.map(common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
         if(d.model.columns) _this.cols = d.model.columns
@@ -318,11 +322,7 @@
     destroy_object(e) {
       UIkit.modal.confirm("Are you sure?").then(function() {
         common.delete(url + "/cruds/@{{objects}}/" + e.item.row._key, function() {
-          common.get(url + "/cruds/@{{objects}}/page/1", function(d) {
-            _this.data = d.data[0].data
-            _this.count = d.data[0].count
-            _this.update()
-          })
+          _this.loadPage(_this.page)
         })
       }, function() {})
     }

@@ -127,7 +127,7 @@ var Common = {
           html += '<div id="map_'+l.n+'" class="map" style="'+l.s+'"></div>'
           html += '<input id="'+l.n+'_lat" type="hidden" name="'+l.n+'" value="'+value[0]+'" />'
           html += '<input id="'+l.n+'_lng" type="hidden" name="'+l.n+'" value="'+value[1]+'" />'
-          positions.push([id, value])
+          positions.push([l.n, value])
         }
         if(l.t === "image" && obj._id) {
           html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'

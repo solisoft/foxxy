@@ -6,7 +6,7 @@
     <thead>
       <tr>
         <th each={ col in cols }>
-          {col.name == undefined ? col : col.name}
+          {col.name == undefined ? col : col.label === undefined ? col.name : col.label}
         </th>
         <th width="70"></th>
       </tr>
@@ -246,7 +246,7 @@
   <table class="uk-table uk-table-striped">
     <thead>
       <tr>
-        <th each={ col in cols }>{col.name == undefined ? col : col.name}</th>
+        <th each={ col in cols }>{col.name == undefined ? col : col.label === undefined ? col.name : col.label}</th>
         <th width="70"></th>
       </tr>
     </thead>

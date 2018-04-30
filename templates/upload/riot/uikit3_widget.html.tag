@@ -43,7 +43,7 @@
     delete_asset(e) {
       UIkit.modal.confirm("Are you sure?").then(function() {
         common.delete(url + "uploads/" + e.item.row._key, function() {
-          $('#asset_' + e.item.row._key).remove()
+          $('[data-id='+e.item.row._key+']').remove()
         })
       }, function() {})
     }
@@ -94,7 +94,7 @@
     delete_asset(e) {
       UIkit.modal.confirm("Are you sure?").then(function() {
         common.delete(url + "uploads/" + e.item.row._key, function() {
-          $('#asset_' + e.item.row._key).remove()
+          $('[data-id='+e.item.row._key+']').remove()
         })
       }, function() {})
     }

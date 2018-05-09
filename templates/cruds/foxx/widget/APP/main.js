@@ -128,7 +128,8 @@ router.post('/:service', function (req, res) {
           search_arr.push(data[s])
         }
       })
-      data.search = search_arr.join(" ")
+      data.search = {}
+      data.search[req.headers['foxx-locale']] = search_arr.join(" ")
     }
     obj = collection.save(data, { waitForSync: true })
   }

@@ -5,6 +5,7 @@
 - assets upload
 - fix map persistent data
 - Allow reorder assets
+- Float type + fix typecast
 
 # v0.4.6
 

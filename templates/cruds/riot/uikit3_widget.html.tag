@@ -232,7 +232,7 @@
 
 <@{{objects}}>
   <div class="uk-float-right">
-    <a href="/#@{{objects}}/new" class="uk-button uk-button-small uk-button-default">New @{{object}}</a>
+    <a href="#@{{objects}}/new" class="uk-button uk-button-small uk-button-default">New @{{object}}</a>
 
   </div>
   <h3>Listing @{{objects}}</h3>

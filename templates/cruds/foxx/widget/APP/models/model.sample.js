@@ -43,6 +43,7 @@ const model = function() {
       // { r: true, c: "1-1", n: "name", t: "string", j: joi.string().required(), l: "Name" },
     ],
     //columns: [{ name: "title", tr: true, class: "uk-text-right" }, ...],
+    //sort: "SORT doc.order ASC",
     //search: ["title", "barcode", "desc"],
     //
     // 1-n relations

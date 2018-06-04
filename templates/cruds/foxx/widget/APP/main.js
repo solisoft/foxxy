@@ -63,6 +63,8 @@ module.context.use(function (req, res, next) {
 
 // -----------------------------------------------------------------------------
 router.get('/:service/page/:page/:perpage', function (req, res) {
+  const order = models()[req.pathParams.service].sort || 'SORT doc._key DESC'
+
   res.send({
     model: models()[req.pathParams.service],
     data: db._query(`
@@ -70,7 +72,7 @@ router.get('/:service/page/:page/:perpage', function (req, res) {
     LET data = (
       FOR doc IN @@collection
         LET image = (FOR u IN uploads FILTER u.object_id == doc._id SORT u.pos LIMIT 1 RETURN u)[0]
-        SORT doc._key DESC
+        ${order}
         LIMIT @offset,@perpage
         RETURN MERGE(doc, { image: image })
     )

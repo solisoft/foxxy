@@ -45,6 +45,7 @@ const model = function() {
     //columns: [{ name: "title", tr: true, class: "uk-text-right" }, ...],
     //sort: "SORT doc.order ASC",
     //search: ["title", "barcode", "desc"],
+    //timestamps: true,
     //
     // 1-n relations
     // Don't forget to create your collection in setup.js

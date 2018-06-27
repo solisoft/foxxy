@@ -140,6 +140,7 @@ router.post('/:service', function (req, res) {
       data.search = {}
       data.search[req.headers['foxx-locale']] = search_arr.join(" ")
     }
+    if(models()[req.pathParams.service].timestamps === true) { data.created_at = +new Date() }
     obj = collection.save(data, { waitForSync: true })
   }
   res.send({ success: errors.length == 0, data: obj, errors: errors });
@@ -175,6 +176,7 @@ router.post('/:service/:id', function (req, res) {
       })
       data.search[req.headers['foxx-locale']] = search_arr.join(" ")
     }
+    if(models()[req.pathParams.service].timestamps === true) { data.updated_at = +new Date() }
 
     obj = collection.update(object, data)
   }

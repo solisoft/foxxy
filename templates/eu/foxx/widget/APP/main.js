@@ -4,7 +4,8 @@ const db = require('@arangodb').db;
 const joi = require('joi');
 const fields = require('./model.js');
 const config = require('./config.js')();
-const each = require('lodash').each;
+const _ = require('lodash');
+
 const createRouter = require('@arangodb/foxx/router');
 const sessionsMiddleware = require('@arangodb/foxx/sessions');
 const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
@@ -21,23 +22,36 @@ const sessions = sessionsMiddleware({
 module.context.use(sessions);
 module.context.use(router);
 
-var fieldsToData = function(fields, req) {
+var typeCast = function(type, value) {
+  var value = unescape(value)
+  if(type == "integer") value = parseInt(value)
+  if(type == "float") value = parseFloat(value)
+  return value
+}
+
+var fieldsToData = function(fields, body, headers) {
   var data = {}
-  _.each(fields(), function(f) {
+  _.each(fields, function(f) {
     if(f.tr != true) {
-      if(_.isArray(req.body[f.n])) {
-        data[f.n] = _.map(req.body[f.n], function(v) { return unescape(v) })
+      if(_.isArray(body[f.n])) {
+        data[f.n] = _.map(body[f.n], function(v) { return typeCast(f.t,v) })
       } else {
-        data[f.n] = unescape(req.body[f.n])
+        if(body[f.n] === undefined) {
+          if(f.t == "boolean") data[f.n] = false
+          else data[f.n] = null
+        } else {
+          if(f.t == "boolean") data[f.n] = true
+          else data[f.n] = typeCast(f.t, body[f.n])
+        }
       }
     } else {
       data[f.n] = {}
-      if(_.isArray(req.body[f.n])) {
-        data[f.n][req.headers['foxx-locale']] = _.map(
-          req.body[f.n], function(v) { return unescape(v) }
+      if(_.isArray(body[f.n])) {
+        data[f.n][headers['foxx-locale']] = _.map(
+          body[f.n], function(v) { return typeCast(f.t,v) }
         )
       } else {
-        data[f.n][req.headers['foxx-locale']] = unescape(req.body[f.n])
+        data[f.n][headers['foxx-locale']] = unescape(body[f.n])
       }
     }
   })
@@ -45,7 +59,7 @@ var fieldsToData = function(fields, req) {
 }
 
 var schema = {}
-each(fields(), function(f) {schema[f.n] = f.j })
+_.each(fields(), function(f) {schema[f.n] = f.j })
 
 // Comment this block if you want to avoid authorization
 module.context.use(function (req, res, next) {
@@ -56,10 +70,10 @@ module.context.use(function (req, res, next) {
 
 // -----------------------------------------------------------------------------
 router.get('/', function (req, res) {
-  res.send({ fields: fields(), data: db._query(`FOR doc IN ${config.collection} RETURN doc`).toArray()[0] });
+  res.send({ fields: fields(), data: db._query(`FOR doc IN @{{objects}} RETURN doc`).toArray()[0] });
 })
 .header('X-Session-Id')
-.description(`Returns first ${config.collection}`);
+.description(`Returns first @{{objects}}`);
 // -----------------------------------------------------------------------------
 router.get('/check_form', function (req, res) {
     var errors = []
@@ -72,12 +86,19 @@ router.get('/check_form', function (req, res) {
 .description('Check the form for live validation');
 // -----------------------------------------------------------------------------
 router.post('/:id', function (req, res) {
-  var obj = collection.document(req.pathParams.id)
-  var data = fieldsToData(fields, req)
-  collection.update(obj, data)
-  res.send({ success: true });
+  const body = JSON.parse(req.body.toString())
+  var obj = db.@{{objects}}.document(req.pathParams.id)
+  var data = fieldsToData(fields(), body)
+  var errors = []
+  try {
+    var schema = {}
+    _.each(fields(), function(f) {schema[f.n] = f.j })
+    errors = joi.validate(body, schema, { abortEarly: false }).error.details
+  }
+  catch(e) {}
+  if(errors.length == 0)db.@{{objects}}.update(obj, data)
+  res.send({ success: true, errors });
 })
-.body(joi.object(schema), 'data')
 .header('foxx-locale')
 .header('X-Session-Id')
-.description(`Update ${config.collection}.`);
+.description(`Update @{{objects}}.`);

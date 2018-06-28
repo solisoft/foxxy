@@ -45,6 +45,10 @@ const model = function() {
     //columns: [{ name: "title", tr: true, class: "uk-text-right" }, ...],
     //sort: "SORT doc.order ASC",
     //search: ["title", "barcode", "desc"],
+    //includes: {
+    //  conditions: "FOR c IN customers FILTER c._key == doc.customer_key",
+    //  merges: ", customer: c "
+    //},
     //timestamps: true,
     //
     // 1-n relations

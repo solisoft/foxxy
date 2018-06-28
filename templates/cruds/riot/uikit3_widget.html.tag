@@ -14,8 +14,8 @@
     <tbody>
       <tr each={ row in data } >
         <td each={ col in cols } class="{col.class}">
-          <virtual if={ col.tr == true }>{row[col.name][locale]}</virtual>
-          <virtual if={ col.tr != true }>{row[col.name]}</virtual>
+          <virtual if={ col.tr == true }>{_.get(row,col.name)[locale]}</virtual>
+          <virtual if={ col.tr != true }>{_.get(row,col.name)}</virtual>
         </td>
         <td class="uk-text-center" width="110">
           <a onclick={edit} class="uk-button uk-button-primary uk-button-small" uk-icon="icon: pencil"></a>
@@ -253,8 +253,8 @@
     <tbody>
       <tr each={ row in data } >
         <td each={ col in cols } class="{col.class}">
-          <virtual if={ col.tr == true }>{row[col.name][locale]}</virtual>
-          <virtual if={ col.tr != true }>{row[col.name]}</virtual>
+          <virtual if={ col.tr == true }>{_.get(row,col.name)[locale]}</virtual>
+          <virtual if={ col.tr != true }>{_.get(row,col.name)}</virtual>
         </td>
         <td class="uk-text-center" width="110">
           <a onclick={edit} class="uk-button uk-button-primary uk-button-small" uk-icon="icon: pencil"></a>

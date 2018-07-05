@@ -253,8 +253,20 @@
     <tbody>
       <tr each={ row in data } >
         <td each={ col in cols } class="{col.class}">
-          <virtual if={ col.tr == true }>{_.get(row,col.name)[locale]}</virtual>
-          <virtual if={ col.tr != true }>{_.get(row,col.name)}</virtual>
+          <virtual if={ col.toggle == true } >
+            <virtual if={ col.tr == true }><a onclick={toggleField} data-key="{row._key}">{col.values ? col.values[row[col.name][locale]] : _.get(row,col.name)[locale]}</a></virtual>
+            <virtual if={ col.tr != true }><a onclick={toggleField} data-key="{row._key}">{col.values ? col.values[row[col.name]] : _.get(row,col.name) }</a></virtual>
+          </virtual>
+
+          <virtual if={ col.toggle != true } >
+            <virtual if={ col.tr == true }>
+              {_.get(row,col.name)[locale]}
+            </virtual>
+            <virtual if={ col.tr != true }>
+              {_.get(row,col.name)}
+            </virtual>
+          </virtual>
+
         </td>
         <td class="uk-text-center" width="110">
           <a onclick={edit} class="uk-button uk-button-primary uk-button-small" uk-icon="icon: pencil"></a>
@@ -326,6 +338,16 @@
         })
       }, function() {})
     }
+
+    toggleField(e) {
+      e.preventDefault()
+      common.patch(url + "/cruds/products/" + e.target.dataset.key + "/" + e.item.col.name + "/toggle", "{}", function(data) {
+          if(data.success) {
+            e.target.innerText = data.data
+          }
+      })
+    }
+
 
   </script>
 </@{{objects}}>

@@ -186,6 +186,25 @@ router.post('/:service/:id', function (req, res) {
 .header('X-Session-Id')
 .description('Update an object.');
 // -----------------------------------------------------------------------------
+router.patch('/:service/:id/:field/toggle', function (req, res) {
+  const collection = db._collection(req.pathParams.service)
+  var item = collection.firstExample({_key: req.pathParams.id})
+  let column = _.first(_.filter(models()[req.pathParams.service].columns, function(el) { return el.name == req.pathParams.field}))
+  if(item) {
+    var data = {}
+    data[req.pathParams.field] = !item[req.pathParams.field]
+    collection.update(item, data)
+    var returned_data = !item[req.pathParams.field]
+    if(column && column.values) returned_data = column.values[!item[req.pathParams.field]]
+    res.send({ success: true, data: returned_data })
+  } else {
+    res.send({ success: false })
+  }
+})
+.header('foxx-locale')
+.header('X-Session-Id')
+.description('Toggle boolean field.');
+// -----------------------------------------------------------------------------
 router.get('/:service/:id/duplicate', function (req, res) {
   var new_obj = db._query(`
     FOR doc IN @@collection

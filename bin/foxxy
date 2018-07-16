@@ -10,7 +10,7 @@ var argv = require('yargs').argv
 var hasbin = require('hasbin')
 var pluralize = require('pluralize')
 var colors = require('colors')
-var version = '0.5.43'
+var version = '0.5.44'
 var user_password = +new Date()
 var copyFileSync = function(src, dest) {
   fs.writeFileSync(dest, fs.readFileSync(src, { encoding: "utf8" }))

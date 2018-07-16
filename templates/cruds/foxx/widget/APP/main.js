@@ -232,18 +232,25 @@ router.delete('/:service/:id', function (req, res) {
 
 // Sub
 // -----------------------------------------------------------------------------
-router.get('/sub/:id/:service/:key/page/:page/:perpage', function (req, res) {
+router.get('/:service/:id/:subservice/:key/page/:page/:perpage', function (req, res) {
+  let includes = ''
+  let include_merge = ''
+  if(models()[req.pathParams.service].sub_models[req.pathParams.subservice].includes) {
+    includes = models()[req.pathParams.service].sub_models[req.pathParams.subservice].includes.conditions
+    include_merge = models()[req.pathParams.service].sub_models[req.pathParams.subservice].includes.merges
+  }
   res.send({ data: db._query(`
     LET count = LENGTH(@@collection)
     LET data = (
       FOR doc IN @@collection
         FILTER doc.@key == @id
         SORT doc._key DESC
+        ${includes}
         LIMIT @offset,@perpage
-        RETURN doc
+        RETURN MERGE(doc, { ${include_merge} })
     )
     RETURN { count: count, data: data }
-    `, { "@collection": req.pathParams.service,
+    `, { "@collection": req.pathParams.subservice,
          "offset": (req.pathParams.page - 1) * parseInt(req.pathParams.perpage),
          "perpage": parseInt(req.pathParams.perpage),
          "key": req.pathParams.key,
@@ -266,6 +273,7 @@ router.post('/sub/:service/:subservice', function (req, res) {
   catch(e) {}
   if(errors.length == 0) {
     var data = fieldsToData(fields, body, req.headers)
+    if(models()[req.pathParams.service].sub_models[req.pathParams.subservice].timestamps === true) { data.created_at = +new Date() }
 
     obj = collection.save(data, { waitForSync: true })
   }
@@ -289,6 +297,7 @@ router.post('/sub/:service/:subservice/:id', function (req, res) {
   if(errors.length == 0) {
     var object = collection.document(req.pathParams.id)
     var data = fieldsToData(fields, body, req.headers)
+    if(models()[req.pathParams.service].sub_models[req.pathParams.subservice].timestamps === true) { data.updated_at = +new Date() }
 
     obj = collection.update(object, data)
   }

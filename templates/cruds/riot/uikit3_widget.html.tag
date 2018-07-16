@@ -1,4 +1,4 @@
-<crud_index>
+<@{{object}}_crud_index>
 
   <a href="#" class="uk-button uk-button-small uk-button-default" onclick={ new_item }>New { opts.singular }</a>
 
@@ -36,11 +36,11 @@
     this.data = []
     new_item(e) {
       e.preventDefault()
-      riot.mount("#"+opts.id, "crud_new", opts)
+      riot.mount("#"+opts.id, "@{{object}}_crud_new", opts)
     }
 
     this.loadPage = function(pageIndex) {
-      common.get(url + "/cruds/sub/"+opts.parent_id+"/"+opts.id+"/"+opts.key+"/page/"+pageIndex+"/"+per_page, function(d) {
+      common.get(url + "/cruds/"+opts.parent_name+"/"+opts.parent_id+"/"+opts.id+"/"+opts.key+"/page/"+pageIndex+"/"+per_page, function(d) {
         _this.data = d.data[0].data
         _this.cols = _.map(common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
         if(opts.columns) _this.cols = opts.columns
@@ -53,7 +53,7 @@
     edit(e) {
       e.preventDefault()
       opts.element_id = e.item.row._key
-      riot.mount("#"+opts.id, "crud_edit", opts)
+      riot.mount("#"+opts.id, "@{{object}}_crud_edit", opts)
     }
 
     nextPage(e) {
@@ -77,9 +77,9 @@
       }, function() {})
     }
   </script>
-</crud_index>
+</@{{object}}_crud_index>
 
-<crud_edit>
+<@{{object}}_crud_edit>
   <a href="#" class="uk-button uk-button-link" onclick={ goback }>Back to { opts.id }</a>
   <form onsubmit="{ save_form }" class="uk-form" id="{opts.id}_crud_@{{object}}">
   </form>
@@ -87,12 +87,12 @@
   <script>
     goback(e) {
       e.preventDefault()
-      riot.mount("#"+opts.id, "crud_index", opts)
+      riot.mount("#"+opts.id, "@{{object}}_crud_index", opts)
     }
 
     save_form(e) {
       e.preventDefault()
-      common.saveForm(opts.id+'_crud_@{{object}}', "cruds/sub/@{{objects}}/"+ opts.id+"/"+opts.element_id, "", opts)
+      common.saveForm(opts.id+'_crud_@{{object}}', "cruds/sub/"+opts.parent_name+"/"+ opts.id+"/"+opts.element_id, "", opts)
     }
 
     var _this = this;
@@ -107,9 +107,9 @@
       $(".select_tag").select2({ tags: true })
     })
   </script>
-</crud_edit>
+</@{{object}}_crud_edit>
 
-<crud_new>
+<@{{object}}_crud_new>
   <a href="#" class="uk-button uk-button-link" onclick={ goback }>Back to { opts.id }</a>
   <form onsubmit="{ save_form }" class="uk-form" id="{opts.id}_crud_@{{object}}">
   </form>
@@ -121,7 +121,7 @@
 
     goback(e) {
       e.preventDefault()
-      riot.mount("#"+opts.id, "crud_index", opts)
+      riot.mount("#"+opts.id, "@{{object}}_crud_index", opts)
     }
 
     this.on('mount', function() {
@@ -135,7 +135,7 @@
 
 
   </script>
-</crud_new>
+</@{{object}}_crud_new>
 
 <@{{object}}_edit>
 
@@ -188,7 +188,7 @@
       common.buildForm(_this.@{{object}}, fields, '#form_@{{object}}', '@{{objects}}', function() {
           $(".crud").each(function(i, c) {
           var id = $(c).attr("id")
-          riot.mount("#" + id, "crud_index", { model: id,
+          riot.mount("#" + id, "@{{object}}_crud_index", { model: id,
             fields: _this.sub_models[id].fields,
             key: _this.sub_models[id].key,
             singular: _this.sub_models[id].singular,

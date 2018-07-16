@@ -61,7 +61,12 @@ const model = function() {
     //    ],
     //    singular: "author",
     //    key: "post_id",
-    //    columns: [{ name: "name", tr: false, class: ""}, ...] // Displayed on listing
+    //    columns: [{ name: "name", tr: false, class: ""}, ...], // Displayed on listing
+    //    includes: {
+    //      conditions: "FOR c IN customers FILTER c._key == doc.customer_key",
+    //      merges: "customer: c "
+    //    },
+    //    timestamps: true,
     //  },
     //}
   }

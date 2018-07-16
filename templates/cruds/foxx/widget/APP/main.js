@@ -64,7 +64,12 @@ module.context.use(function (req, res, next) {
 // -----------------------------------------------------------------------------
 router.get('/:service/page/:page/:perpage', function (req, res) {
   const order = models()[req.pathParams.service].sort || 'SORT doc._key DESC'
-
+  let includes = ''
+  let include_merge = ''
+  if(models()[req.pathParams.service].includes) {
+    includes = models()[req.pathParams.service].includes.conditions
+    include_merge = models()[req.pathParams.service].includes.merges
+  }
   res.send({
     model: models()[req.pathParams.service],
     data: db._query(`
@@ -73,8 +78,9 @@ router.get('/:service/page/:page/:perpage', function (req, res) {
       FOR doc IN @@collection
         LET image = (FOR u IN uploads FILTER u.object_id == doc._id SORT u.pos LIMIT 1 RETURN u)[0]
         ${order}
+        ${includes}
         LIMIT @offset,@perpage
-        RETURN MERGE(doc, { image: image })
+        RETURN MERGE(doc, { image: image ${include_merge} })
     )
     RETURN { count: count, data: data }
     `, { "@collection": req.pathParams.service,
@@ -229,7 +235,13 @@ router.delete('/:service/:id', function (req, res) {
 router.get('/sub/:id/:service/:key/page/:page/:perpage', function (req, res) {
   res.send({ data: db._query(`
     LET count = LENGTH(@@collection)
-    LET data = (FOR doc IN @@collection FILTER doc.@key == @id SORT doc._key DESC LIMIT @offset,@perpage RETURN doc)
+    LET data = (
+      FOR doc IN @@collection
+        FILTER doc.@key == @id
+        SORT doc._key DESC
+        LIMIT @offset,@perpage
+        RETURN doc
+    )
     RETURN { count: count, data: data }
     `, { "@collection": req.pathParams.service,
          "offset": (req.pathParams.page - 1) * parseInt(req.pathParams.perpage),

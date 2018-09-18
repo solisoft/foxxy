@@ -40,7 +40,7 @@
     }
 
     this.loadPage = function(pageIndex) {
-      common.get(url + "/cruds/"+opts.parent_name+"/"+opts.parent_id+"/"+opts.id+"/"+opts.key+"/page/"+pageIndex+"/"+per_page, function(d) {
+      common.get(url + "/cruds/sub/"+opts.parent_id+"/"+opts.id+"/"+opts.key+"/page/"+pageIndex+"/"+per_page, function(d) {
         _this.data = d.data[0].data
         _this.cols = _.map(common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
         if(opts.columns) _this.cols = opts.columns

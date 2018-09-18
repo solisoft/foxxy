@@ -269,7 +269,7 @@ var Common = {
           route("/"+ path +"/" + objID + "/edit")
         }
         if(!_.isEmpty(opts)) {
-          riot.mount("#"+opts.id, "crud_index", opts)
+          riot.mount("#"+opts.id, _.last(formID.split("_") + "_crud_index", opts)
         }
       }
       setTimeout(function() {

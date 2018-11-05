@@ -195,9 +195,10 @@
             columns: _this.sub_models[id].columns,
             parent_id: opts.@{{object}}_id,
             parent_name: "@{{objects}}" })
-        })
+         })
       })
     })
+
     this.on('updated', function() {
       $(".select_list").select2()
       $(".select_mlist").select2()
@@ -222,6 +223,7 @@
       if(!_.isArray(fields)) fields = fields.model
       common.buildForm({}, fields, '#form_new_@{{object}}', '@{{objects}}');
     })
+
     this.on('updated', function() {
       $(".select_list").select2()
       $(".select_mlist").select2()
@@ -302,6 +304,7 @@
     }
     this.loadPage(1)
 
+    ////////////////////////////////////////////////////////////////////////////
     filter(e) {
       e.preventDefault();
       if(_this.refs.term.value != "") {
@@ -317,20 +320,24 @@
       }
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     edit(e) {
       route("/@{{objects}}/" + e.item.row._key + "/edit")
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     nextPage(e) {
       _this.page += 1
       _this.loadPage(_this.page + 1)
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     previousPage(e) {
       _this.page -= 1
       _this.loadPage(_this.page + 1)
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     destroy_object(e) {
       UIkit.modal.confirm("Are you sure?").then(function() {
         common.delete(url + "/cruds/@{{objects}}/" + e.item.row._key, function() {
@@ -339,6 +346,7 @@
       }, function() {})
     }
 
+    ////////////////////////////////////////////////////////////////////////////
     toggleField(e) {
       e.preventDefault()
       common.patch(url + "/cruds/products/" + e.target.dataset.key + "/" + e.item.col.name + "/toggle", "{}", function(data) {
@@ -348,6 +356,12 @@
       })
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    setPerPage(e) {
+      e.preventDefault()
+      this.perpage = parseInt(e.srcElement.innerText)
+      this.loadPage(1)
+    }
 
   </script>
 </@{{objects}}>

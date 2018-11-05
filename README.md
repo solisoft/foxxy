@@ -6,7 +6,7 @@
 
 foxxy is a simple tool which help you starting with your single page application using ArangoDB / Foxx for backend and API, riotjs for views and brunch to build your assets.
 
-https://www.foxxy.ovh
+https://foxxy.ovh
 
 ## Prerequisite
 

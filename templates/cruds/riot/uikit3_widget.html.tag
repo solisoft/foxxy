@@ -262,10 +262,20 @@
 
           <virtual if={ col.toggle != true } >
             <virtual if={ col.tr == true }>
-              {_.get(row,col.name)[locale]}
+              <virtual if={ col.type == "image" }>
+                <img src="{_.get(row,col.name)[locale]} " style="height:25px">
+              </virtual>
+              <virtual if={ col.type != "image" }>
+                {_.get(row,col.name)[locale]}
+              </virtual>
             </virtual>
             <virtual if={ col.tr != true }>
-              {_.get(row,col.name)}
+              <virtual if={ col.type == "image" }>
+                <img src="{_.get(row,col.name)} " style="height:25px">
+              </virtual>
+              <virtual if={ col.type != "image" }>
+                {_.get(row,col.name)}
+              </virtual>
             </virtual>
           </virtual>
 

@@ -5,7 +5,7 @@
     <title>Foxxy CRUD</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.35/css/uikit.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.25/css/uikit.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/pell/0.7.0/pell.min.css">
@@ -37,7 +37,7 @@
         </div>
       </div>
     </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.25/js/uikit.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
     <script src="DIGEST(js/vendors.js)"></script>
     <script src="DIGEST(js/js.js)"></script>
@@ -53,7 +53,6 @@
       var locale = window.localStorage.getItem('foxx-locale') || 'en'
       window.localStorage.setItem('foxx-locale', locale)
 
-      var UIkit = require("vendors/uikit.js")
       var common = require("js/common.js")
 
       common.init()

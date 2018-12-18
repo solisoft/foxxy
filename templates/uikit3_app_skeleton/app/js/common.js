@@ -342,14 +342,18 @@ var Common = {
     UIkit.upload(drop_id, {
       url: url + '/uploads/' + key + '/' + collection + '/' + field, // upload url,
       multiple: true,
-      headers: {
-        'X-Session-Id': localStorage.getItem('X-Session-Id'),
-        'foxx-locale': i18n == true ? localStorage.getItem('foxx-locale') : null
-      },
+
       allow: filter,
 
       error: function () {
         console.log('error', arguments);
+      },
+
+      beforeSend(env) {
+        env.headers = {
+          'X-Session-Id': localStorage.getItem('X-Session-Id'),
+          'foxx-locale': i18n == true ? localStorage.getItem('foxx-locale') : null
+        }
       },
 
       loadStart: function (e) {

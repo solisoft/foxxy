@@ -95,15 +95,26 @@ router.get('/:service/page/:page/:perpage', function (req, res) {
 router.get('/:service/search/:term', function (req, res) {
   var locale = req.headers['foxx-locale']
   if(locale.match(/[a-z]+/) == null) locale = 'en'
+  const order = models()[req.pathParams.service].sort || 'SORT doc._key DESC'
+  let includes = ''
+  let include_merge = ''
+  if(models()[req.pathParams.service].includes) {
+    includes = models()[req.pathParams.service].includes.conditions
+    include_merge = models()[req.pathParams.service].includes.merges
+  }
+  if(locale.match(/[a-z]+/) == null) locale = 'en'
   res.send({ data: db._query(`
-    FOR u IN FULLTEXT(@@collection, 'search.${locale}', @term)
+    FOR doc IN FULLTEXT(@@collection, 'search.${locale}', @term)
+    LET image = (FOR u IN uploads FILTER u.object_id == doc._id SORT u.pos LIMIT 1 RETURN u)[0]
+    ${order}
+    ${includes}
     LIMIT 100
-    RETURN u`, { "@collection": req.pathParams.service,
-                 "term": req.pathParams.term }).toArray() });
+    RETURN MERGE(doc, { image: image ${include_merge} })`, { "@collection": req.pathParams.service,
+                 "term": req.pathParams.term }).toArray() })
 })
 .header('foxx-locale')
 .header('X-Session-Id')
-.description('Returns all objects');
+.description('Returns First 100 found objects');
 // -----------------------------------------------------------------------------
 router.get('/:service/:id', function (req, res) {
   const collection = db._collection(req.pathParams.service)

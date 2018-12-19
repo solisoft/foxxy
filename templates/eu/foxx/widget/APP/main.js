@@ -13,10 +13,10 @@ require("@arangodb/aql/cache").properties({ mode: "on" });
 
 const router = createRouter();
 
-const _settings = db._collection('foxxy_settings').firstExample();
+const _settings = db.foxxy_settings.firstExample();
 
 const sessions = sessionsMiddleware({
-  storage: jwtStorage(_settings.jwt_secret),
+  storage: jwtStorage(_settings.jwt_secret_admin),
   transport: 'header'
 });
 module.context.use(sessions);
@@ -88,7 +88,7 @@ router.get('/check_form', function (req, res) {
 router.post('/:id', function (req, res) {
   const body = JSON.parse(req.body.toString())
   var obj = db.@{{objects}}.document(req.pathParams.id)
-  var data = fieldsToData(fields(), body)
+  var data = fieldsToData(fields(), body, req.headers)
   var errors = []
   try {
     var schema = {}

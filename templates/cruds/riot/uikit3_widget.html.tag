@@ -297,7 +297,7 @@
     this.loadPage = function(pageIndex) {
       common.get(url + "/cruds/@{{objects}}/page/"+pageIndex+"/"+this.perpage, function(d) {
         _this.data = d.data[0].data
-        _this.export = !!d.data[0].export
+        _this.export = !!d.data[0].model.export
         _this.cols = _.map(common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
         if(d.model.columns) _this.cols = d.model.columns
         _this.count = d.data[0].count

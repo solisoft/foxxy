@@ -235,7 +235,7 @@
 <@{{objects}}>
   <div class="uk-float-right">
     <a href="#@{{objects}}/new" class="uk-button uk-button-small uk-button-default">New @{{object}}</a>
-
+    <a if={ export } onclick="{ export_data }" class="uk-button uk-button-small uk-button-primary">Export CSV</a>
   </div>
   <h3>Listing @{{objects}}</h3>
 
@@ -287,14 +287,17 @@
   <a onclick={ setPerPage } class="uk-label">100</a>
   <script>
 
-    var _this = this
-    this.page = 0
-    this.perpage = per_page
-    this.locale = window.localStorage.getItem('foxx-locale')
+    var _this     = this
+    this.page     = 0
+    this.perpage  = per_page
+    this.locale   = window.localStorage.getItem('foxx-locale')
+    this.data     = []
+    this.export   = false
 
     this.loadPage = function(pageIndex) {
       common.get(url + "/cruds/@{{objects}}/page/"+pageIndex+"/"+this.perpage, function(d) {
         _this.data = d.data[0].data
+        _this.export = !!d.data[0].export
         _this.cols = _.map(common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
         if(d.model.columns) _this.cols = d.model.columns
         _this.count = d.data[0].count
@@ -360,9 +363,9 @@
     toggleField(e) {
       e.preventDefault()
       common.patch(url + "/cruds/products/" + e.target.dataset.key + "/" + e.item.col.name + "/toggle", "{}", function(data) {
-          if(data.success) {
-            e.target.innerText = data.data
-          }
+        if(data.success) {
+          e.target.innerText = data.data
+        }
       })
     }
 
@@ -373,6 +376,20 @@
       this.loadPage(1)
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    export_data(e) {
+      common.get(url + '/cruds/@{{objects}}/export', function(d) {
+        var csvContent = d.data
+        var encodedUri = encodeURI(csvContent)
+        var link = document.createElement("a")
+        link.setAttribute("href", encodedUri)
+        link.setAttribute("download", "@{{objects}}.csv")
+        link.innerHTML= "Click Here to download"
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      })
+    }
   </script>
 </@{{objects}}>
 

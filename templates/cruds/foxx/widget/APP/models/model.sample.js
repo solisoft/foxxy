@@ -42,7 +42,12 @@ const model = function() {
     model: [
       // { r: true, c: "1-1", n: "name", t: "string", j: joi.string().required(), l: "Name" },
     ],
-    //columns: [{ name: "title", tr: true, class: "uk-text-right", toggle: true, values: { true: "online", false: "offline" } }, ...],
+    //columns: [
+    //  { name: "title", tr: true, class: "uk-text-right", toggle: true,
+    //    values: { true: "online", false: "offline" },
+    //    truncate: 20, uppercase: true, lowercase: true
+    //  }, ...
+    //],
     //sort: "SORT doc.order ASC",
     //search: ["title", "barcode", "desc"],
     //includes: {

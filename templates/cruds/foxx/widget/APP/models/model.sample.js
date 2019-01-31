@@ -48,6 +48,7 @@ const model = function() {
     //    truncate: 20, uppercase: true, lowercase: true
     //  }, ...
     //],
+    //slug: ["title"],
     //sort: "SORT doc.order ASC",
     //search: ["title", "barcode", "desc"],
     //includes: {

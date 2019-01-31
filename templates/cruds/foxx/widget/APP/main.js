@@ -158,6 +158,12 @@ router.post('/:service', function (req, res) {
       data.search[req.headers['foxx-locale']] = search_arr.join(" ")
     }
     if(models()[req.pathParams.service].timestamps === true) { data.created_at = +new Date() }
+    if(models()[req.pathParams.service].slug) {
+      var slug = _.map(models()[req.pathParams.service].slug, function(field_name) {
+        return data[field_name]
+      })
+      data['slug'] = _.kebabCase(slug)
+    }
     obj = collection.save(data, { waitForSync: true })
   }
   res.send({ success: errors.length == 0, data: obj, errors: errors });
@@ -194,7 +200,12 @@ router.post('/:service/:id', function (req, res) {
       data.search[req.headers['foxx-locale']] = search_arr.join(" ")
     }
     if(models()[req.pathParams.service].timestamps === true) { data.updated_at = +new Date() }
-
+    if(models()[req.pathParams.service].slug) {
+      var slug = _.map(models()[req.pathParams.service].slug, function(field_name) {
+        return data[field_name]
+      })
+      data['slug'] = _.kebabCase(slug)
+    }
     obj = collection.update(object, data)
   }
   res.send({ success: errors.length == 0, data: obj, errors: errors });

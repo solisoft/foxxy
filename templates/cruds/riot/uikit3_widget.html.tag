@@ -164,7 +164,7 @@
 
     duplicate(e) {
       UIkit.modal.confirm("Are you sure?").then(function() {
-        common.get(url + "/cruds/@{{objects}}/" + _this.product._key + "/duplicate", function(data) {
+        common.get(url + "/cruds/@{{objects}}/" + _this.@{{object}}._key + "/duplicate", function(data) {
           route('/@{{objects}}/' + data._key + '/edit')
           UIkit.notification({
             message : 'Successfully duplicated!',
@@ -362,7 +362,7 @@
     ////////////////////////////////////////////////////////////////////////////
     toggleField(e) {
       e.preventDefault()
-      common.patch(url + "/cruds/products/" + e.target.dataset.key + "/" + e.item.col.name + "/toggle", "{}", function(data) {
+      common.patch(url + "/cruds/@{{objects}}/" + e.target.dataset.key + "/" + e.item.col.name + "/toggle", "{}", function(data) {
         if(data.success) {
           e.target.innerText = data.data
         }

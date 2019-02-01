@@ -361,7 +361,7 @@ var Common = {
         console.log('error', arguments);
       },
 
-      beforeSend(env) {
+      beforeSend: function(env) {
         env.headers = {
           'X-Session-Id': localStorage.getItem('X-Session-Id'),
           'foxx-locale': i18n == true ? localStorage.getItem('foxx-locale') : null

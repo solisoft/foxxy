@@ -41,6 +41,7 @@ var Common = {
     var values = []
     var positions = []
     var wysiwygs = []
+    var html_editors = []
     fields.forEach(function(l, i) {
 
       if (l.h !== undefined) {
@@ -91,6 +92,11 @@ var Common = {
           values.push([l.n, value])
           html += '<div id="editor_'+l.n+'" class="editor" style="'+l.s+'"></div>'
           editors.push(["editor_"+l.n, "ace/mode/" + l.t.split(":")[1], l.n])
+        }
+        if(l.t == 'html') {
+          html += '<input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="">'
+          html += '<div id="html_editor_'+l.n+'" data-name="'+l.n+'" class="html_editor" style="'+l.s+'"></div>'
+          html_editors.push([l.n, value])
         }
         if(l.t === "list") {
           html += '<select name="'+ l.n +'" style="width:100%" class="uk-select select_list" id="'+l.n+'">'
@@ -180,6 +186,9 @@ var Common = {
     values.forEach(function(v, i) {
       $(formId+" #" + v[0]).val(v[1])
     })
+    html_editors.forEach(function(e, i) {
+      $('#html_editor_'+e[0]).contentEditor({ value: e[1].html || '' })
+    })
     editors.forEach(function(e, i) {
       _this.startEditor(e[0], e[1], e[2])
     })
@@ -232,8 +241,11 @@ var Common = {
   saveForm: function (formID, path, objID, opts) {
     objID = objID||""
     opts = opts||{}
-    var _this = this;
+    var _this = this
     var json = $("#"+ formID).serializeObject()
+    _.each(json, function(v, k) {
+      if(k.split('-')[0] == "trumbowyg") delete json[k];
+    })
 
     $('.select_tag, .select_mlist').each(function(i, st) {
       if(typeof json[$(st).attr("name")] === "string") {

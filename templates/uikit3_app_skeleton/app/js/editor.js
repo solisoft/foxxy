@@ -230,7 +230,6 @@
                     success: function (data) {
                       $(el).html('<div data-type="img" class="drag drop" data-editable="true"><img src="https://resize.ovh/r/' + data.filename + '/300"></div>')
                       clear_empty_drags()
-                      save_content()
                     }
                   });
 
@@ -271,7 +270,7 @@
 
       window.drag_end = function (event) {
         event.stopPropagation()
-        clear_empty_drags()
+
         $('.row_editor').css('margin-left', (-99999) + 'px')
         $('.dragging').removeClass('dragging')
         $('.active').removeClass('active')
@@ -297,11 +296,7 @@
       history.push($(self).find('.edit-mode .page-content').html())
       history.splice(0, history.length - 20);
       LSet('editor-history', JSON.stringify(history))
-      var data = {
-        html: $(self).find('.edit-mode .page-content').html(),
-        json: run_export($(self).find('.edit-mode .page-content'))
-      }
-      $('input[name="' + object_name + '"]').val(JSON.stringify(data))
+
     }
 
     /*
@@ -482,24 +477,34 @@
     */
     var run_export = function (base) {
       var data = []
-      $(base).find(' > .cms_row').each(function (i, row) {
+      $(base).find('> .cms_row').each(function (i, row) {
+        console.log(row)
+        if($(row).data('type') == 'full') row = $(row).children().first();
+      [0]
         var data_row = {
           data: [],
           type: $(row).data('type')
         }
 
         $(row).find('> .cms_col').each(function (y, col) {
-          var data_col = []
-          $(col).find('> [data-type]').each(function (z, widget) {
-            var data_widget = {}
-            data_widget['type'] = $(widget).data('type')
-            if ($(widget).data('type').indexOf('col') >= 0) {
-              data_widget['content'] = run_export($(widget).parent())
-            } else {
-              data_widget['content'] = $(widget).html()
-            }
 
-            data_col.push(data_widget)
+          var data_col = []
+          $(col).find('[data-type]').each(function (z, widget) {
+            console.log(widget)
+            if($(widget).data('exported') == undefined) {
+
+              $(widget).data('exported', true)
+
+              var data_widget = {}
+              data_widget['type'] = $(widget).data('type')
+              if ($(widget).data('type').indexOf('col') >= 0) {
+                data_widget['content'] = run_export($(widget).parent())
+              } else {
+                data_widget['content'] = $(widget).html()
+              }
+
+              data_col.push(data_widget)
+            }
           })
           data_row['data'].push(data_col)
         })
@@ -507,6 +512,8 @@
         data.push(data_row)
       })
 
+      $(base).find('[data-exported]').removeAttr('data-exported')
+      console.log("Data : ", data)
       return data
     }
 
@@ -565,6 +572,8 @@
       // It should open the editor modal with the right content / tools
       $(self).find('.edit-mode .page-content').on('click', '[data-type]', function () {
         editObj = $(this)
+        $(self).find(".editor-code").hide()
+        $(self).find(".editor-simplecode").hide()
         if (editObj.data('editable')) {
           $(self).find('.trumbowyg').hide()
           $(self).find('#ace-editor-'+object_name).hide()
@@ -577,11 +586,13 @@
           }
 
           if (editObj.data('type') == 'code') {
+            $(self).find(".editor-code").show()
             $(self).find('#ace-editor-'+object_name).show()
             var mode = 'html'
             if (editObj.find('code').hasClass('ruby')) mode = 'ruby';
             if (editObj.find('code').hasClass('css')) mode = 'css';
             if (editObj.find('code').hasClass('javascript')) mode = 'javascript';
+            $(self).find("input[data-name=lang]").val(mode)
             ace_editor.session.setMode('ace/mode/' + mode);
 
             ace_editor.setOptions({
@@ -595,6 +606,7 @@
           }
 
           if (['embed', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'].indexOf(editObj.data('type')) >= 0) {
+            $(self).find(".editor-simplecode").show()
             $('#ace-editor-'+object_name).show()
             var mode = 'html'
 
@@ -664,7 +676,12 @@
         $(self).find('.view-mode').toggleClass('isactive')
         $(self).find('.edit-mode').toggleClass('isactive')
         $(self).toggleClass('fullscreen')
-        var data = JSON.parse($('input[name="'+object_name+'"]').val())
+        $('[data-exported]').removeAttr('data-exported')
+        var data = {
+          html: $(self).find('.edit-mode .page-content').html(),
+          json: run_export($(self).find('.edit-mode .page-content'))
+        }
+        $('input[name="' + object_name + '"]').val(JSON.stringify(data))
         $(self).find('.page-content').html(data['html'] || '')
         remove_drag_attributes()
         $(self).find('[data-html]').each(function (i, el) {
@@ -722,7 +739,8 @@
           <i class="far fa-times-circle" style="float: right;padding: 10px"></i>\
           <div class="content">\
             <div id="trumbowyg-'+object_name+'"></div>\
-            <div id="ace-editor-'+object_name+'" class="ace-editor"></div>\
+            <div class="editor-code"><label>Language</label><input type="text" data-name="lang" class="uk-input"></div>\
+            <div class="editor-code editor-simplecode"><label>Code</label><div id="ace-editor-'+object_name+'" class="ace-editor"></div></div>\
           </div>\
         </div>\
       </div>\
@@ -763,7 +781,7 @@
     ace_editor.getSession().on('change', function () {
       if (editObj) {
 
-        var mode = ace_editor.getOptions().mode.split('/').pop()
+        var mode = $(self).find("input[data-name=lang]").val()
         var content = ace_editor.getSession().getValue()
         if (editObj.data('type') == 'code') {
           content = htmlEntities(content)

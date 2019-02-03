@@ -381,6 +381,13 @@
         }
         clear_empty_drags()
       }
+
+      $(self).find('[data-type=full] .col-12').each(function(i, item) {
+        if($(item).find('.sg-row').length > 0) {
+          var html = $(item).html()
+          $(item).parent()[0].outerHTML = html
+        }
+      })
     }
 
     /*
@@ -476,11 +483,16 @@
       (saved to localstorage for now)
     */
     var run_export = function (base) {
+
       var data = []
       $(base).find('> .cms_row').each(function (i, row) {
-        console.log(row)
-        if($(row).data('type') == 'full') row = $(row).children().first();
-      [0]
+
+        if($(row).data('type') == 'full') {
+          if($(row).find('div:first').hasClass('cms_col')) $(row).data('type', $(row).find("[data-type]").data('type'))
+          else {
+            row = $(row).children()[0]
+          }
+        }
         var data_row = {
           data: [],
           type: $(row).data('type')
@@ -513,7 +525,6 @@
       })
 
       $(base).find('[data-exported]').removeAttr('data-exported')
-      console.log("Data : ", data)
       return data
     }
 

@@ -13,7 +13,7 @@ const request = require('@arangodb/request')
 const _settings = db._collection('foxxy_settings').firstExample();
 
 const sessions = sessionsMiddleware({
-  storage: jwtStorage(_settings.jwt_secret),
+  storage: jwtStorage(_settings.jwt_secret_admin),
   transport: 'header'
 });
 module.context.use(sessions);

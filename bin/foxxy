@@ -10,7 +10,7 @@ var argv = require('yargs').argv
 var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
-var version = '0.6.00'
+var version = '0.6.01'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
 
@@ -262,7 +262,7 @@ if (fs.existsSync(homedir + "/.foxxrc") && fs.readFileSync(homedir + "/.foxxrc")
       }
     }
 
-    if (argv._[0] == "setup") {
+    if (argv._[0] == "setup" || argv._[0] == "upgrade") {
       var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
       if (argv._[1] != undefined) {
         install_service(`foxx/${argv._[1]}`, arangoconf.database)

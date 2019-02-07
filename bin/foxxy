@@ -10,7 +10,7 @@ var argv = require('yargs').argv
 var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
-var version = '0.6.03'
+var version = '0.6.04'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
 
@@ -90,6 +90,7 @@ var generate = function (action, model) {
 
     var dest_folder = process.cwd() + "/foxx/" + service_endpoint
     copyRecursiveSync(src_folder, dest_folder, model)
+
     // Widget
     console.log("Creating widget " + model)
     try {
@@ -98,7 +99,8 @@ var generate = function (action, model) {
       copyFileSync(src_file, dest_file)
       replaceInFile(dest_file, /@\{\{object\}\}/g, model)
       replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
-    } catch(e) {}
+    } catch (e) { }
+
     var dest_file = "";
     var src_file = "";
 
@@ -118,9 +120,7 @@ var generate = function (action, model) {
       src_file = path.join(__dirname, `../templates/${action}/router/router.js`)
       try {
         fs.statSync(src_file)
-        var js = fs.readFileSync(src_file, {
-          encoding: "utf8"
-        })
+        var js = fs.readFileSync(src_file, { encoding: "utf8" })
         replaceInFile(dest_file, /\/\*@\{\{router\}\}\*\//g, js)
         replaceInFile(dest_file, /@\{\{object\}\}/g, model)
         replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
@@ -130,9 +130,7 @@ var generate = function (action, model) {
       src_file = path.join(__dirname, `../templates/${action}/router/router_ca.js`)
       try {
         fs.statSync(src_file)
-        var js = fs.readFileSync(src_file, {
-          encoding: "utf8"
-        })
+        var js = fs.readFileSync(src_file, { encoding: "utf8" })
         replaceInFile(dest_file, /\/\*@\{\{router_ca\}\}\*\//g, js)
         replaceInFile(dest_file, /@\{\{object\}\}/g, model)
         replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
@@ -152,9 +150,11 @@ var generate = function (action, model) {
       if (action == 'cruds') {
         var exists = fs.existsSync(path.join(process.cwd(), 'foxx/uploads'))
         if (!exists) generate('upload', 'upload') // Generate the upload service
+
         dest_file = path.join(process.cwd(), `foxx/cruds/APP/models/${final_model_name}.js`)
         src_file = path.join(__dirname, `../templates/${action}/foxx/widget/APP/models/model.sample.js`)
         copyFileSync(src_file, dest_file)
+
         var model_file = path.join(process.cwd(), `foxx/cruds/APP/models.js`)
         replaceInFile(model_file, "/*@{{models}}*/", final_model_name + ": require('./models/" + final_model_name + ".js')(),\n    /*@{{models}}*/")
         var setup_file = path.join(process.cwd(), `foxx/cruds/APP/scripts/setup.js`)
@@ -165,7 +165,6 @@ var generate = function (action, model) {
 
     install_service('/foxx/' + service_endpoint, arangoconf.database)
     console.log(action.toUpperCase() + " " + model + " created successfully!".green)
-
   }
 }
 
@@ -201,11 +200,13 @@ var replaceInFile = function (filename, find, replace) {
   fs.writeFileSync(filename, result)
 }
 var foxxy_welcome = `
- ___
-|  _|___ _ _ _ _ _ _
-|  _| . |_'_|_'_| | |
-|_| |___|_,_|_,_|_  |
-                |___|`
+███████╗ ██████╗ ██╗  ██╗██╗  ██╗██╗   ██╗
+██╔════╝██╔═══██╗╚██╗██╔╝╚██╗██╔╝╚██╗ ██╔╝
+█████╗  ██║   ██║ ╚███╔╝  ╚███╔╝  ╚████╔╝
+██╔══╝  ██║   ██║ ██╔██╗  ██╔██╗   ╚██╔╝
+██║     ╚██████╔╝██╔╝ ██╗██╔╝ ██╗   ██║
+╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝
+                                          `
 
 console.log(foxxy_welcome.yellow)
 console.log(('Version ' + version).yellow)

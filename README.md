@@ -27,10 +27,6 @@ $ cd demo_app/
 $ yarn install
 ````
 
-### Symlink to your foxx folder
-
-To simplify your work, create a symlink from your arangodb foxx folder to your app foxx folder
-
 # Creating a new application
 
 First create a database called `demoapp` within ArangoDB Web UI
@@ -53,6 +49,14 @@ Please use singular for your model name.
 
 Ok now you have your first CRUD created.
 
+## Upgrading the service
+
+To update your arangodb Foxx service run :
+
+`$ foxxy upgrade` or `$foxxy upgrade <your_service>`
+
+With no arguments, all the service aill be refreshed.
+
 # Compile the app
 
 ## Dev mode
@@ -69,6 +73,3 @@ Then run : `$ mina deploy`
 
 It will compile assets for production env and deploy code (app & Foxx services)
 
-# Todo
-
-- Use jwtTokens to avoid nginx _db mounting point

@@ -10,7 +10,7 @@ var argv = require('yargs').argv
 var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
-var version = '0.6.02'
+var version = '0.6.03'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
 
@@ -32,7 +32,7 @@ var copyRecursiveSync = function (src, dest, model) {
   var stats = exists && fs.statSync(src)
   var isDirectory = exists && stats.isDirectory()
   if (exists && isDirectory) {
-    fs.mkdirSync(dest)
+    if(!fs.existsSync(dest)) fs.mkdirSync(dest)
     fs.readdirSync(src).forEach(function (childItemName) {
       copyRecursiveSync(path.join(src, childItemName),
         path.join(dest, childItemName),

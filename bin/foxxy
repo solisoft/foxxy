@@ -10,7 +10,7 @@ var argv = require('yargs').argv
 var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
-var version = '0.6.01'
+var version = '0.6.02'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
 
@@ -92,6 +92,13 @@ var generate = function (action, model) {
     copyRecursiveSync(src_folder, dest_folder, model)
     // Widget
     console.log("Creating widget " + model)
+    try {
+      var src_file = path.join(__dirname, `../templates/${action}/riot/${foxxyconf.theme}_widget.html.tag`)
+      var dest_file = path.join(process.cwd(), `app/widgets/${final_model_name}.html.tag`)
+      copyFileSync(src_file, dest_file)
+      replaceInFile(dest_file, /@\{\{object\}\}/g, model)
+      replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
+    } catch(e) {}
     var dest_file = "";
     var src_file = "";
 

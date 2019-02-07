@@ -27,6 +27,17 @@ $ cd demo_app/
 $ yarn install
 ````
 
+You'll also need to have a `~/.foxxrc` file with this content :
+
+```
+[server.foxxy]
+url=http://localhost:8529
+username=root
+password=
+```
+
+Of course update params if needed.
+
 # Creating a new application
 
 First create a database called `demoapp` within ArangoDB Web UI

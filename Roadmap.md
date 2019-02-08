@@ -1,5 +1,11 @@
 # Roadmap
 
+# 0.6.x
+
+- Foxx-manager replaced by foxx-cli
+- Remove needs of arangosh and use arangojs instead
+- New HTML widget
+
 # 0.5.x
 
 New Cruds code

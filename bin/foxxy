@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 "use strict"
-
+var arangojs = require("arangojs")
 var execSync = require('child_process').execSync
 var yaml = require('js-yaml')
 var fs = require('fs')
@@ -10,7 +10,7 @@ var argv = require('yargs').argv
 var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
-var version = '0.6.04'
+var version = '0.6.05'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
 
@@ -32,7 +32,7 @@ var copyRecursiveSync = function (src, dest, model) {
   var stats = exists && fs.statSync(src)
   var isDirectory = exists && stats.isDirectory()
   if (exists && isDirectory) {
-    if(!fs.existsSync(dest)) fs.mkdirSync(dest)
+    if (!fs.existsSync(dest)) fs.mkdirSync(dest)
     fs.readdirSync(src).forEach(function (childItemName) {
       copyRecursiveSync(path.join(src, childItemName),
         path.join(dest, childItemName),
@@ -99,7 +99,7 @@ var generate = function (action, model) {
       copyFileSync(src_file, dest_file)
       replaceInFile(dest_file, /@\{\{object\}\}/g, model)
       replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
-    } catch (e) { }
+    } catch (e) {}
 
     var dest_file = "";
     var src_file = "";
@@ -120,7 +120,9 @@ var generate = function (action, model) {
       src_file = path.join(__dirname, `../templates/${action}/router/router.js`)
       try {
         fs.statSync(src_file)
-        var js = fs.readFileSync(src_file, { encoding: "utf8" })
+        var js = fs.readFileSync(src_file, {
+          encoding: "utf8"
+        })
         replaceInFile(dest_file, /\/\*@\{\{router\}\}\*\//g, js)
         replaceInFile(dest_file, /@\{\{object\}\}/g, model)
         replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
@@ -130,7 +132,9 @@ var generate = function (action, model) {
       src_file = path.join(__dirname, `../templates/${action}/router/router_ca.js`)
       try {
         fs.statSync(src_file)
-        var js = fs.readFileSync(src_file, { encoding: "utf8" })
+        var js = fs.readFileSync(src_file, {
+          encoding: "utf8"
+        })
         replaceInFile(dest_file, /\/\*@\{\{router_ca\}\}\*\//g, js)
         replaceInFile(dest_file, /@\{\{object\}\}/g, model)
         replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
@@ -168,17 +172,18 @@ var generate = function (action, model) {
   }
 }
 
-var createDatabase = function () {
+var createDatabase = function (callback) {
   argv.user = argv.user || "root"
   argv.password = argv.password || ""
   argv.endpoint = argv.endpoint || "http+tcp://127.0.0.1:8529"
   argv.theme = argv.theme || "uikit3"
 
-  var password = "--server.password \"\""
-  if (argv.password != "") password = `--server.password ${argv.password}`
-  var cmd = `arangosh --javascript.execute-string "if(db._databases().indexOf('${argv.database}') < 0) db._createDatabase('${argv.database}');" --server.endpoint ${argv.endpoint} --server.username ${argv.user} ${password}`
-  console.log(cmd)
-  execSync(cmd)
+  var db = new arangojs.Database(argv.endpoint)
+  db.useBasicAuth(argv.user, argv.password)
+  db.createDatabase(argv.database)
+    .then(function () {
+      callback()
+    })
 }
 
 var install_service = function (service, db_name, dev = true) {
@@ -229,44 +234,46 @@ if (fs.existsSync(homedir + "/.foxxrc") && fs.readFileSync(homedir + "/.foxxrc")
       if (argv._.length == 1 || argv.database === undefined) {
         console.log("Usage : foxxy new <app_name> --database db_name".red)
       } else {
-        createDatabase();
-        var src_folder = path.join(__dirname, `../templates/${argv.theme}_app_skeleton`)
-        var dest_folder = path.join(process.cwd(), argv._[1])
+        createDatabase(function () {
+          var src_folder = path.join(__dirname, `../templates/${argv.theme}_app_skeleton`)
+          var dest_folder = path.join(process.cwd(), argv._[1])
 
-        fs.stat(dest_folder, function (err, stats) {
-          if (err !== null) {
-            copyRecursiveSync(src_folder, dest_folder)
-            var dest_file = path.join(process.cwd(), `${argv._[1]}/app/index.html`)
-            replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
-
-            var dest_file = path.join(process.cwd(), `${argv._[1]}/app/login.html`)
-            replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
-            fs.writeFileSync(dest_folder + "/.arangodb.yml", yaml.safeDump({
-              database: argv.database,
-              username: argv.user,
-              password: argv.password,
-              endpoint: argv.endpoint
-            }))
-            fs.writeFileSync(dest_folder + "/.foxxy.yml", yaml.safeDump({
-              theme: argv.theme
-            }))
-
-            if (argv.no_widgets === undefined) {
-              src_folder = path.join(__dirname, '../templates/auth/foxx/widget')
-              dest_folder = path.join(process.cwd(), argv._[1] + "/foxx/auth")
-
+          fs.stat(dest_folder, function (err, stats) {
+            if (err !== null) {
               copyRecursiveSync(src_folder, dest_folder)
-              install_service(argv._[1] + '/foxx/auth', argv.database)
-              console.log("User 'demo@foxxy.ovh' with password '" + user_password + "' created successfully".cyan)
-              console.log("App Created ! Grrrrr!".green)
+              var dest_file = path.join(process.cwd(), `${argv._[1]}/app/index.html`)
+              replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
 
+              var dest_file = path.join(process.cwd(), `${argv._[1]}/app/login.html`)
+              replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
+              fs.writeFileSync(dest_folder + "/.arangodb.yml", yaml.safeDump({
+                database: argv.database,
+                username: argv.user,
+                password: argv.password,
+                endpoint: argv.endpoint
+              }))
+              fs.writeFileSync(dest_folder + "/.foxxy.yml", yaml.safeDump({
+                theme: argv.theme
+              }))
+
+              if (argv.no_widgets === undefined) {
+                src_folder = path.join(__dirname, '../templates/auth/foxx/widget')
+                dest_folder = path.join(process.cwd(), argv._[1] + "/foxx/auth")
+
+                copyRecursiveSync(src_folder, dest_folder)
+                install_service(argv._[1] + '/foxx/auth', argv.database)
+                console.log("User 'demo@foxxy.ovh' with password '" + user_password + "' created successfully".cyan)
+                console.log("App Created ! Grrrrr!".green)
+
+              } else {
+                console.log("App Created ! Grrrrr!".green)
+              }
             } else {
-              console.log("App Created ! Grrrrr!".green)
+              console.log("Folder already exists ... aborting ... ".red)
             }
-          } else {
-            console.log("Folder already exists ... aborting ... ".red)
-          }
-        })
+          })
+        });
+
       }
     }
 

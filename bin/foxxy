@@ -10,9 +10,12 @@ var argv = require('yargs').argv
 var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
-var version = '0.6.05'
+var hasbin = require('hasbin')
+var version = '0.6.06'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
+
+const server = argv.server || 'foxxy'
 
 var copyFileSync = function (src, dest) {
   fs.writeFileSync(dest, fs.readFileSync(src, {
@@ -187,14 +190,33 @@ var createDatabase = function (callback) {
 }
 
 var install_service = function (service, db_name, dev = true) {
-  console.log(`Installing Foxx service [${service}]`.blue)
+  console.log(`Installing Foxx service [${service}]`.cyan)
   var dest_folder = path.join(process.cwd(), service)
   var endpoint = service.split('/')[service.split('/').length - 1]
-  var cmd = `foxx uninstall --server foxxy --database ${db_name} /${endpoint};\n`
-  cmd += `foxx install --server foxxy --database ${db_name} /${endpoint} ${dest_folder};\n`
-  if (dev) cmd += `foxx set-dev --server foxxy --database ${db_name} /${endpoint}\n`
-  console.log(cmd)
+  var cmd = `foxx uninstall --server ${server} --database ${db_name} /${endpoint};\n`
+  cmd += `foxx install --server ${server} --database ${db_name} /${endpoint} ${dest_folder};\n`
+  if (dev) cmd += `foxx set-dev --server ${server} --database ${db_name} /${endpoint}\n`
   execSync(cmd)
+}
+
+var upgrade_service = function (service, db_name, dev = true) {
+  console.log(`Upgrading Foxx service [${service}]`.cyan)
+  var dest_folder = path.join(process.cwd(), service)
+  var endpoint = service.split('/')[service.split('/').length - 1]
+  try {
+    var cmd = `foxx upgrade --server ${server} --database ${db_name} /${endpoint} ${dest_folder};\n`
+    execSync(cmd)
+    if (dev) {
+      cmd = `foxx set-dev --server ${server} --database ${db_name} /${endpoint}\n`
+      execSync(cmd)
+    }
+
+  } catch (e) {
+    // Fallback to install then
+    console.log("Then installing /" + endpoint)
+    var cmd = `foxx install --server ${server} --database ${db_name} /${endpoint} ${dest_folder};\n`
+    execSync(cmd)
+  }
 }
 
 var replaceInFile = function (filename, find, replace) {
@@ -215,96 +237,118 @@ var foxxy_welcome = `
 
 console.log(foxxy_welcome.yellow)
 console.log(('Version ' + version).yellow)
-
-if (fs.existsSync(homedir + "/.foxxrc") && fs.readFileSync(homedir + "/.foxxrc").indexOf("[server.foxxy]") >= 0) {
-  if (argv._.length == 0) {
-    console.log("Usage : foxxy <command> <options> --database db_name --user username --password secret --endpoint http+tcp://127.0.0.1:8529".green)
-    console.log("Samples :")
-    console.log("- Create a new app : foxxy new app_name --database db_name --user username --password secret --endpoint http+tcp://127.0.0.1:8529")
-    console.log("- - endpoint, username and password are not mandatory")
-    console.log("- Generate a CRUD : foxxy g crud user")
-    console.log("- Generate an Edit/Update only : foxxy g eu user")
-    console.log("- Generate a basic service & widget : foxxy g basic user")
-    console.log("- Generate a basic service only : foxxy g service user")
-    //console.log("## hcrud : a CRUD widget within a Hierachical structure (tree)")
+hasbin('foxx', function (result) {
+  if (!result) {
+    console.log("Please install foxx-cli first : npm install -g foxx-cli".red)
   } else {
-    // Create a new application
-
-    if (argv._[0] == "new") {
-      if (argv._.length == 1 || argv.database === undefined) {
-        console.log("Usage : foxxy new <app_name> --database db_name".red)
+    if (fs.existsSync(homedir + "/.foxxrc") && fs.readFileSync(homedir + "/.foxxrc").indexOf("[server.foxxy]") >= 0) {
+      if (argv._.length == 0) {
+        console.log("Usage : foxxy <command> <options> --database db_name --user username --password secret --endpoint http+tcp://127.0.0.1:8529".green)
+        console.log("Samples :")
+        console.log("- Create a new app : foxxy new app_name --database db_name --user username --password secret --endpoint http+tcp://127.0.0.1:8529")
+        console.log("- - endpoint, username and password are not mandatory")
+        console.log("- Generate a CRUD : foxxy g crud user")
+        console.log("- Generate an Edit/Update only : foxxy g eu user")
+        console.log("- Generate a basic service & widget : foxxy g basic user")
+        console.log("- Generate a basic service only : foxxy g service user")
+        //console.log("## hcrud : a CRUD widget within a Hierachical structure (tree)")
       } else {
-        createDatabase(function () {
-          var src_folder = path.join(__dirname, `../templates/${argv.theme}_app_skeleton`)
-          var dest_folder = path.join(process.cwd(), argv._[1])
+        // Create a new application
 
-          fs.stat(dest_folder, function (err, stats) {
-            if (err !== null) {
-              copyRecursiveSync(src_folder, dest_folder)
-              var dest_file = path.join(process.cwd(), `${argv._[1]}/app/index.html`)
-              replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
+        if (argv._[0] == "new") {
+          if (argv._.length == 1 || argv.database === undefined) {
+            console.log("Usage : foxxy new <app_name> --database db_name".red)
+          } else {
+            createDatabase(function () {
+              var src_folder = path.join(__dirname, `../templates/${argv.theme}_app_skeleton`)
+              var dest_folder = path.join(process.cwd(), argv._[1])
 
-              var dest_file = path.join(process.cwd(), `${argv._[1]}/app/login.html`)
-              replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
-              fs.writeFileSync(dest_folder + "/.arangodb.yml", yaml.safeDump({
-                database: argv.database,
-                username: argv.user,
-                password: argv.password,
-                endpoint: argv.endpoint
-              }))
-              fs.writeFileSync(dest_folder + "/.foxxy.yml", yaml.safeDump({
-                theme: argv.theme
-              }))
+              fs.stat(dest_folder, function (err, stats) {
+                if (err !== null) {
+                  copyRecursiveSync(src_folder, dest_folder)
+                  var dest_file = path.join(process.cwd(), `${argv._[1]}/app/index.html`)
+                  replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
 
-              if (argv.no_widgets === undefined) {
-                src_folder = path.join(__dirname, '../templates/auth/foxx/widget')
-                dest_folder = path.join(process.cwd(), argv._[1] + "/foxx/auth")
+                  var dest_file = path.join(process.cwd(), `${argv._[1]}/app/login.html`)
+                  replaceInFile(dest_file, /\{\{DBNAME\}\}/g, argv.database)
+                  fs.writeFileSync(dest_folder + "/.arangodb.yml", yaml.safeDump({
+                    database: argv.database,
+                    username: argv.user,
+                    password: argv.password,
+                    endpoint: argv.endpoint
+                  }))
+                  fs.writeFileSync(dest_folder + "/.foxxy.yml", yaml.safeDump({
+                    theme: argv.theme
+                  }))
 
-                copyRecursiveSync(src_folder, dest_folder)
-                install_service(argv._[1] + '/foxx/auth', argv.database)
-                console.log("User 'demo@foxxy.ovh' with password '" + user_password + "' created successfully".cyan)
-                console.log("App Created ! Grrrrr!".green)
+                  if (argv.no_widgets === undefined) {
+                    src_folder = path.join(__dirname, '../templates/auth/foxx/widget')
+                    dest_folder = path.join(process.cwd(), argv._[1] + "/foxx/auth")
 
-              } else {
-                console.log("App Created ! Grrrrr!".green)
-              }
-            } else {
-              console.log("Folder already exists ... aborting ... ".red)
-            }
-          })
-        });
+                    copyRecursiveSync(src_folder, dest_folder)
+                    install_service(argv._[1] + '/foxx/auth', argv.database)
+                    console.log("User 'demo@foxxy.ovh' with password '" + user_password + "' created successfully".cyan)
+                    console.log("App Created ! Grrrrr!".green)
 
+                  } else {
+                    console.log("App Created ! Grrrrr!".green)
+                  }
+                } else {
+                  console.log("Folder already exists ... aborting ... ".red)
+                }
+              })
+            });
+
+          }
+        }
+
+        if (argv._[0] == "setup") {
+          var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
+          if (argv._[1] != undefined) {
+            install_service(`foxx/${argv._[1]}`, argv.database || arangoconf.database)
+          } else {
+            fs.readdir(process.cwd() + "/foxx", function (err, files) {
+              files.forEach(function (file, index) {
+                var stats = fs.statSync(process.cwd() + "/foxx/" + file)
+                if (stats.isDirectory() && file != '_appbundles') {
+                  install_service(`foxx/${file}`, argv.database || arangoconf.database)
+                }
+              })
+            })
+          }
+        }
+
+        if (argv._[0] == "upgrade") {
+          var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
+          if (argv._[1] != undefined) {
+            upgrade_service(`foxx/${argv._[1]}`, argv.database || arangoconf.database)
+          } else {
+            fs.readdir(process.cwd() + "/foxx", function (err, files) {
+              files.forEach(function (file, index) {
+                var stats = fs.statSync(process.cwd() + "/foxx/" + file)
+                if (stats.isDirectory() && file != '_appbundles') {
+                  upgrade_service(`foxx/${file}`, argv.database || arangoconf.database)
+                }
+              })
+            })
+          }
+        }
+
+        if (argv._[0] == "g") {
+          if (argv._.length != 3) {
+            console.log("Usage : foxxy g <type> <model>".red)
+          } else {
+            generate(argv._[1], argv._[2])
+          }
+        }
       }
-    }
-
-    if (argv._[0] == "setup" || argv._[0] == "upgrade") {
-      var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
-      if (argv._[1] != undefined) {
-        install_service(`foxx/${argv._[1]}`, arangoconf.database)
-      } else {
-        fs.readdir(process.cwd() + "/foxx", function (err, files) {
-          files.forEach(function (file, index) {
-            var stats = fs.statSync(process.cwd() + "/foxx/" + file)
-            if (stats.isDirectory()) {
-              install_service(`foxx/${file}`, arangoconf.database)
-            }
-          })
-        })
-      }
-    }
-
-    if (argv._[0] == "g") {
-      if (argv._.length != 3) {
-        console.log("Usage : foxxy g <type> <model>".red)
-      } else {
-        generate(argv._[1], argv._[2])
-      }
+    } else {
+      console.log("You need to create a ~/.foxxrc file with the content below".red)
+      console.log(`[server.foxxy]
+      url=http://localhost:8529
+      username=root
+      password=`)
     }
   }
-} else {
-  console.log("You need to create a ~/.foxxrc file with the content below".red)
-  console.log(`[server.foxxy]
-  url=http://localhost:8529
-  username=root
-  password=`)
-}
+})
+

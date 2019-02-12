@@ -21,7 +21,7 @@ const queue = queues.create('mailer');
 const _settings = db.foxxy_settings.firstExample();
 
 const sessions = sessionsMiddleware({
-  storage: jwtStorage(_settings.jwt_secret_admin),
+  storage: jwtStorage(_settings.jwt_secret),
   transport: 'header'
 });
 module.context.use(sessions);

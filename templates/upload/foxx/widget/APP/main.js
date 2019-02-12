@@ -12,7 +12,7 @@ const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt')
 const request = require('@arangodb/request')
 const _settings = db._collection('foxxy_settings').firstExample()
 const sessions = sessionsMiddleware({
-  storage: jwtStorage(_settings.jwt_secret_admin),
+  storage: jwtStorage(_settings.jwt_secret),
   transport: 'header'
 })
 module.context.use(sessions)

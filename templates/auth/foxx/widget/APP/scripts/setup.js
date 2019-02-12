@@ -10,7 +10,7 @@ const uuid = crypt.genRandomAlphaNumbers(80);
 if (!db._collection(settings)) {
   db._createDocumentCollection(settings);
   db._collection(settings).save({
-    jwt_secret_admin: uuid,
+    jwt_secret: uuid,
     mailgun_apikey: "mailgun_apikey",
     mailgun_domain: "mailgun_domain",
     mailgun_from: "mailgun_from",

@@ -233,7 +233,7 @@ var foxxy_welcome = `
 ██╔══╝  ██║   ██║ ██╔██╗  ██╔██╗   ╚██╔╝
 ██║     ╚██████╔╝██╔╝ ██╗██╔╝ ██╗   ██║
 ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝
-                                          `
+`
 
 console.log(foxxy_welcome.yellow)
 console.log(('Version ' + version).yellow)

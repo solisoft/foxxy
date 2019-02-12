@@ -11,7 +11,7 @@ var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
 var hasbin = require('hasbin')
-var version = '0.6.06'
+var version = '0.6.07'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
 
@@ -25,9 +25,9 @@ var copyFileSync = function (src, dest) {
 
 /**
  * copyRecursiveSync
- * @param {string} src ; The path to the thing to copy.
- * @param {string} dest ; The path to the new copy.
- * @param {string} model ; Model's name
+ * @param {string} src ;
+ * @param {string} dest ;
+ * @param {string} model ;
  */
 var copyRecursiveSync = function (src, dest, model) {
   var exists = fs.existsSync(src)
@@ -84,7 +84,6 @@ var generate = function (action, model) {
       foxxyconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.foxxy.yml"))
     }
 
-    // First install foxx service
     var src_folder = path.join(__dirname, `../templates/${action}/foxx/widget`)
     var final_model_name = model
     if (action != "service") final_model_name = pluralize(model)
@@ -92,7 +91,7 @@ var generate = function (action, model) {
     if (action == 'cruds') service_endpoint = 'cruds'
 
     var dest_folder = process.cwd() + "/foxx/" + service_endpoint
-    copyRecursiveSync(src_folder, dest_folder, model)
+    if(!fs.existsSync(dest_folder)) copyRecursiveSync(src_folder, dest_folder, model)
 
     // Widget
     console.log("Creating widget " + model)

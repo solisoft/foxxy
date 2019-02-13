@@ -11,7 +11,7 @@ var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
 var hasbin = require('hasbin')
-var version = '0.6.07'
+var version = '0.6.08'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
 

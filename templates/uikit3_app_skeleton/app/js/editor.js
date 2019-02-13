@@ -635,6 +635,7 @@
           }
 
           if (['img'].indexOf(editObj.data('type')) >= 0) {
+            $(self).find(".editor-simplecode").show()
             $('#ace-editor-'+object_name).show()
             var mode = 'html'
 

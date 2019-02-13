@@ -36,7 +36,8 @@ require("@arangodb/aql/cache").properties({ mode: "on" })
 // { r: true, c: "1-1", n: "scss", t: "code:scss", j: joi.any(), l: "Some SCSS" },
 // { r: true, c: "1-1", n: "javascript", t: "code:javascript", j: joi.any(), l: "Some JS" },
 // { r: true, c: "1-1", n: "json", t: "code:json", j: joi.any(), l: "Some Json" },
-// { r: true, c: "1-1", n: "content", t: "html", j: joi.any(), l: "Content Editor" },
+// { r: true, c: "1-1", n: "wysiwyg", t: "wysiwyg", j: joi.string(), l: "Wysiwyg editor" },
+// { r: true, c: "1-1", n: "content", t: "html", j: joi.string(), l: "Content Editor" },
 
 const model = function() {
   return {

@@ -67,14 +67,14 @@ router.post('/:key/:type/:field', function (req, res) {
           .split('')[2].trim().replace(/"/g, ''))
         .filename
 
-      const ext = _.last(filename.split('.'))
+      const ext = _.last(filename.split('.')).toLowerCase()
       const filedest = _settings.upload_path + uuid + "." + ext
       let urldest = _settings.upload_url + uuid + "/" + ext
       fs.write(filedest, data.data)
 
       const image_exts = ['png', 'jpg', 'jpeg']
 
-      if (_settings.resize_ovh && _.include(image_exts, ext.toLowerCase())) {
+      if (_settings.resize_ovh && _.include(image_exts, ext)) {
         // upload to resize.ovh service
         var res = request.post('https://resize.ovh/upload_http', {
           form: {

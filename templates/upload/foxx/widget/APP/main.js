@@ -74,7 +74,7 @@ router.post('/:key/:type/:field', function (req, res) {
 
       const image_exts = ['png', 'jpg', 'jpeg']
 
-      if (_settings.resize_ovh && _.include(image_exts, ext)) {
+      if (_settings.resize_ovh && _.includes(image_exts, ext)) {
         // upload to resize.ovh service
         var res = request.post('https://resize.ovh/upload_http', {
           form: {

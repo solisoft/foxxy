@@ -223,12 +223,12 @@
                     type: 'POST',
                     url: "https://resize.ovh/upload_base64",
                     data: {
-                      key: 'LDMuBjhCs]cn9o3,D4bM8$8KACpsyy+ejCDig2U@ppgi(sCPzgCX^pywB%M7AoPq',
+                      key: resize_key,
                       image: base64data,
                       filename: file.name
                     },
                     success: function (data) {
-                      $(el).html('<div data-type="img" class="drag drop" data-editable="true"><img src="https://resize.ovh/r/' + data.filename + '/300"></div>')
+                      $(el).html('<div data-type="img" class="drag drop" data-editable="true"><img src="https://resize.ovh/o/' + data.filename + '></div>')
                       clear_empty_drags()
                     }
                   });
@@ -502,7 +502,6 @@
 
           var data_col = []
           $(col).find('[data-type]').each(function (z, widget) {
-            console.log(widget)
             if($(widget).data('exported') == undefined) {
 
               $(widget).data('exported', true)
@@ -608,7 +607,6 @@
 
             ace_editor.setOptions({
               maxLines: Infinity,
-              enableEmmet: mode == 'html',
               tabSize: 2,
               useSoftTabs: true
             });
@@ -625,7 +623,6 @@
 
             ace_editor.setOptions({
               maxLines: Infinity,
-              enableEmmet: mode == 'html',
               tabSize: 2,
               useSoftTabs: true
             });
@@ -643,7 +640,6 @@
 
             ace_editor.setOptions({
               maxLines: Infinity,
-              enableEmmet: mode == 'html',
               tabSize: 2,
               useSoftTabs: true
             });

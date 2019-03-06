@@ -158,28 +158,24 @@
       </li>
     </ul>
   </virtual>
-  <virtual if={!can_access}>
+  <virtual if={!can_access && loaded}>
     Sorry, you can't access this page...
   </virtual>
 
   <script>
     var self = this
     self.can_access = false
-
-    common.get(url + "/auth/whoami", function(me) {
-      self.can_access = _.includes(d.model.roles.write, me.role)
-      self.update()
-    })
+    self.loaded = false
 
     save_form(e) {
       e.preventDefault()
-      common.saveForm("form_@{{object}}", "cruds/@{{objects}}",opts.@{{object}}_id)
+      common.saveForm("form_page", "cruds/pages",opts.page_id)
     }
 
     duplicate(e) {
       UIkit.modal.confirm("Are you sure?").then(function() {
-        common.get(url + "/cruds/@{{objects}}/" + self.@{{object}}._key + "/duplicate", function(data) {
-          route('/@{{objects}}/' + data._key + '/edit')
+        common.get(url + "/cruds/pages/" + self.page._key + "/duplicate", function(data) {
+          route('/pages/' + data._key + '/edit')
           UIkit.notification({
             message : 'Successfully duplicated!',
             status  : 'success',
@@ -190,25 +186,31 @@
       }, function() {})
     }
 
-    common.get(url + "/cruds/@{{objects}}/" + opts.@{{object}}_id, function(d) {
-      self.@{{object}} = d.data
+    common.get(url + "/cruds/pages/" + opts.page_id, function(d) {
+      self.page = d.data
       self.fields = d.fields
       self.sub_models = d.fields.sub_models
       var fields = d.fields
 
       if(!_.isArray(fields)) fields = fields.model
-
-      common.buildForm(self.@{{object}}, fields, '#form_@{{object}}', '@{{objects}}', function() {
-          $(".crud").each(function(i, c) {
-          var id = $(c).attr("id")
-          riot.mount("#" + id, "@{{object}}_crud_index", { model: id,
-            fields: self.sub_models[id].fields,
-            key: self.sub_models[id].key,
-            singular: self.sub_models[id].singular,
-            columns: self.sub_models[id].columns,
-            parent_id: opts.@{{object}}_id,
-            parent_name: "@{{objects}}" })
-         })
+      common.get(url + "/auth/whoami", function(me) {
+        console.log(d)
+        self.can_access = _.includes(d.fields.roles.write, me.role)
+        self.loaded = true
+        self.update()
+        if(self.can_access)
+          common.buildForm(self.page, fields, '#form_page', 'pages', function() {
+            $(".crud").each(function(i, c) {
+            var id = $(c).attr("id")
+            riot.mount("#" + id, "page_crud_index", { model: id,
+              fields: self.sub_models[id].fields,
+              key: self.sub_models[id].key,
+              singular: self.sub_models[id].singular,
+              columns: self.sub_models[id].columns,
+              parent_id: opts.page_id,
+              parent_name: "pages" })
+          })
+        })
       })
     })
 
@@ -217,7 +219,6 @@
       $(".select_mlist").select2()
       $(".select_tag").select2({ tags: true })
     })
-  </script>
 </@{{object}}_edit>
 
 <@{{object}}_new>
@@ -226,28 +227,31 @@
     <form onsubmit="{ save_form }" class="uk-form" id="form_new_@{{object}}">
     </form>
   </virtual>
-  <virtual if={!can_access}>
+  <virtual if={!can_access && loaded}>
     Sorry, you can't access this page...
   </virtual>
   <script>
     var self = this
     self.can_access = false
+    self.loaded = false
 
     save_form(e) {
       e.preventDefault()
       common.saveForm("form_new_@{{object}}", "cruds/@{{objects}}")
     }
 
-    common.get(url + "/auth/whoami", function(me) {
-      self.can_access = _.includes(d.model.roles.write, me.role)
-      self.update()
-    })
-
     common.get(url + "/cruds/@{{objects}}/fields", function(d) {
-      // Ignore sub models if any
-      var fields = d.fields
-      if(!_.isArray(fields)) fields = fields.model
-      common.buildForm({}, fields, '#form_new_@{{object}}', '@{{objects}}');
+      common.get(url + "/auth/whoami", function(me) {
+        self.can_access = _.includes(d.fields.roles.write, me.role)
+        self.loaded = true
+        self.update()
+        if(self.can_access) {
+          // Ignore sub models if any
+          var fields = d.fields
+          if(!_.isArray(fields)) fields = fields.model
+          common.buildForm({}, fields, '#form_new_@{{object}}', '@{{objects}}');
+        }
+      })
     })
 
     this.on('updated', function() {
@@ -280,9 +284,9 @@
           <th width="70"></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="list">
         <tr each={ row in data } >
-          <td if={sortable}><i class="fas fa-grip-vertical"></i></td>
+          <td if={sortable}><i class="fas fa-grip-vertical handle"></i></td>
           <td each={ col in cols } class="{col.class}">
             <virtual if={ col.toggle == true } >
               <virtual if={ col.tr == true }><a onclick={toggleField} data-key="{row._key}">{col.values ? col.values[row[col.name][locale]] : _.get(row,col.name)[locale]}</a></virtual>
@@ -320,6 +324,9 @@
   <virtual if={!can_access && loaded}>
     Sorry, you can't access this page...
   </virtual>
+  <style>
+    .handle { cursor: move; }
+  </style>
   <script>
 
     var self        = this

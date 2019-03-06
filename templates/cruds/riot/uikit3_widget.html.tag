@@ -1,6 +1,8 @@
 <@{{object}}_crud_index>
 
-  <a href="#" class="uk-button uk-button-small uk-button-default" onclick={ new_item }>New { opts.singular }</a>
+  <a href="#" class="uk-button uk-button-small uk-button-default" onclick={ new_item }>
+    <i class="fas fa-plus"></i> New { opts.singular }
+  </a>
 
   <table class="uk-table uk-table-striped" if={data.length > 0}>
     <thead>
@@ -18,8 +20,8 @@
           <virtual if={ col.tr != true }>{_.get(row,col.name)}</virtual>
         </td>
         <td class="uk-text-center" width="110">
-          <a onclick={edit} class="uk-button uk-button-primary uk-button-small" uk-icon="icon: pencil"></a>
-          <a onclick={ destroy_object } class="uk-button uk-button-danger uk-button-small" uk-icon="icon: trash"></a>
+          <a onclick={edit} class="uk-button uk-button-primary uk-button-small"><i class="fas fa-edit"></i></a>
+          <a onclick={ destroy_object } class="uk-button uk-button-danger uk-button-small" ><i class="fas fa-trash-alt"></i></a>
         </td>
       </tr>
     </tbody>
@@ -32,7 +34,7 @@
   </ul>
 
   <script>
-    var _this = this
+    var self = this
     this.data = []
     new_item(e) {
       e.preventDefault()
@@ -41,11 +43,11 @@
 
     this.loadPage = function(pageIndex) {
       common.get(url + "/cruds/sub/"+opts.parent_id+"/"+opts.id+"/"+opts.key+"/page/"+pageIndex+"/"+per_page, function(d) {
-        _this.data = d.data[0].data
-        _this.cols = _.map(common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
-        if(opts.columns) _this.cols = opts.columns
-        _this.count = d.data[0].count
-        _this.update()
+        self.data = d.data[0].data
+        self.cols = _.map(common.array_diff(common.keys(self.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
+        if(opts.columns) self.cols = opts.columns
+        self.count = d.data[0].count
+        self.update()
       })
     }
     this.loadPage(1)
@@ -58,21 +60,21 @@
 
     nextPage(e) {
       e.preventDefault()
-      _this.page += 1
-      _this.loadPage(_this.page + 1)
+      self.page += 1
+      self.loadPage(self.page + 1)
     }
 
     previousPage(e) {
       e.preventDefault()
-      _this.page -= 1
-      _this.loadPage(_this.page + 1)
+      self.page -= 1
+      self.loadPage(self.page + 1)
     }
 
     destroy_object(e) {
       e.preventDefault()
       UIkit.modal.confirm("Are you sure?").then(function() {
         common.delete(url + "/cruds/" + opts.id + "/" + e.item.row._key, function() {
-          _this.loadPage(1)
+          self.loadPage(1)
         })
       }, function() {})
     }
@@ -95,11 +97,11 @@
       common.saveForm(opts.id+'_crud_@{{object}}', "cruds/sub/"+opts.parent_name+"/"+ opts.id+"/"+opts.element_id, "", opts)
     }
 
-    var _this = this;
+    var self = this;
     common.get(url + "/cruds/" + opts.id + "/" + opts.element_id, function(d) {
-      _this.@{{object}} = d.data
+      self.@{{object}} = d.data
 
-      common.buildForm(_this.@{{object}}, opts.fields, '#'+opts.id+'_crud_@{{object}}')
+      common.buildForm(self.@{{object}}, opts.fields, '#'+opts.id+'_crud_@{{object}}')
     })
     this.on('updated', function() {
       $(".select_list").select2()
@@ -115,7 +117,7 @@
   </form>
 
   <script>
-    var _this = this
+    var self = this
     this.crud = {}
     this.crud[opts.key] = opts.parent_id
 
@@ -125,7 +127,7 @@
     }
 
     this.on('mount', function() {
-      common.buildForm(_this.crud, opts.fields, '#'+opts.id+'_crud_@{{object}}')
+      common.buildForm(self.crud, opts.fields, '#'+opts.id+'_crud_@{{object}}')
     })
 
     save_form(e) {
@@ -138,25 +140,37 @@
 </@{{object}}_crud_new>
 
 <@{{object}}_edit>
+  <virtual if={can_access}>
+    <ul uk-tab>
+      <li><a href="#">@{{objects}}</a></li>
+      <li each={ i, k in sub_models }><a href="#">{ k }</a></li>
+    </ul>
 
-  <ul uk-tab>
-    <li><a href="#">@{{objects}}</a></li>
-    <li each={ i, k in sub_models }><a href="#">{ k }</a></li>
-  </ul>
-
-  <ul class="uk-switcher uk-margin">
-    <li>
-      <h3>Editing @{{object}}</h3>
-      <form onsubmit="{ save_form }" class="uk-form" id="form_@{{object}}">
-      </form>
-      <a class="uk-button uk-button-secondary" onclick="{ duplicate }">Duplicate</a>
-    </li>
-    <li each={ i, k in sub_models }>
-      <div id={ k } class="crud"></div>
-    </li>
-  </ul>
+    <ul class="uk-switcher uk-margin">
+      <li>
+        <h3>Editing @{{object}}</h3>
+        <form onsubmit="{ save_form }" class="uk-form" id="form_@{{object}}">
+        </form>
+        <a class="uk-button uk-button-secondary" onclick="{ duplicate }">Duplicate</a>
+      </li>
+      <li each={ i, k in sub_models }>
+        <div id={ k } class="crud"></div>
+      </li>
+    </ul>
+  </virtual>
+  <virtual if={!can_access}>
+    Sorry, you can't access this page...
+  </virtual>
 
   <script>
+    var self = this
+    self.can_access = false
+
+    common.get(url + "/auth/whoami", function(me) {
+      self.can_access = _.includes(d.model.roles.write, me.role)
+      self.update()
+    })
+
     save_form(e) {
       e.preventDefault()
       common.saveForm("form_@{{object}}", "cruds/@{{objects}}",opts.@{{object}}_id)
@@ -164,7 +178,7 @@
 
     duplicate(e) {
       UIkit.modal.confirm("Are you sure?").then(function() {
-        common.get(url + "/cruds/@{{objects}}/" + _this.@{{object}}._key + "/duplicate", function(data) {
+        common.get(url + "/cruds/@{{objects}}/" + self.@{{object}}._key + "/duplicate", function(data) {
           route('/@{{objects}}/' + data._key + '/edit')
           UIkit.notification({
             message : 'Successfully duplicated!',
@@ -176,23 +190,22 @@
       }, function() {})
     }
 
-    var _this = this;
     common.get(url + "/cruds/@{{objects}}/" + opts.@{{object}}_id, function(d) {
-      _this.@{{object}} = d.data
-      _this.fields = d.fields
-      _this.sub_models = d.fields.sub_models
+      self.@{{object}} = d.data
+      self.fields = d.fields
+      self.sub_models = d.fields.sub_models
       var fields = d.fields
 
       if(!_.isArray(fields)) fields = fields.model
 
-      common.buildForm(_this.@{{object}}, fields, '#form_@{{object}}', '@{{objects}}', function() {
+      common.buildForm(self.@{{object}}, fields, '#form_@{{object}}', '@{{objects}}', function() {
           $(".crud").each(function(i, c) {
           var id = $(c).attr("id")
           riot.mount("#" + id, "@{{object}}_crud_index", { model: id,
-            fields: _this.sub_models[id].fields,
-            key: _this.sub_models[id].key,
-            singular: _this.sub_models[id].singular,
-            columns: _this.sub_models[id].columns,
+            fields: self.sub_models[id].fields,
+            key: self.sub_models[id].key,
+            singular: self.sub_models[id].singular,
+            columns: self.sub_models[id].columns,
             parent_id: opts.@{{object}}_id,
             parent_name: "@{{objects}}" })
          })
@@ -208,14 +221,27 @@
 </@{{object}}_edit>
 
 <@{{object}}_new>
-  <h3>Creating @{{object}}</h3>
-  <form onsubmit="{ save_form }" class="uk-form" id="form_new_@{{object}}">
-  </form>
+  <virtual if={can_access}>
+    <h3>Creating @{{object}}</h3>
+    <form onsubmit="{ save_form }" class="uk-form" id="form_new_@{{object}}">
+    </form>
+  </virtual>
+  <virtual if={!can_access}>
+    Sorry, you can't access this page...
+  </virtual>
   <script>
+    var self = this
+    self.can_access = false
+
     save_form(e) {
       e.preventDefault()
       common.saveForm("form_new_@{{object}}", "cruds/@{{objects}}")
     }
+
+    common.get(url + "/auth/whoami", function(me) {
+      self.can_access = _.includes(d.model.roles.write, me.role)
+      self.update()
+    })
 
     common.get(url + "/cruds/@{{objects}}/fields", function(d) {
       // Ignore sub models if any
@@ -233,75 +259,93 @@
 </@{{object}}_new>
 
 <@{{objects}}>
-  <div class="uk-float-right">
-    <a href="#@{{objects}}/new" class="uk-button uk-button-small uk-button-default">New @{{object}}</a>
-    <a if={ export } onclick="{ export_data }" class="uk-button uk-button-small uk-button-primary">Export CSV</a>
-  </div>
-  <h3>Listing @{{objects}}</h3>
-
-  <form onsubmit={filter} class="uk-margin-top">
-    <div class="uk-inline uk-width-1-1">
-      <span class="uk-form-icon" uk-icon="icon: search"></span>
-      <input type="text" ref="term" id="term" class="uk-input" autocomplete="off">
+  <virtual if={can_access}>
+    <div class="uk-float-right">
+      <a href="#@{{objects}}/new" class="uk-button uk-button-small uk-button-default"><i class="fas fa-plus"></i> New @{{object}}</a>
+      <a if={ export } onclick="{ export_data }" class="uk-button uk-button-small uk-button-primary"><i class="fas fa-file-export"></i> Export CSV</a>
     </div>
-  </form>
-  <table class="uk-table uk-table-striped">
-    <thead>
-      <tr>
-        <th each={ col in cols }>{col.name == undefined ? col : col.label === undefined ? col.name : col.label}</th>
-        <th width="70"></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr each={ row in data } >
-        <td each={ col in cols } class="{col.class}">
-          <virtual if={ col.toggle == true } >
-            <virtual if={ col.tr == true }><a onclick={toggleField} data-key="{row._key}">{col.values ? col.values[row[col.name][locale]] : _.get(row,col.name)[locale]}</a></virtual>
-            <virtual if={ col.tr != true }><a onclick={toggleField} data-key="{row._key}">{col.values ? col.values[row[col.name]] : _.get(row,col.name) }</a></virtual>
-          </virtual>
+    <h3>Listing @{{objects}}</h3>
 
-          <virtual if={ col.toggle != true } >
-            <virtual if={ col.type == "image" }>
-              <img src="{_.get(row,col.name)[locale]} " style="height:25px">
+    <form onsubmit={filter} class="uk-margin-top">
+      <div class="uk-inline uk-width-1-1">
+        <span class="uk-form-icon" uk-icon="icon: search"></span>
+        <input type="text" ref="term" id="term" class="uk-input" autocomplete="off">
+      </div>
+    </form>
+    <table class="uk-table uk-table-striped">
+      <thead>
+        <tr>
+          <th if={sortable} width="20"></th>
+          <th each={ col in cols }>{col.name == undefined ? col : col.label === undefined ? col.name : col.label}</th>
+          <th width="70"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr each={ row in data } >
+          <td if={sortable}><i class="fas fa-grip-vertical"></i></td>
+          <td each={ col in cols } class="{col.class}">
+            <virtual if={ col.toggle == true } >
+              <virtual if={ col.tr == true }><a onclick={toggleField} data-key="{row._key}">{col.values ? col.values[row[col.name][locale]] : _.get(row,col.name)[locale]}</a></virtual>
+              <virtual if={ col.tr != true }><a onclick={toggleField} data-key="{row._key}">{col.values ? col.values[row[col.name]] : _.get(row,col.name) }</a></virtual>
             </virtual>
-            <virtual if={ col.type != "image" }>
-              { calc_value(row, col, locale) }
-            </virtual>
-          </virtual>
-        </td>
-        <td class="uk-text-center" width="110">
-          <a onclick={edit} class="uk-button uk-button-primary uk-button-small" uk-icon="icon: pencil"></a>
-          <a onclick={ destroy_object } class="uk-button uk-button-danger uk-button-small" uk-icon="icon: trash"></a>
-        </td>
-      </tr>
-    </tbody>
 
-  </table>
-  <ul class="uk-pagination">
-    <li if={ page > 0 } ><a onclick={ previousPage }><span class="uk-margin-small-right" uk-pagination-previous></span> Previous</a></li>
-    <li if={ (page + 1) * perpage < count} class="uk-margin-auto-left"><a onclick={ nextPage }>Next <span class="uk-margin-small-left" uk-pagination-next></span></a></li>
-  </ul>
-  Per Page : {perpage}
-  <a onclick={ setPerPage } class="uk-label">25</a>
-  <a onclick={ setPerPage } class="uk-label">50</a>
-  <a onclick={ setPerPage } class="uk-label">100</a>
+            <virtual if={ col.toggle != true } >
+              <virtual if={ col.type == "image" }>
+                <img src="{_.get(row,col.name)[locale]} " style="height:25px">
+              </virtual>
+              <virtual if={ col.type != "image" }>
+                { calc_value(row, col, locale) }
+              </virtual>
+            </virtual>
+          </td>
+          <td class="uk-text-center" width="110">
+            <a onclick={edit} class="uk-button uk-button-primary uk-button-small"><i class="fas fa-edit"></i></a>
+            <a onclick={ destroy_object } class="uk-button uk-button-danger uk-button-small" ><i class="fas fa-trash-alt"></i></a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ul class="uk-pagination">
+      <li if={ page > 0 } ><a onclick={ previousPage }><span class="uk-margin-small-right" uk-pagination-previous></span> Previous</a></li>
+      <li if={ (page + 1) * perpage < count} class="uk-margin-auto-left"><a onclick={ nextPage }>Next <span class="uk-margin-small-left" uk-pagination-next></span></a></li>
+    </ul>
+    Per Page : {perpage > 100000 ? 'ALL' : perpage}
+    <a onclick={ setPerPage } class="uk-label">25</a>
+    <a onclick={ setPerPage } class="uk-label">50</a>
+    <a onclick={ setPerPage } class="uk-label">100</a>
+    <a onclick={ setPerPage } class="uk-label">500</a>
+    <a onclick={ setPerPage } class="uk-label">1000</a>
+    <a onclick={ setPerPage } class="uk-label">ALL</a>
+  </virtual>
+  <virtual if={!can_access && loaded}>
+    Sorry, you can't access this page...
+  </virtual>
   <script>
 
-    var _this     = this
-    this.page     = 0
-    this.perpage  = per_page
-    this.locale   = window.localStorage.getItem('foxx-locale')
-    this.data     = []
-    this.export   = false
+    var self        = this
+    this.page       = 0
+    this.perpage    = per_page
+    this.locale     = window.localStorage.getItem('foxx-locale')
+    this.data       = []
+    this.export     = false
+    this.can_access = false
+    this.sortable   = false
+    this.loaded     = false
 
     this.loadPage = function(pageIndex) {
+      self.loaded = false
       common.get(url + "/cruds/@{{objects}}/page/"+pageIndex+"/"+this.perpage, function(d) {
-        _this.data = d.data[0].data
-        _this.export = !!d.model.export
-        _this.cols = _.map(common.array_diff(common.keys(_this.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
-        if(d.model.columns) _this.cols = d.model.columns
-        _this.count = d.data[0].count
-        _this.update()
+        self.data = d.data[0].data
+        self.export = !!d.model.export
+        self.cols = _.map(common.array_diff(common.keys(self.data[0]), ["_id", "_key", "_rev"]), function(v) { return { name: v }})
+        if(d.model.columns) self.cols = d.model.columns
+        self.count = d.data[0].count
+        self.sortable = !!d.model.sortable
+        common.get(url + "/auth/whoami", function(me) {
+          self.loaded = true
+          self.can_access = d.model.roles === undefined || _.includes(d.model.roles.read, me.role)
+          self.update()
+        })
       })
     }
     this.loadPage(1)
@@ -320,16 +364,16 @@
     ////////////////////////////////////////////////////////////////////////////
     filter(e) {
       e.preventDefault();
-      if(_this.refs.term.value != "") {
+      if(self.refs.term.value != "") {
         $(".uk-form-icon i").attr("class", "uk-icon-spin uk-icon-spinner")
-        common.get(url + "/cruds/@{{objects}}/search/"+_this.refs.term.value, function(d) {
-          _this.data = d.data
+        common.get(url + "/cruds/@{{objects}}/search/"+self.refs.term.value, function(d) {
+          self.data = d.data
           $(".uk-form-icon i").attr("class", "uk-icon-search")
-          _this.update()
+          self.update()
         })
       }
       else {
-        _this.loadPage(1)
+        self.loadPage(1)
       }
     }
 
@@ -340,21 +384,21 @@
 
     ////////////////////////////////////////////////////////////////////////////
     nextPage(e) {
-      _this.page += 1
-      _this.loadPage(_this.page + 1)
+      self.page += 1
+      self.loadPage(self.page + 1)
     }
 
     ////////////////////////////////////////////////////////////////////////////
     previousPage(e) {
-      _this.page -= 1
-      _this.loadPage(_this.page + 1)
+      self.page -= 1
+      self.loadPage(self.page + 1)
     }
 
     ////////////////////////////////////////////////////////////////////////////
     destroy_object(e) {
       UIkit.modal.confirm("Are you sure?").then(function() {
         common.delete(url + "/cruds/@{{objects}}/" + e.item.row._key, function() {
-          _this.loadPage(_this.page)
+          self.loadPage(self.page)
         })
       }, function() {})
     }
@@ -372,7 +416,9 @@
     ////////////////////////////////////////////////////////////////////////////
     setPerPage(e) {
       e.preventDefault()
-      this.perpage = parseInt(e.srcElement.innerText)
+      var perpage = parseInt(e.srcElement.innerText)
+      if(e.srcElement.innerText == 'ALL') perpage = 1000000000;
+      this.perpage = perpage
       this.loadPage(1)
     }
 
@@ -390,6 +436,24 @@
         document.body.removeChild(link)
       })
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+    this.on('updated', function() {
+      if(self.sortable) {
+        var el = document.getElementById('list');
+        var sortable = new Sortable(el, {
+          animation: 150,
+          ghostClass: 'blue-background-class',
+          handle: '.fa-grip-vertical',
+          onSort: function (/**Event*/evt) {
+            common.put(
+              url + 'cruds/@{{objects}}/orders/' + evt.oldIndex + "/" + evt.newIndex, {},
+              function() {}
+            )
+          },
+        });
+      }
+    })
   </script>
 </@{{objects}}>
 

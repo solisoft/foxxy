@@ -63,7 +63,8 @@ module.context.use(function (req, res, next) {
 
 // -----------------------------------------------------------------------------
 router.get('/:service/page/:page/:perpage', function (req, res) {
-  const order = models()[req.pathParams.service].sort || 'SORT doc._key DESC'
+  let order = models()[req.pathParams.service].sort || 'SORT doc._key DESC'
+  if(models()[req.pathParams.service].sortable) order = 'SORT doc.order ASC'
   let includes = ''
   let include_merge = ''
   if(models()[req.pathParams.service].includes) {
@@ -251,6 +252,38 @@ router.delete('/:service/:id', function (req, res) {
 })
 .header('X-Session-Id')
 .description('delete an object.');
+// -----------------------------------------------------------------------------
+router.put('/:service/orders/:from/:to', function (req, res) {
+  const collection = db._collection(req.pathParams.service)
+  const from = parseInt(req.pathParams.from)
+  const to = parseInt(req.pathParams.to)
+
+  var doc = db._query(
+    `FOR doc IN @@collection SORT doc.order ASC LIMIT @pos, 1 RETURN doc`,
+    { "@collection": req.pathParams.service, pos: parseInt(req.pathParams.from) }
+  ).toArray()[0]
+
+  if (from < to) {
+    db._query(
+      `FOR doc IN @@collection FILTER doc.order <= @to and doc.order >= @from and doc._key != @key
+      UPDATE({ _key: doc._key, order: doc.order - 1 }) IN @@collection`,
+      { "@collection": req.pathParams.service, from, to, key: doc._key }
+    )
+  } else {
+    db._query(
+      `FOR doc IN @@collection FILTER doc.order <= @from and doc.order >= @to and doc._key != @key
+      UPDATE({ _key: doc._key, order: doc.order + 1 }) IN @@collection`,
+      { "@collection": req.pathParams.service, from, to, key: doc._key }
+    )
+  }
+
+  collection.update(doc._key, { order: to })
+
+  res.send({ success: true });
+})
+  .header('foxx-locale')
+  .header('X-Session-Id')
+  .description('Swap 2 items');
 
 // Sub
 // -----------------------------------------------------------------------------

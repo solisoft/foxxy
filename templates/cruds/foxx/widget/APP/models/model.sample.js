@@ -51,6 +51,7 @@ const model = function() {
     //  }, ...
     //],
     //slug: ["title"],
+    //sortable: false,
     //sort: "SORT doc.order ASC",
     //search: ["title", "barcode", "desc"],
     //includes: {

@@ -4,13 +4,8 @@
     <meta charset="UTF-8">
     <title>Foxxy CRUD</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.25/css/uikit.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css">
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/pell/0.7.0/pell.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.13.0/ui/trumbowyg.min.css" />
-
+    <link rel="stylesheet" href="DIGEST(css/vendors.css)">
     <link rel="stylesheet" href="DIGEST(css/css.css)">
   </head>
   <body>
@@ -23,7 +18,7 @@
       <div class="uk-navbar-nav-left uk-visible@m">
         <ul class="uk-navbar-nav">
           <li class="uk-active"><a href="#">Foxxy</a></li>
-        <!-- item_menu -->
+          <!-- item_menu -->
         </ul>
       </div>
       <div class="uk-navbar-right">
@@ -47,6 +42,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.13.0/trumbowyg.min.js"></script>
 
     <script>
+      var Sortable = require('vendors/Sortable.min.js')
 
       var url = "http://localhost:8529/_db/{{DBNAME}}/"
       var resize_key = "<insert a valid key here>"

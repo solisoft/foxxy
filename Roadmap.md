@@ -5,6 +5,7 @@
 - Foxx-manager replaced by foxx-cli
 - Remove needs of arangosh and use arangojs instead
 - New HTML widget
+- Sortable
 
 # 0.5.x
 

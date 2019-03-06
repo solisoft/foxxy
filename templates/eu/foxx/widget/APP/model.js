@@ -36,9 +36,14 @@ require("@arangodb/aql/cache").properties({ mode: "on" })
 
 const load_fields = function() {
 
-  return [
+  return {
     // Define your model here ...
-  ]
+    //fields: [
+    //],
+    //roles: {
+    //  write: ['designer', 'developper']
+    //}
+  }
 
 }
 

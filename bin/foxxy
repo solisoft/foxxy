@@ -11,7 +11,7 @@ var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
 var hasbin = require('hasbin')
-var version = '0.6.10'
+var version = '0.6.11'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
 
@@ -66,6 +66,24 @@ var deleteFolderRecursive = function (path) {
   }
 }
 
+var upgrade_view = function (action, model) {
+  var foxxyconf = { theme: "uikit3" }
+  if (fs.existsSync(process.cwd() + "/.foxxy.yml")) {
+    foxxyconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.foxxy.yml"))
+  }
+  var final_model_name = model
+  if (action != 'service') final_model_name = pluralize(model)
+
+  try {
+    var src_file = path.join(__dirname, `../templates/${action}/riot/${foxxyconf.theme}_widget.html.tag`)
+    var dest_file = path.join(process.cwd(), `app/widgets/${final_model_name}.html.tag`)
+    copyFileSync(src_file, dest_file)
+    replaceInFile(dest_file, /@\{\{object\}\}/g, model)
+    replaceInFile(dest_file, /@\{\{objects\}\}/g, final_model_name)
+  } catch (e) {}
+
+}
+
 var generate = function (action, model) {
   if (["crud", "eu", "basic", "service", "upload", "cruds", "model"].indexOf(action) < 0) throw "No action found ! Please check manual..."
   if (action == "model") {
@@ -77,16 +95,14 @@ var generate = function (action, model) {
     if (action == 'crud') action = 'cruds' // Ignore old crud method
     if (action == "upload") model = "upload"
     var arangoconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.arangodb.yml"))
-    var foxxyconf = {
-      theme: "uikit2"
-    }
+    var foxxyconf = { theme: "uikit3" }
     if (fs.existsSync(process.cwd() + "/.foxxy.yml")) {
       foxxyconf = yaml.safeLoad(fs.readFileSync(process.cwd() + "/.foxxy.yml"))
     }
 
     var src_folder = path.join(__dirname, `../templates/${action}/foxx/widget`)
     var final_model_name = model
-    if (action != "service") final_model_name = pluralize(model)
+    if (action != 'service') final_model_name = pluralize(model)
     var service_endpoint = final_model_name;
     if (action == 'cruds') service_endpoint = 'cruds'
 
@@ -338,6 +354,14 @@ hasbin('foxx', function (result) {
             console.log("Usage : foxxy g <type> <model>".red)
           } else {
             generate(argv._[1], argv._[2])
+          }
+        }
+
+        if (argv._[0] == "u") {
+          if (argv._.length != 3) {
+            console.log("Usage : foxxy u <type> <model>".red)
+          } else {
+            upgrade_view(argv._[1], argv._[2])
           }
         }
       }

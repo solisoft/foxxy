@@ -7,6 +7,11 @@ function create_collection(collection) {
     type: 'fulltext',
     fields: ['search.en']
   });
+
+  db._collection(collection).ensureIndex({
+    type: 'skiplist',
+    fields: ['order']
+  });
 }
 
 /*@{{setup}}*/

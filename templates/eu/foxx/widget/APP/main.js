@@ -2,7 +2,7 @@
 
 const db = require('@arangodb').db;
 const joi = require('joi');
-const fields = require('./model.js');
+const model = require('./model.js')();
 const config = require('./config.js')();
 const _ = require('lodash');
 
@@ -59,7 +59,7 @@ var fieldsToData = function(fields, body, headers) {
 }
 
 var schema = {}
-_.each(fields(), function(f) {schema[f.n] = f.j })
+_.each(model.fields, function(f) {schema[f.n] = f.j })
 
 // Comment this block if you want to avoid authorization
 module.context.use(function (req, res, next) {
@@ -70,7 +70,7 @@ module.context.use(function (req, res, next) {
 
 // -----------------------------------------------------------------------------
 router.get('/', function (req, res) {
-  res.send({ fields: fields(), data: db._query(`FOR doc IN @{{objects}} RETURN doc`).toArray()[0] });
+  res.send({ fields: model.fields, roles: model.roles, data: db._query(`FOR doc IN @{{objects}} RETURN doc`).toArray()[0] });
 })
 .header('X-Session-Id')
 .description(`Returns first @{{objects}}`);
@@ -88,11 +88,11 @@ router.get('/check_form', function (req, res) {
 router.post('/:id', function (req, res) {
   const body = JSON.parse(req.body.toString())
   var obj = db.@{{objects}}.document(req.pathParams.id)
-  var data = fieldsToData(fields(), body, req.headers)
+  var data = fieldsToData(model.fields, body, req.headers)
   var errors = []
   try {
     var schema = {}
-    _.each(fields(), function(f) {schema[f.n] = f.j })
+    _.each(model.fields, function(f) {schema[f.n] = f.j })
     errors = joi.validate(body, schema, { abortEarly: false }).error.details
   }
   catch(e) {}

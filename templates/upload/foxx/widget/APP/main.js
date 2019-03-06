@@ -63,9 +63,9 @@ router.post('/:key/:type/:field', function (req, res) {
     let docs = []
     _.each(req.body, function (data) {
       const uuid = crypt.genRandomAlphaNumbers(40)
-      let filename = querystring.parse(data.headers["Content-Disposition"]
-          .split('')[2].trim().replace(/"/g, ''))
-        .filename
+      let filename = querystring.parse(
+        data.headers["Content-Disposition"].split(';')[2].trim().replace(/"/g, '')
+      ).filename
 
       const ext = _.last(filename.split('.')).toLowerCase()
       const filedest = _settings.upload_path + uuid + "." + ext

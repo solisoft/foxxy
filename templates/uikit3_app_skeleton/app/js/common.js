@@ -21,7 +21,8 @@ var Common = {
     editor.getSession().setMode(mode);
     editor.setOptions({
       maxLines: Infinity,
-      enableEmmet: mode == "ace/mode/html",
+      //enableEmmet: mode == "ace/mode/html",
+      theme: 'ace/theme/twilight',
       tabSize: 2, useSoftTabs: true
     });
     editor.getSession().setUseWrapMode(true);
@@ -43,7 +44,7 @@ var Common = {
     var wysiwygs = []
     var html_editors = []
     fields.forEach(function(l, i) {
-
+      console.log(l)
       if (l.h !== undefined) {
         html += '<div class="uk-grid uk-grid-small uk-margin-top"><h3>'+ l.h +'</h3></div>'
       }
@@ -63,8 +64,10 @@ var Common = {
           html += '<label for="" class="uk-form-label">'+ title +'</label>'
 
         var value = obj[l.n]
-        if(l.tr == true && obj[l.n]) value = obj[l.n][window.localStorage.getItem('foxx-locale')]
-        if(value === undefined) value = ""
+
+        if(l.tr && obj[l.n]) value = obj[l.n][window.localStorage.getItem('foxx-locale')]
+        if (value === undefined) value = ""
+
         //value = escape(value)
         if(l.t.match(/string/)) {
           html += '<input type="'+(l.t.split(":").length == 2 ? l.t.split(":")[1] : "text")+'" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value=""><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
@@ -93,7 +96,8 @@ var Common = {
           html += '<div id="editor_'+l.n+'" class="editor" style="'+l.s+'"></div>'
           editors.push(["editor_"+l.n, "ace/mode/" + l.t.split(":")[1], l.n])
         }
-        if(l.t == 'html') {
+        if (l.t == 'html') {
+          if(value != "") value = JSON.parse(value)
           html += '<input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="">'
           html += '<div id="html_editor_'+l.n+'" data-name="'+l.n+'" class="html_editor" style="'+l.s+'"></div>'
           html_editors.push([l.n, value])
@@ -180,14 +184,14 @@ var Common = {
       html += '<a href="#'+ back_str +'" class="uk-button">Back</a> '
     }
     html += '<input type="submit" class="uk-button uk-button-primary" value="Save" /></div></div><hr>'
-
     $(formId).html(html)
 
     values.forEach(function(v, i) {
       $(formId+" #" + v[0]).val(v[1])
     })
-    html_editors.forEach(function(e, i) {
-      $('#html_editor_'+e[0]).contentEditor({ value: e[1].html || '' })
+    html_editors.forEach(function (e, i) {
+      $('#html_editor_' + e[0]).contentEditor({ value: e[1].html || '' })
+      $("#" + e[0]).val(JSON.stringify(e[1]))
     })
     editors.forEach(function(e, i) {
       _this.startEditor(e[0], e[1], e[2])

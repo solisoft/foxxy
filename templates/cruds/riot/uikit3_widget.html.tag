@@ -169,13 +169,13 @@
 
     save_form(e) {
       e.preventDefault()
-      common.saveForm("form_page", "cruds/pages",opts.page_id)
+      common.saveForm("form_@{{object}}", "cruds/@{{objects}}",opts.@{{object}}_id)
     }
 
     duplicate(e) {
       UIkit.modal.confirm("Are you sure?").then(function() {
-        common.get(url + "/cruds/pages/" + self.page._key + "/duplicate", function(data) {
-          route('/pages/' + data._key + '/edit')
+        common.get(url + "/cruds/@{{objects}}/" + self.@{{object}}._key + "/duplicate", function(data) {
+          route('/@{{objects}}/' + data._key + '/edit')
           UIkit.notification({
             message : 'Successfully duplicated!',
             status  : 'success',
@@ -186,29 +186,28 @@
       }, function() {})
     }
 
-    common.get(url + "/cruds/pages/" + opts.page_id, function(d) {
-      self.page = d.data
+    common.get(url + "/cruds/@{{objects}}/" + opts.@{{object}}_id, function(d) {
+      self.@{{object}} = d.data
       self.fields = d.fields
       self.sub_models = d.fields.sub_models
       var fields = d.fields
 
       if(!_.isArray(fields)) fields = fields.model
       common.get(url + "/auth/whoami", function(me) {
-        console.log(d)
-        self.can_access = _.includes(d.fields.roles.write, me.role)
+        self.can_access = d.fields.roles === undefined || _.includes(d.fields.roles.write, me.role)
         self.loaded = true
         self.update()
         if(self.can_access)
-          common.buildForm(self.page, fields, '#form_page', 'pages', function() {
+          common.buildForm(self.@{{object}}, fields, '#form_@{{object}}', '@{{objects}}', function() {
             $(".crud").each(function(i, c) {
             var id = $(c).attr("id")
-            riot.mount("#" + id, "page_crud_index", { model: id,
+            riot.mount("#" + id, "@{{object}}_crud_index", { model: id,
               fields: self.sub_models[id].fields,
               key: self.sub_models[id].key,
               singular: self.sub_models[id].singular,
               columns: self.sub_models[id].columns,
-              parent_id: opts.page_id,
-              parent_name: "pages" })
+              parent_id: opts.@{{object}}_id,
+              parent_name: "@{{objects}}" })
           })
         })
       })
@@ -242,7 +241,7 @@
 
     common.get(url + "/cruds/@{{objects}}/fields", function(d) {
       common.get(url + "/auth/whoami", function(me) {
-        self.can_access = _.includes(d.fields.roles.write, me.role)
+        self.can_access = d.fields.roles === undefined || _.includes(d.fields.roles.write, me.role)
         self.loaded = true
         self.update()
         if(self.can_access) {

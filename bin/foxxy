@@ -11,7 +11,7 @@ var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
 var hasbin = require('hasbin')
-var version = '0.6.13'
+var version = '0.6.14'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
 
@@ -224,12 +224,16 @@ var upgrade_service = function (service, db_name, dev = true) {
     if (dev) {
       cmd = `foxx set-dev --server ${server} --database ${db_name} /${endpoint}\n`
       execSync(cmd)
+      cmd = `foxx set-prod --server ${server} --database ${db_name} /${endpoint};\n`
+      execSync(cmd)
     }
 
   } catch (e) {
     // Fallback to install then
     console.log("Then installing /" + endpoint)
     var cmd = `foxx install --server ${server} --database ${db_name} /${endpoint} ${dest_folder};\n`
+    execSync(cmd)
+    cmd = `foxx set-prod --server ${server} --database ${db_name} /${endpoint};\n`
     execSync(cmd)
   }
 }

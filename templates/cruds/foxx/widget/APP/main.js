@@ -1,22 +1,23 @@
 'use strict';
-const db = require('@arangodb').db;
-const joi = require('joi');
-const models = require('./models.js');
-const _ = require('lodash');
-const createRouter = require('@arangodb/foxx/router');
-const sessionsMiddleware = require('@arangodb/foxx/sessions');
-const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt');
-require("@arangodb/aql/cache").properties({ mode: "on" });
+const db = require('@arangodb').db
+const joi = require('joi')
+const models = require('./models.js')
+const _ = require('lodash')
+const createRouter = require('@arangodb/foxx/router')
+const sessionsMiddleware = require('@arangodb/foxx/sessions')
+const jwtStorage = require('@arangodb/foxx/sessions/storages/jwt')
+require("@arangodb/aql/cache").properties({ mode: "on" })
 
-const router = createRouter();
-const _settings = db.foxxy_settings.firstExample();
+const router = createRouter()
+const _settings = db.foxxy_settings.firstExample()
 
 const sessions = sessionsMiddleware({
   storage: jwtStorage(_settings.jwt_secret),
   transport: 'header'
-});
-module.context.use(sessions);
-module.context.use(router);
+})
+
+module.context.use(sessions)
+module.context.use(router)
 
 var typeCast = function(type, value) {
   var value = unescape(value)
@@ -38,6 +39,10 @@ var fieldsToData = function(fields, body, headers) {
         } else {
           if(f.t == "boolean") data[f.n] = true
           else data[f.n] = typeCast(f.t, body[f.n])
+          if(f.t == "password" || f.t == "password_confirmation") {
+            data.authData = auth.create(body[f.n])
+            delete data[f.n]
+          }
         }
       }
     } else {
@@ -47,7 +52,8 @@ var fieldsToData = function(fields, body, headers) {
           body[f.n], function(v) { return typeCast(f.t,v) }
         )
       } else {
-        data[f.n][headers['foxx-locale']] = unescape(body[f.n])
+
+        data[f.n][headers['foxx-locale']] = typeCast(f.t, body[f.n])
       }
     }
   })
@@ -57,9 +63,9 @@ var fieldsToData = function(fields, body, headers) {
 // Comment this block if you want to avoid authorization
 module.context.use(function (req, res, next) {
   if(!req.session.uid) res.throw('unauthorized')
-  res.setHeader("Access-Control-Expose-Headers", "X-Session-Id")
-  next();
-});
+  res.setHeader('Access-Control-Expose-Headers', 'X-Session-Id')
+  next()
+})
 
 // -----------------------------------------------------------------------------
 router.get('/:service/page/:page/:perpage', function (req, res) {
@@ -88,10 +94,10 @@ router.get('/:service/page/:page/:perpage', function (req, res) {
          "offset": (req.pathParams.page - 1) * parseInt(req.pathParams.perpage),
          "perpage": parseInt(req.pathParams.perpage)
     }).toArray()
-  });
+  })
 })
 .header('X-Session-Id')
-.description('Returns all objects');
+.description('Returns all objects')
 // -----------------------------------------------------------------------------
 router.get('/:service/search/:term', function (req, res) {
   var locale = req.headers['foxx-locale']
@@ -115,21 +121,21 @@ router.get('/:service/search/:term', function (req, res) {
 })
 .header('foxx-locale')
 .header('X-Session-Id')
-.description('Returns First 100 found objects');
+.description('Returns First 100 found objects')
 // -----------------------------------------------------------------------------
 router.get('/:service/:id', function (req, res) {
   const collection = db._collection(req.pathParams.service)
   res.send({ fields: models()[req.pathParams.service],
-             data: collection.document(req.pathParams.id) });
+             data: collection.document(req.pathParams.id) })
 })
 .header('X-Session-Id')
-.description('Returns object within ID');
+.description('Returns object within ID')
 // -----------------------------------------------------------------------------
 router.get('/:service/fields', function (req, res) {
-  res.send({ fields: models()[req.pathParams.service] });
+  res.send({ fields: models()[req.pathParams.service] })
 })
 .header('X-Session-Id')
-.description('Get all fields to build form');
+.description('Get all fields to build form')
 // -----------------------------------------------------------------------------
 router.post('/:service', function (req, res) {
   const collection = db._collection(req.pathParams.service)
@@ -167,10 +173,10 @@ router.post('/:service', function (req, res) {
     }
     obj = collection.save(data, { waitForSync: true })
   }
-  res.send({ success: errors.length == 0, data: obj, errors: errors });
+  res.send({ success: errors.length == 0, data: obj, errors: errors })
 }).header('foxx-locale')
 .header('X-Session-Id')
-.description('Create a new object.');
+.description('Create a new object.')
 // -----------------------------------------------------------------------------
 router.post('/:service/:id', function (req, res) {
   const collection = db._collection(req.pathParams.service)
@@ -209,11 +215,11 @@ router.post('/:service/:id', function (req, res) {
     }
     obj = collection.update(object, data)
   }
-  res.send({ success: errors.length == 0, data: obj, errors: errors });
+  res.send({ success: errors.length == 0, data: obj, errors: errors })
 })
 .header('foxx-locale')
 .header('X-Session-Id')
-.description('Update an object.');
+.description('Update an object.')
 // -----------------------------------------------------------------------------
 router.patch('/:service/:id/:field/toggle', function (req, res) {
   const collection = db._collection(req.pathParams.service)
@@ -232,7 +238,7 @@ router.patch('/:service/:id/:field/toggle', function (req, res) {
 })
 .header('foxx-locale')
 .header('X-Session-Id')
-.description('Toggle boolean field.');
+.description('Toggle boolean field.')
 // -----------------------------------------------------------------------------
 router.get('/:service/:id/duplicate', function (req, res) {
   var new_obj = db._query(`
@@ -240,18 +246,18 @@ router.get('/:service/:id/duplicate', function (req, res) {
     FILTER doc._key == @key
     INSERT UNSET( doc, "_id", "_key", "_rev" ) IN @@collection RETURN NEW
   `, { "@collection": req.pathParams.service, key: req.pathParams.id }).toArray()[0]
-  res.send(new_obj);
+  res.send(new_obj)
 })
 .header('X-Session-Id')
-.description('duplicate an object.');
+.description('duplicate an object.')
 // -----------------------------------------------------------------------------
 router.delete('/:service/:id', function (req, res) {
   const collection = db._collection(req.pathParams.service)
   collection.remove(req.pathParams.service+"/"+req.pathParams.id)
-  res.send({success: true });
+  res.send({success: true })
 })
 .header('X-Session-Id')
-.description('delete an object.');
+.description('delete an object.')
 // -----------------------------------------------------------------------------
 router.put('/:service/orders/:from/:to', function (req, res) {
   const collection = db._collection(req.pathParams.service)
@@ -279,11 +285,11 @@ router.put('/:service/orders/:from/:to', function (req, res) {
 
   collection.update(doc._key, { order: to })
 
-  res.send({ success: true });
+  res.send({ success: true })
 })
   .header('foxx-locale')
   .header('X-Session-Id')
-  .description('Swap 2 items');
+  .description('Swap 2 items')
 
 // Sub
 // -----------------------------------------------------------------------------
@@ -309,10 +315,10 @@ router.get('/:service/:id/:subservice/:key/page/:page/:perpage', function (req, 
          "offset": (req.pathParams.page - 1) * parseInt(req.pathParams.perpage),
          "perpage": parseInt(req.pathParams.perpage),
          "key": req.pathParams.key,
-         "id": req.pathParams.id }).toArray() });
+         "id": req.pathParams.id }).toArray() })
 })
 .header('X-Session-Id')
-.description('Returns all sub objects');
+.description('Returns all sub objects')
 // -----------------------------------------------------------------------------
 router.post('/sub/:service/:subservice', function (req, res) {
   const collection = db._collection(req.pathParams.subservice)
@@ -332,10 +338,10 @@ router.post('/sub/:service/:subservice', function (req, res) {
 
     obj = collection.save(data, { waitForSync: true })
   }
-  res.send({ success: errors.length == 0, data: obj, errors: errors });
+  res.send({ success: errors.length == 0, data: obj, errors: errors })
 }).header('foxx-locale')
 .header('X-Session-Id')
-.description('Create a new sub object.');
+.description('Create a new sub object.')
 // -----------------------------------------------------------------------------
 router.post('/sub/:service/:subservice/:id', function (req, res) {
   const collection = db._collection(req.pathParams.subservice)
@@ -356,8 +362,8 @@ router.post('/sub/:service/:subservice/:id', function (req, res) {
 
     obj = collection.update(object, data)
   }
-  res.send({ success: errors.length == 0, data: obj, errors: errors });
+  res.send({ success: errors.length == 0, data: obj, errors: errors })
 })
 .header('foxx-locale')
 .header('X-Session-Id')
-.description('Update a sub object.');
+.description('Update a sub object.')

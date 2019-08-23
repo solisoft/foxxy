@@ -1,6 +1,7 @@
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/solisoft/foxxy)
 
+Please check https://fasty.ovh
 
 # foxxy
 

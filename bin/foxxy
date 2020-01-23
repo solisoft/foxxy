@@ -11,7 +11,7 @@ var pluralize = require('pluralize')
 var crypto = require('crypto')
 var colors = require('colors')
 var hasbin = require('hasbin')
-var version = '0.6.18'
+var version = '0.6.20'
 var user_password = crypto.randomBytes(4).toString('hex');
 const homedir = require('os').homedir();
 
@@ -245,17 +245,7 @@ var replaceInFile = function (filename, find, replace) {
   var result = data.replace(find, replace)
   fs.writeFileSync(filename, result)
 }
-var foxxy_welcome = `
-███████╗ ██████╗ ██╗  ██╗██╗  ██╗██╗   ██╗
-██╔════╝██╔═══██╗╚██╗██╔╝╚██╗██╔╝╚██╗ ██╔╝
-█████╗  ██║   ██║ ╚███╔╝  ╚███╔╝  ╚████╔╝
-██╔══╝  ██║   ██║ ██╔██╗  ██╔██╗   ╚██╔╝
-██║     ╚██████╔╝██╔╝ ██╗██╔╝ ██╗   ██║
-╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝
-`
-
-console.log(foxxy_welcome.yellow)
-console.log(('Version ' + version).yellow)
+console.log(('Foxxy - Version ' + version).yellow)
 hasbin('foxx', function (result) {
   if (!result) {
     console.log("Please install foxx-cli first : npm install -g foxx-cli".red)

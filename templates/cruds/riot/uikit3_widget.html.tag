@@ -1,3 +1,70 @@
+<@{{object}}_folders>
+  <div>
+    <ul class="uk-breadcrumb">
+      <li each={ f in path }><a href="#@{{objects}}/{f._key}">{ f.name }</a></li>
+      <li>
+        <a if={ path.length > 1 } onclick={renameFolder}><i class="far fa-edit"></i></a>
+        <a onclick={addFolder}><i class="fas fa-plus"></i></a>
+        <a if={ path.length > 1 && folders.length == 0 } onclick={deleteFolder}><i class="fas fa-trash"></i></a>
+      </li>
+    </ul>
+    <ul class="uk-list">
+      <li each={f in folders}><a href="#@{{objects}}/{f._key}"><i class="far fa-folder" /> {f.name}</a></li>
+    </ul>
+  </div>
+  <script>
+    this.folders = []
+    this.folder = {}
+    this.path = [ this.folder ]
+    this.folder_key = this.opts.folder_key || '';
+    var self = this
+
+    var loadFolder = function(folder_key) {
+      common.get(url + '/cruds/folders/@{{objects}}/' + folder_key, function(d) {
+        self.folders = d.folders
+        self.path = d.path
+        self.folder = _.last(self.path)
+        self.parent.setFolder(self.folder)
+        self.update()
+      })
+    }
+
+    addFolder(e) {
+      var name = prompt("Folder's name");
+      common.post(url + "/cruds/folders/@{{objects}}", JSON.stringify({ name: name, parent_id: self.folder._key }), function(d) {
+        loadFolder(self.folder._key)
+      })
+    }
+
+    renameFolder(e) {
+      var name = prompt("Update Folder's name");
+      common.patch(url + "/cruds/folders/@{{objects}}", JSON.stringify({ name: name, id: self.folder._key }), function(d) {
+        self.path = d.path
+        self.update()
+      })
+    }
+
+    deleteFolder(e) {
+      UIkit.modal.confirm('Are you sure? This action will destroy the folder and it\'s content')
+        .then(function() {
+          var parent = _.last(_.initial(self.path));
+          common.delete(url + "/cruds/folders/@{{objects}}/" + self.folder._key, function(d) {
+            common.get(url + "/cruds/folders/@{{objects}}/" + parent._key, function(d) {
+              self.folders = d.folders
+              self.path = d.path
+              loadFolder(parent._key)
+              self.update()
+            })
+          })
+      }, function () {
+        console.log('Rejected.')
+      });
+    }
+
+    loadFolder(this.folder_key)
+  </script>
+</@{{object}}_folders>
+
 <@{{object}}_crud_index>
 
   <a href="#" class="uk-button uk-button-small uk-button-default" onclick={ new_item }>
@@ -262,9 +329,11 @@
 </@{{object}}_new>
 
 <@{{objects}}>
+  <page_folders show={loaded} folder_key={folder_key} />
   <virtual if={can_access}>
     <div class="uk-float-right">
-      <a href="#@{{objects}}/new" class="uk-button uk-button-small uk-button-default"><i class="fas fa-plus"></i> New @{{object}}</a>
+      <a if={act_as_tree} href="#@{{objects}}/{folder._key}/new" class="uk-button uk-button-small uk-button-default"><i class="fas fa-plus"></i> New page</a>
+      <a if={!act_as_tree} href="#@{{objects}}/new" class="uk-button uk-button-small uk-button-default"><i class="fas fa-plus"></i> New page</a>
       <a if={ export } onclick="{ export_data }" class="uk-button uk-button-small uk-button-primary"><i class="fas fa-file-export"></i> Export CSV</a>
     </div>
     <h3>Listing @{{objects}}</h3>
@@ -337,6 +406,9 @@
     this.can_access = false
     this.sortable   = false
     this.loaded     = false
+    this.folder     = {}
+    this.folder_key = this.opts.folder_key || ''
+    this.act_as_tree = true
 
     this.loadPage = function(pageIndex) {
       self.loaded = false
@@ -355,6 +427,13 @@
       })
     }
     this.loadPage(1)
+
+    ////////////////////////////////////////////////////////////////////////////
+    this.setFolder = function(folder) {
+      self.folder = folder
+      self.act_as_tree = folder !== ''
+      self.loadPage(1)
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     calc_value(row, col, locale) {
@@ -452,8 +531,10 @@
           ghostClass: 'blue-background-class',
           handle: '.fa-grip-vertical',
           onSort: function (/**Event*/evt) {
+            var folder_key = "?folder_key=" + self.folder._key
+            if(!self.act_as_tree) folder_key = ''
             common.put(
-              url + 'cruds/@{{objects}}/orders/' + evt.oldIndex + "/" + evt.newIndex, {},
+              url + 'cruds/@{{objects}}/orders/' + evt.oldIndex + "/" + evt.newIndex + folder_key, {},
               function() {}
             )
           },

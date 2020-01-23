@@ -1,40 +1,40 @@
 var Common = {
   init: function init(){
     $.fn.serializeObject = function() {
-      var o = {};
-      var a = this.serializeArray();
+      var o = {}
+      var a = this.serializeArray()
       $.each(a, function() {
         if (o[this.name] !== undefined) {
           if (!o[this.name].push) {
-            o[this.name] = [o[this.name]];
+            o[this.name] = [o[this.name]]
           }
-          o[this.name].push(this.value || '');
+          o[this.name].push(this.value || '')
         } else {
-          o[this.name] = this.value || '';
+          o[this.name] = this.value || ''
         }
-      });
-      return o;
-    };
+      })
+      return o
+    }
   },
   startEditor: function(name, mode, id) {
-    var editor = ace.edit(name);
-    editor.getSession().setMode(mode);
+    console.log("Editor", name)
+    var editor = ace.edit(name)
+    editor.getSession().setMode(mode)
     editor.setOptions({
       maxLines: Infinity,
       //enableEmmet: mode == "ace/mode/html",
       theme: 'ace/theme/twilight',
       tabSize: 2, useSoftTabs: true
-    });
-    editor.getSession().setUseWrapMode(true);
-    editor.getSession().setValue(unescape($("#"+id).val()));
-    editor.getSession().on('change', function(){
-      $("#"+id).val(editor.getSession().getValue());
-    });
+    })
+    editor.getSession().setUseWrapMode(true)
+    editor.getSession().setValue(unescape($("#"+id).val()))
+    editor.getSession().on('change', function(){ $("#"+id).val(editor.getSession().getValue()); })
 
     return editor;
   },
 
   buildForm: function buildForm(obj, fields, formId, back_str, callback) {
+
     var html = ""
     var uploads = []
     var _this = this
@@ -43,141 +43,193 @@ var Common = {
     var positions = []
     var wysiwygs = []
     var html_editors = []
+    var usetab = false
+    var tabs = []
+    var tab_last_id = ''
+    var y = 0
+    var _html = ''
     fields.forEach(function(l, i) {
-      console.log(l)
-      if (l.h !== undefined) {
-        html += '<div class="uk-grid uk-grid-small uk-margin-top"><h3>'+ l.h +'</h3></div>'
-      }
-      else {
-        if (l.r && i > 0) html += '</div>'
-        if (l.r) html += '<div class="uk-grid uk-grid-small">'
-        if (l.c.indexOf("uk-width") == -1) l.c = "uk-width-" + l.c
+      if (l.tab) {
+        if (y > 0) html += "</div>"
+        if (usetab == false) html += '<ul uk-tab>'
+        if (usetab == false) tabs = []
+        usetab = true
+        html += '<li><a href="#">' + l.tab + '</a></li>'
+        if (html != '') {
+          tabs.push(_html)
+          _html = ''
+        }
+        tab_last_id = l.id
 
-        var hidden = ''
-        if(l.t === "hidden") hidden = 'uk-hidden'
-        html += '<div class="'+ l.c + ' ' + hidden +'">'
-        var title = l.l
-        if (l.j._flags.presence === "required") {
-          title = "<strong>" + title + "*</strong>"
+        y = 0
+      } else {
+        if (l.h !== undefined) {
+          _html += '<div class="uk-grid uk-grid-small uk-margin-top"><h3>'+ l.h +'</h3></div>'
         }
-        if(!((l.t === "file" || l.t === "image") && obj._id === undefined))
-          html += '<label for="" class="uk-form-label">'+ title +'</label>'
+        else {
+          if (l.r && y > 0) _html += '</div>'
+          if (l.r) _html += '<div class="uk-grid uk-grid-small">'
+          if (l.c && l.c.indexOf("uk-width") == -1) l.c = "uk-width-" + l.c
 
-        var value = obj[l.n]
+          var validation = l.j
+          if (obj['_key'] && l.ju) validation = l.ju
 
-        if(l.tr && obj[l.n]) value = obj[l.n][window.localStorage.getItem('foxx-locale')]
-        if (value === undefined) value = ""
-
-        //value = escape(value)
-        if(l.t.match(/string/)) {
-          html += '<input type="'+(l.t.split(":").length == 2 ? l.t.split(":")[1] : "text")+'" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value=""><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-          values.push([l.n, value])
-        }
-        if(l.t === "integer") {
-          html += '<input type="number" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-          values.push([l.n, value])
-        }
-        if(l.t === "float") {
-          html += '<input type="text" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value="'+value+'"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-          values.push([l.n, value])
-        }
-        if(l.t === "hidden") html += '<input type="hidden" id="'+l.n+'"  name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'">'
-        if(l.t === "date") html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="date" id="'+l.n+'" data-date-format="YYYY/MM/DD" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
-        if(l.t === "time") html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="time" id="'+l.n+'" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
-        if(l.t === "text") html += '<textarea id="'+l.n+'" class="uk-textarea" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-          if(l.t === "wysiwyg") {
-          wysiwygs.push(l.n)
-          html += '<div id="wysiwyg_'+l.n+'"></div><input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="" /><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
-          values.push([l.n, value])
-        }
-        if(l.t.match(/^code/)) {
-          html += '<input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="">'
-          values.push([l.n, value])
-          html += '<div id="editor_'+l.n+'" class="editor" style="'+l.s+'"></div>'
-          editors.push(["editor_"+l.n, "ace/mode/" + l.t.split(":")[1], l.n])
-        }
-        if (l.t == 'html') {
-          if(value != "") value = JSON.parse(value)
-          html += '<input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="">'
-          html += '<div id="html_editor_'+l.n+'" data-name="'+l.n+'" class="html_editor" style="'+l.s+'"></div>'
-          html_editors.push([l.n, value])
-        }
-        if(l.t === "list") {
-          html += '<select name="'+ l.n +'" style="width:100%" class="uk-select select_list" id="'+l.n+'">'
-          l.d.forEach(function(o) {
-            selected = ""
-            if(value === o[0]) selected="selected='selected'"
-            html += '<option value="'+ o[0] +'" '+selected+'>'+ o[1] +'</option>'
-          })
-          html += '</select>'
-        }
-        if(l.t === "multilist") {
-          html += '<select name="'+ l.n +'" style="width:100%" class="uk-select select_mlist" multiple="multiple" id="'+l.n+'">'
-          l.d.forEach(function(o) {
-            selected = ""
-            if(value && value.indexOf(o[0]) >= 0) selected="selected='selected'"
-            html += '<option value="'+ o[0] +'" '+selected+'>'+ o[1] +'</option>'
-          })
-          html += '</select>'
-        }
-        if(l.t === "tags") {
-          html +='<select name="'+l.n+'" style="width:100%" class="select_tag" multiple="multiple">'
-          var tags = l.d[0]
-          if(l.tr) tags = _.flatten(_.compact(_.map(l.d[0], function(t) { return t[window.localStorage.getItem('foxx-locale')]})))
-          tags = _.filter(tags, function(t) { return t != "undefined" })
-          _.uniq(tags).forEach(function(v) {
-            if(v != 'undefined' || v != '') {
-              selected = ""
-              if(value && value.indexOf(v) >= 0) selected="selected='selected'"
-              html += '<option value="'+ v +'" '+selected+'>'+ v +'</option>'
+          var hidden = ''
+          if(l.t === 'hidden') hidden = 'uk-hidden'
+          _html += '<div class="'+ l.c + ' ' + hidden +'">'
+          var title = l.l
+          if (_.isString(validation)) {
+            if (validation.indexOf('required') > 0) {
+              title = "<strong>" + title + "*</strong>"
             }
-          })
-          html +='</select>'
-        }
+          } else {
+            if (validation && validation._flags.presence === "required") {
+              title = "<strong>" + title + "*</strong>"
+            }
+          }
+          if(!((l.t === "file" || l.t === "image") && obj._id === undefined))
+            _html += '<label for="" class="uk-form-label">'+ title +'</label>'
 
-        if(l.t === "map") {
-          if(value === "") value = [0,0]
-          html += '<div class="uk-text-center" id="'+l.n+'_infos"><span class="uk-label"></span></div>'
-          html += '<div id="map_'+l.n+'" class="map" style="'+l.s+'"></div>'
-          html += '<input id="'+l.n+'_lat" type="hidden" name="'+l.n+'" value="'+value[0]+'" />'
-          html += '<input id="'+l.n+'_lng" type="hidden" name="'+l.n+'" value="'+value[1]+'" />'
-          positions.push([l.n, value])
-        }
-        if(l.t === "image" && obj._id) {
-          html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'
-          html += '    <span uk-icon="icon: cloud-upload"></span>'
-          html += '    <span class="uk-text-middle">Attach images by dropping them here or</span>'
-          html += '    <div uk-form-custom>'
-          html += '        <input type="file" multiple>'
-          html += '        <span class="uk-link">selecting one</span>'
-          html += '    </div>'
-          html += '</div>'
-          html += '<progress id="progressbar_'+l.n+'" class="uk-progress" value="0" max="100" hidden></progress>'
+          var value = obj[l.n]
 
-          html += '<images i18n="'+l.tr+'" field="'+l.n+'" id="'+obj._id+'" />'
-          uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.(jpg|jpeg|gif|png)', 'progressbar_'+l.n, '#upload-drop_'+l.n, l.tr])
+          if(l.tr && obj[l.n]) value = obj[l.n][window.localStorage.getItem('foxx-locale')]
+          if (value === undefined) value = ""
+
+          //value = escape(value)
+          if(l.t.match(/string/)) {
+            _html += '<input type="'+(l.t.split(":").length == 2 ? l.t.split(":")[1] : "text")+'" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value="" autocomplete="off"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+            values.push([l.n, value])
+          }
+          if(l.t.match(/password/)) {
+            _html += '<input type="password" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value="" autocomplete="off"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+          }
+          if(l.t === "integer") {
+            _html += '<input type="number" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value="'+value+'" autocomplete="off"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+            values.push([l.n, value])
+          }
+          if(l.t === "float") {
+            _html += '<input type="text" id="'+l.n+'" class="uk-input" name="'+ l.n +'" value="'+value+'" autocomplete="off"><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+            values.push([l.n, value])
+          }
+          if(l.t === "hidden") _html += '<input type="hidden" id="'+l.n+'"  name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'">'
+          if(l.t === "date") _html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="date" id="'+l.n+'" data-date-format="YYYY/MM/DD" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
+          if(l.t === "time") _html += '<div><div class="uk-inline"><span class="uk-form-icon" uk-icon="icon: calendar"></span><input type="time" id="'+l.n+'" class="uk-input" name="'+ l.n +'"  value="'+value+'"></div><div data-hint="'+ l.n +'" class="uk-text-danger"></div></div>'
+          if(l.t === "text") _html += '<textarea id="'+l.n+'" class="uk-textarea" name="'+ l.n +'" style="'+l.s+'">'+ value +'</textarea><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+            if(l.t === "wysiwyg") {
+            wysiwygs.push(l.n)
+            _html += '<div id="wysiwyg_'+l.n+'"></div><input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="" /><div data-hint="'+ l.n +'" class="uk-text-danger"></div>'
+            values.push([l.n, value])
+          }
+          if(l.t.match(/^code/)) {
+            _html += '<input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="">'
+            values.push([l.n, value])
+            _html += '<div id="editor_'+l.n+'" class="editor" style="'+l.s+'"></div>'
+            editors.push(["editor_"+l.n, "ace/mode/" + l.t.split(":")[1], l.n])
+          }
+          if (l.t == 'html') {
+            _html += '<input type="hidden" id="'+l.n+'" name="'+ l.n +'" value="">'
+            _html += '<div id="html_editor_'+l.n+'" data-name="'+l.n+'" class="html_editor" style="'+l.s+'"></div>'
+            html_editors.push([l.n, value])
+          }
+          if(l.t === "list") {
+            _html += '<select name="'+ l.n +'" style="width:100%" class="uk-select select_list" id="'+l.n+'">'
+            l.d.forEach(function(o) {
+              selected = ""
+              if(value === o[0]) selected="selected='selected'"
+              _html += '<option value="'+ o[0] +'" '+selected+'>'+ o[1] +'</option>'
+            })
+            _html += '</select>'
+          }
+          if(l.t === "multilist") {
+            _html += '<select name="'+ l.n +'" style="width:100%" class="uk-select select_mlist" multiple="multiple" id="'+l.n+'">'
+            l.d.forEach(function(o) {
+              selected = ""
+              if(value && value.indexOf(o[0]) >= 0) selected="selected='selected'"
+              _html += '<option value="'+ o[0] +'" '+selected+'>'+ o[1] +'</option>'
+            })
+            _html += '</select>'
+          }
+          if(l.t === "tags") {
+            _html +='<select name="'+l.n+'" style="width:100%" class="select_tag" multiple="multiple">'
+            var tags = l.d[0]
+            if(l.tr) tags = _.flatten(_.compact(_.map(l.d[0], function(t) { return t[window.localStorage.getItem('foxx-locale')]})))
+            tags = _.filter(tags, function(t) { return t != "undefined" })
+            _.uniq(tags).forEach(function(v) {
+              if(v != 'undefined' || v != '') {
+                selected = ""
+                if(value && value.indexOf(v) >= 0) selected="selected='selected'"
+                _html += '<option value="'+ v +'" '+selected+'>'+ v +'</option>'
+              }
+            })
+            _html +='</select>'
+          }
+
+          if(l.t === "map") {
+            if(value === "") value = [0,0]
+            _html += '<div class="uk-text-center" id="'+l.n+'_infos"><span class="uk-label"></span></div>'
+            _html += '<div id="map_'+l.n+'" class="map" style="'+l.s+'"></div>'
+            _html += '<input id="'+l.n+'_lat" type="hidden" name="'+l.n+'" value="'+value[0]+'" />'
+            _html += '<input id="'+l.n+'_lng" type="hidden" name="'+l.n+'" value="'+value[1]+'" />'
+            positions.push([l.n, value])
+          }
+          if(l.t === "image" && obj._id) {
+            _html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'
+            _html += '    <span uk-icon="icon: cloud-upload"></span>'
+            _html += '    <span class="uk-text-middle">Attach images by dropping them here or</span>'
+            _html += '    <div uk-form-custom>'
+            _html += '        <input type="file" multiple>'
+            _html += '        <span class="uk-link">selecting one</span>'
+            _html += '    </div>'
+            _html += '</div>'
+            _html += '<progress id="progressbar_'+l.n+'" class="uk-progress" value="0" max="100" hidden></progress>'
+
+            _html += '<images i18n="'+l.tr+'" field="'+l.n+'" id="'+obj._id+'" />'
+            uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.(jpg|jpeg|gif|png)', 'progressbar_'+l.n, '#upload-drop_'+l.n, l.tr])
+          }
+          if(l.t === "file" && obj._id) {
+            _html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'
+            _html += '    <span uk-icon="icon: cloud-upload"></span>'
+            _html += '    <span class="uk-text-middle">Attach binaries by dropping them here or</span>'
+            _html += '    <div uk-form-custom>'
+            _html += '        <input type="file" multiple>'
+            _html += '        <span class="uk-link">selecting one</span>'
+            _html += '    </div>'
+            _html += '</div>'
+            _html += '<progress id="progressbar_'+l.n+'" class="uk-progress" value="0" max="100" hidden></progress>'
+            _html += '<files i18n="'+l.tr+'" field="'+l.n+'" id="'+obj._id+'" />'
+            uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.*', 'progressbar_'+l.n, '#upload-drop_'+l.n, l.tr])
+          }
+          if(l.t === "boolean") {
+            var checked = obj[l.n] === true ? " checked='checked' " : ''
+            _html += ' <input name="'+ l.n +'" '+ checked +'  class="uk-checkbox" type="checkbox" value="1"  /> '
+          }
+
+          _html += '</div>'
+
+          if (!usetab) {
+            html += _html
+            _html = ''
+          }
+
+          if (l.endtab == true) {
+            if (html != '') tabs.push(_html)
+            _html = ''
+            usetab = false
+            html += '</ul><ul class="uk-switcher">{{'+tab_last_id+'}}</ul>'
+          }
+          y++
         }
-        if(l.t === "file" && obj._id) {
-          html += '<div id="upload-drop_'+l.n+'" class="js-upload uk-placeholder uk-text-center">'
-          html += '    <span uk-icon="icon: cloud-upload"></span>'
-          html += '    <span class="uk-text-middle">Attach binaries by dropping them here or</span>'
-          html += '    <div uk-form-custom>'
-          html += '        <input type="file" multiple>'
-          html += '        <span class="uk-link">selecting one</span>'
-          html += '    </div>'
-          html += '</div>'
-          html += '<progress id="progressbar_'+l.n+'" class="uk-progress" value="0" max="100" hidden></progress>'
-          html += '<files i18n="'+l.tr+'" field="'+l.n+'" id="'+obj._id+'" />'
-          uploads.push([obj._key, obj._id.split('/')[0], l.n, '*.*', 'progressbar_'+l.n, '#upload-drop_'+l.n, l.tr])
-        }
-        if(l.t === "boolean") {
-          var checked = obj[l.n] === true ? " checked='checked' " : ''
-          html += ' <input name="'+ l.n +'" '+ checked +'  class="uk-checkbox" type="checkbox" value="1"  /> '
-        }
-        html += '</div>'
       }
     })
+
     html += '</div>'
+
+    if (tabs.length > 0) {
+      var switcher = ""
+      _.each(tabs, function (t) { if (t!='') switcher += "<li>" + t + "</li>" })
+      html = html.replace('{{'+ tab_last_id +'}}', switcher)
+    }
+
     html += '<hr><div class="uk-grid uk-grid-small uk-text-right"><div class="uk-width-1-1">'
 
     if (back_str != undefined) {
@@ -247,9 +299,7 @@ var Common = {
     opts = opts||{}
     var _this = this
     var json = $("#"+ formID).serializeObject()
-    _.each(json, function(v, k) {
-      if(k.split('-')[0] == "trumbowyg") delete json[k];
-    })
+    _.each(json, function(v, k) { if(k.split('-')[0] == "trumbowyg") delete json[k] })
 
     $('.select_tag, .select_mlist').each(function(i, st) {
       if(typeof json[$(st).attr("name")] === "string") {
@@ -281,7 +331,8 @@ var Common = {
 
         if(objID == "" && _.isEmpty(opts)) {
           objID = d.data._key
-          path = path.split("/").length == 2 ? path.split("/")[1] : path
+          if(path.split('/')[0] != 'datasets')
+            path = path.split("/").length == 2 ? path.split("/")[1] : path
           route("/"+ path +"/" + objID + "/edit")
         }
         if(!_.isEmpty(opts)) {
